@@ -102,6 +102,8 @@ class NameGenerator
                     resp += 'Here are your ' + limit + ' fantasy place names:\n\n';
                 } else if(type === 'land'){
                     resp += 'Here are your ' + limit + ' fantasy land names:\n\n';
+                } else if(type === 'book'){
+                    resp += 'Here are your ' + limit + ' book titles:\n\n';
                 }
                 
                 resp += results.join('\n');
