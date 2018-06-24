@@ -1,0 +1,21 @@
+{
+
+        "names": {
+        
+            "1": ["b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "y", "z", "d", "r", "t", "n", "d", "r", "n", "m", "t"],
+            "2": ["a", "e", "i", "o", "u", "a", "e"],
+        
+        
+            "3": ["br", "by", "bl", "cr", "ch", "cl", "dr", "fr", "fl", "gr", "gl", "kr", "pr", "pl", "st", "sl", "sh", "sm", "sy", "tr", "th", "wr"],
+            "4": ["a", "ae", "au", "ao", "ai", "ea", "eo", "eu", "e", "ua", "ue", "uo", "u", "ia", "io", "ie", "i", "oa", "oe", "ou", "oi", "o"],
+            "5": ["ral", "ver", "len", "he", "hei", "str", "po", "ol", "oli", "vis", "mar", "mard", "an", "ros", "cal", "ber", "mer", "dak", "pro", "prom", "sha", "shar", "von", "sun", "car", "cara", "jas", "na", "nau", "pen", "ros", "ava", "ken", "len", "ny", "nin", "yel", "aar", "at", "ate", "aten", "mor", "sky", "cyr", "nyx", "syr", "mov", "alen", "tam", "ald", "els", "val", "ara", "ata", "ala", "ale", "are", "ate", "ada", "ala", "ata", "atu", "alt", "aln", "eca", "ece", "eda", "ede", "ela", "eli", "elo", "era", "ero", "er", "eta", "eto", "eti", "eys", "eyl", "eo", "eon", "aeo", "ae", "arn", "art", "ent", "eno", "ena", "enu", "ex", "exr", "esa", "est", "ese", "il", "in", "it", "ord", "orb", "orn", "orl", "ola", "olo", "opa", "ope", "oda", "ode", "odi", "ola", "olo", "oli", "ole", "oly", "ona", "oma", "ono", "omo", "one", "ome", "oni", "omi", "lor", "sum", "ner", "sep", "jag", "yok", "ka", "kam", "tan", "rem", "mez", "elv", "og", "ser", "am", "bes", "bet", "mad", "end", "isr", "eul", "san", "lis", "har", "lem", "kin", "un", "shal", "shan", "dov"],
+            
+            
+            "6": ["dra", "rim", "run", "riel", "ra", "ceta", "ty", "the", "nia", "sal", "lor", "ca", "lan", "ren", "ron", "roth", "rin", "run", "tan", "ten", "ton", "tin", "tun", "ven", "vin", "von", "wan", "win", "won", "yon", "yan", "yn", "pan", "dan", "don", "din", "lan", "len", "lon", "lin", "lun", "man", "men", "mon", "so", "za", "na", "ma", "la", "lo", "ro", "ra", "ta", "to", "holm", "kin", "let"],
+            "7": ["our", "ania", "ia", "oria", "ana", "ena", "era", "ara", "am", "ar", "er", "ir", "or", "ur", "ad", "ed", "od", "et", "at", "eta", "ota", "on", "en", "in", "em", "on", "ol", "ian", "ith", "undr", "un"]
+        
+	},
+	"formats": ["$5$6", "$5$7", "$3$2$6", "$3$4$6", "$3$2$6", "$1$2$3$6", "$2$3$7", "$5$2$7", "$5$1$2$6", "$5$2$1$6"],
+	"limit": 20
+
+}

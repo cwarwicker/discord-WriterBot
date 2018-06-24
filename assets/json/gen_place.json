@@ -1,0 +1,18 @@
+{
+
+    "names": {
+        
+        "0": ["kings", "queens", "dragons", "blue", "green", "red", "white", "yellow", "black", "grey", "violet", "gold", "silver", "light", "dark", "day", "night", "shadow", "sun", "moon", "pine", "oak", "birch", "river", "raven", "wolf", "dawn", "night", "star", "stone", "wood", "iron", "blood", "great", "little", "emerald", "ruby",  "rose", "skull", "death", "deep", "ash", "north", "south", "west", "east", "rain", "sea", "new", "old", "sword", "arrow", "frost", "flame", "fire", "ice", "myth", "myst", "slow", "quick", "hammer"],
+        "1": ["morn", "ton", "town", "dale", "pale", " city", "caster", "cester", "chester", "haven", "cott", "dean", "den", "don", "field", "firth", "helm", "ham", "mouth", "set", "star", "pool", "stead", "wick", "worth", "down", "downs", "springs", "ford", "forth", "ville", "bridge", "market", "land", "cliff", "gate", "port", "avon", "walk", "ash", "glen", "grove", "acre", "wood", "ward", "hill", "water", "born", "tree", "falls", "watch", "peak", "run", "hold", "spire", "shield", "fell", "glade", "shore"],
+        "2": ["ral", "ver", "len", "he", "hei", "str", "po", "ol", "oli", "vis", "mar", "mard", "an", "ros", "cal", "ber", "mer", "dak", "pro", "prom", "sha", "shar", "von", "sun", "car", "cara", "jas", "na", "nau", "pen", "ros", "ava", "ken", "len", "ny", "nin", "yel", "aar", "at", "ate", "aten", "mor", "sky", "cyr", "nyx", "syr", "mov", "alen", "tam", "ald", "els", "val", "ara", "ata", "ala", "ale", "are", "ate", "ada", "ala", "ata", "atu", "alt", "aln", "eca", "ece", "eda", "ede", "ela", "eli", "elo", "era", "ero", "er", "eta", "eto", "eti", "eys", "eyl", "eo", "eon", "aeo", "ae", "arn", "art", "ent", "eno", "ena", "enu", "ex", "exr", "esa", "est", "ese", "il", "in", "it", "ord", "orb", "orn", "orl", "ola", "olo", "opa", "ope", "oda", "ode", "odi", "ola", "olo", "oli", "ole", "oly", "ona", "oma", "ono", "omo", "one", "ome", "oni", "omi", "lor", "sum", "ner", "sep", "jag", "yok", "ka", "kam", "tan", "rem", "mez", "elv", "og", "ser", "am", "bes", "bet", "mad", "end", "isr", "eul", "san", "lis", "har", "lem", "kin", "un", "shal", "shan"],
+        "3": ["a", "e", "i", "o", "u", "a", "e"],
+        "4": ["dra", "rim", "run", "riel", "ra", "ceta", "ty", "the", "nia", "sal", "lor", "ca", "lan", "ren", "ron", "roth", "rin", "run", "tan", "ten", "ton", "tin", "tun", "ven", "vin", "von", "wan", "win", "won", "yon", "yan", "yn", "pan", "dan", "don", "din", "lan", "len", "lon", "lin", "lun", "man", "men", "mon", "so", "za", "na", "ma", "la", "lo", "ro", "ra", "ta", "to", "holm", "kin", "let", "ris", "hus"],
+        "5": ["reach", "leap", "stand", "brink", "rift", "pale", "sadness", "sacrifice", "embrace", "ascent", "desolation", "dream", "heart", "end", "rest", "refuge", "tears"],
+        "6": ["arch", "forest", "wood", "hollow", "fen", "coast", "wildlands", "shore", "mountain", "cove", "grove", "pass", "keep", "camp", "ridge", "crossing", "gorge", "passage", "watch", "palace", "castle", "farm", "throne", "rock", "ruins", "barrow", "citadel", "tower", "causeway", "desert", "jungle", "wastes", "lair", "bridge", "labyrinth", "swamp", "lands", "vale", "valley", "highlands", "lowlands", "foothills", "glade", "peak", "mesa", "altar", "temple", "church", "gate", "post", "bay", "shrine", "mine", "cave", "cavern"],
+        "7": ["king's", "queen's", "dragon's", "empire's", "divinity's", "divine's", "sky's", "ocean's", "dawn's", "twilight's", "giant's", "heroes'", "death's"]
+    		   
+	},
+	
+	"formats": ["$0$1", "$0$1 $6", "$2$3$4 $6", "$7 $5", "$0 $6", "$2$3$4's $5"]
+
+}
