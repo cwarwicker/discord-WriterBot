@@ -54,8 +54,8 @@ module.exports = class SprintCommand extends Command {
         
         this.defaults = {
             length: 20,
-            delay: 1,
-            post_delay: 10
+            delay: 2,
+            post_delay: 120
         };
         
         this.max = {
@@ -119,6 +119,10 @@ module.exports = class SprintCommand extends Command {
             this.run_end(msg);
         }
         
+        else if(opt1 === 'help'){
+            this.run_help(msg);
+        }
+        
     }
     
     is_sprinting(){
@@ -165,6 +169,38 @@ module.exports = class SprintCommand extends Command {
         return (declared === userArray.length);
         
     }
+    
+    run_help(msg){
+       
+        var output = `
+**Sprint Info**
+Write with your friends and see who can write the most in the time limit!                        
+                        
+**Sprint Default Settings**
+\`length\` ${this.defaults.length} minutes
+\`delay\` ${this.defaults.delay} minute
+                        
+**Sprint Commands**
+\`sprint start\` Quick-start a sprint with the default settings
+\`sprint for 30 in 5\` Sprint for 30 minutes, starting in 5 minutes 
+\`sprint for 30 now\` Sprint for 30 minutes, starting immediately
+\`sprint join\` Join the current sprint
+\`sprint join 1000\` Join the current sprint, with a starting wordcount of 1000 (written before the sprint started)
+\`sprint leave\` Leave the current sprint
+\`sprint time\` Check how long is remaining
+\`sprint users\` Display a list of the users taking part in the sprint
+\`sprint cancel\` Cancel the current sprint for all users (you must be the sprint creator or a server moderator to do this)
+\`sprint wc 2000\` Declare your finished word count is 2000 words (total written by the end of the sprint)
+                        
+**Sprint Tips**
+If you join the sprint with a starting wordcount, remember to declare your total word count at the end, not just the amount of words you wrote in the sprint.
+e.g. if you joined with 1000 words, and during the sprint you wrote another 500 words, your final wordcount you should declare would be 1500
+`;
+        msg.say(output);
+        
+    }
+    
+    
         
     run_declare(msg, amount){
         
@@ -217,20 +253,24 @@ module.exports = class SprintCommand extends Command {
     
     run_users(msg){
         
-        // Check if you are already in the sprint
-        var userArray = this.guildSettings.sprint.users;
-        
-        var users = [];
-        for (var i = 0; i < userArray.length; i++){
-            var user = msg.guild.member(userArray[i].user);
-            if (user !== null){
-                users.push(user.user.username);
+        if (this.is_sprinting()){
+            
+            // Check if you are already in the sprint
+            var userArray = this.guildSettings.sprint.users;
+
+            var users = [];
+            for (var i = 0; i < userArray.length; i++){
+                var user = msg.guild.member(userArray[i].user);
+                if (user !== null){
+                    users.push(user.user.username);
+                }
             }
-        }
+
+            var output = 'Sprint Participants: ';
+            output += users.join(', ');
+            msg.say(output);
         
-        var output = 'Sprint Participants: ';
-        output += users.join(', ');
-        msg.say(output);
+        }
         
     }
     
@@ -389,8 +429,8 @@ module.exports = class SprintCommand extends Command {
                 sIn = this.defaults.delay;
             }
             
-//            sFor = Math.floor(sFor);
-//            sIn = Math.floor(sIn);
+            sFor = Math.ceil(sFor);
+            sIn = Math.ceil(sIn);
             
             var start = now + (sIn * 60);
             var end = start + (sFor * 60);
@@ -401,9 +441,9 @@ module.exports = class SprintCommand extends Command {
                 start: start,
                 end: end,
                 created: now,
-                createdBy: '267035345537728512',
+                createdBy: msg.author.id,
                 users: [{
-                    user: '267035345537728512',
+                    user: msg.author.id,
                     s_wc: 0,
                     e_wc: 0
                 }]
