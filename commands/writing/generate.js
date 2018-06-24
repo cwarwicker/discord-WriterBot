@@ -1,5 +1,4 @@
 const { Command } = require('discord.js-commando');
-const reassurances = require('./../../assets/json/reassure.json');
 const NameGenerator = require('./../../structures/gen.js');
 
 module.exports = class GenerateCommand extends Command {
