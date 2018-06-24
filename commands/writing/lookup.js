@@ -10,8 +10,8 @@ module.exports = class LookupCommand extends Command {
             aliases: ['define'],
             group: 'writing',
             memberName: 'lookup',
-            description: 'Looks up the definitions of a given word, using the Oxford English Dictionary API. Add the flag "-s" to search for synonymns instead of definitions.',
-            examples: ['lookup house', 'lookup happy -s'],
+            description: 'Looks up the definitions of a given word, using the Oxford English Dictionary API. Add the flag "s" to search for synonymns instead of definitions.',
+            examples: ['lookup happy', 'lookup happy s'],
             args: [
                 {
                     key: 'word',
@@ -20,7 +20,7 @@ module.exports = class LookupCommand extends Command {
                 },
                 {
                     key: 'flag',
-                    default: '-d',
+                    default: 'd',
                     prompt: '',
                     type: 'string'
                 }
@@ -35,8 +35,8 @@ module.exports = class LookupCommand extends Command {
     run(msg, {word, flag}) {
         
         
-        var type = (flag === '-s') ? 'synonyms' : 'definitions';
-        var url = (flag === '-s') ? 'https://od-api.oxforddictionaries.com:443/api/v1/entries/en/'+word+'/synonyms' : 'https://od-api.oxforddictionaries.com:443/api/v1/entries/en/'+word;
+        var type = (flag === 's') ? 'synonyms' : 'definitions';
+        var url = (flag === 's') ? 'https://od-api.oxforddictionaries.com:443/api/v1/entries/en/'+word+'/synonyms' : 'https://od-api.oxforddictionaries.com:443/api/v1/entries/en/'+word;
 
         var message = '';
 

@@ -72,9 +72,15 @@ module.exports = class SprintCommand extends Command {
         this.data = new Data(msg.guild);
         this.guildSettings = this.data.g();
         
+        // Create sprint object, if there isn't one
         if (this.guildSettings.sprint === undefined){
             this.guildSettings.sprint = {};
         }  
+        
+        // Create records array, if there isn't one
+        if (this.guildSettings.records === undefined){
+            this.guildSettings.records = [];
+        }
                         
         // Start a sprint
         if (opt1 === 'start'){
@@ -115,12 +121,16 @@ module.exports = class SprintCommand extends Command {
             this.run_declare(msg, opt2);
         }
         
-        else if(opt1 === 'end'){
+        else if (opt1 === 'end'){
             this.run_end(msg);
         }
         
-        else if(opt1 === 'help'){
+        else if (opt1 === 'help'){
             this.run_help(msg);
+        }
+        
+        else if (opt1 === 'pb' || opt1 === 'record'){
+            this.run_pb(msg);
         }
         
     }
@@ -191,6 +201,7 @@ Write with your friends and see who can write the most in the time limit!
 \`sprint users\` Display a list of the users taking part in the sprint
 \`sprint cancel\` Cancel the current sprint for all users (you must be the sprint creator or a server moderator to do this)
 \`sprint wc 2000\` Declare your finished word count is 2000 words (total written by the end of the sprint)
+\`sprint pb\` Shows you your Personal Best words-per-minute from sprints done on this server                        
                         
 **Sprint Tips**
 If you join the sprint with a starting wordcount, remember to declare your total word count at the end, not just the amount of words you wrote in the sprint.
@@ -200,7 +211,27 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
         
     }
     
-    
+    run_pb(msg){
+        
+        var records = this.guildSettings.records;
+
+        // First check if they even have a record
+        var index = records.findIndex(function(i){
+            return (i.user == msg.author.id && i.record === 'wpm');
+        });
+
+        // If they don't have one, create one now
+        if (index < 0){
+            var userRecord = {user: msg.author.id, record: 'wpm', value: 0};
+            records.push(userRecord);
+            this.data.s(this.guildSettings);
+        } else {
+            var userRecord = records[index];
+        }
+        
+        return msg.say(`${msg.author}, your WPM personal best is **${userRecord.value}**`);                                
+        
+    }
         
     run_declare(msg, amount){
         
@@ -429,8 +460,8 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 sIn = this.defaults.delay;
             }
             
-            sFor = Math.ceil(sFor);
-            sIn = Math.ceil(sIn);
+//            sFor = Math.ceil(sFor);
+//            sIn = Math.ceil(sIn);
             
             var start = now + (sIn * 60);
             var end = start + (sFor * 60);
@@ -451,17 +482,24 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             
             this.data.s(this.guildSettings);
             
-            var left = lib.secsToMins( (delay / 1000) );
+            // If we are starting immediately, display that message instead of the standard one
+            if (delay === 0){
+                this.post_start_message(msg);
+            } else {
             
-            var output = '\:alarm_clock:  **STARTING SPRINT**\n\nThe next sprint starts in ' + left.m + ' minute(s) and will run for ' + sFor + ' minute(s). `sprint join` to join this sprint.\n';
-            output += `${msg.author}`;
+                var left = lib.secsToMins( (delay / 1000) );
+
+                var output = '\:alarm_clock:  **STARTING SPRINT**\n\nThe next sprint starts in ' + left.m + ' minute(s) and will run for ' + sFor + ' minute(s). `sprint join` to join this sprint.\n';
+                output += `${msg.author}`;
+
+                msg.say(output);
+
+                // Set timeout to alert users when it starts
+                this.messageTimeout = setTimeout(function(){
+                    obj.post_start_message(msg);
+                }, delay);
             
-            msg.say(output);
-            
-            // Set timeout to alert users when it starts
-            this.messageTimeout = setTimeout(function(){
-                obj.post_start_message(msg);
-            }, delay);
+            }
             
         } else {
             msg.say('There is already a sprint running on this server. Please wait until it has finished before creating a new one.');
@@ -499,7 +537,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             }, delay);
             
             // Post the starting message
-            var output = '\:writing_hand: **THE SPRINT BEGINS**\n\nGet writing, you have ' + left.m + ' minutes.\n';
+            var output = '\:writing_hand: **THE SPRINT BEGINS**\n\nGet writing, you have ' + left.m + ' minute(s).\n';
             output += users.join(', ');
             msg.say(output);
                                                     
@@ -548,6 +586,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
         var obj = this;
         var now = Math.floor(new Date() / 1000);
         var sprint = this.guildSettings.sprint;
+        var records = this.guildSettings.records;
         
         if (this.is_sprinting()){
             
@@ -558,12 +597,38 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             var result = [];
             var userArray = sprint.users;
             
+            // Loop through the users and add their wordcount and wpm into the results array
             for (var i = 0; i < userArray.length; i++){
+                
                 var usr = userArray[i];
                 if (usr.e_wc > 0){
+                    
                     var count = usr.e_wc - usr.s_wc;
                     var wpm = count / ((sprint.end - sprint.start) / 60);
-                    result.push({user: usr.user, count: count, wpm: wpm});
+                    var newWpmRecord = 0;
+                    
+                    // Check their record to see if they beat it
+                    // First check if they even have a record
+                    var index = records.findIndex(function(i){
+                        return (i.user == usr.user && i.record === 'wpm');
+                    });
+                    
+                    // If they don't have one, create one now
+                    if (index < 0){
+                        var userRecord = {user: usr.user, record: 'wpm', value: 0};
+                        records.push(userRecord);
+                    } else {
+                        var userRecord = records[index];
+                    }
+                                        
+                    // Compare it to their wpm from this sprint and update if necessary
+                    if (wpm > userRecord.value){
+                        userRecord.value = wpm;
+                        newWpmRecord = 1;
+                    }
+                                        
+                    result.push({user: usr.user, count: count, wpm: wpm, newWpmRecord: newWpmRecord});
+                    
                 }
 
             }
@@ -580,7 +645,11 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             // Post the message
             var output = '\:trophy: **THE RESULTS ARE IN**\n\nCongratulations to everyone:\n';
             for (var i = 0; i < result.length; i++){
-                output += '`'+(i+1)+'`. <@' + result[i].user + '> - **' + result[i].count + ' words** ('+result[i].wpm+' wpm)\n';
+                output += '`'+(i+1)+'`. <@' + result[i].user + '> - **' + result[i].count + ' words** ('+result[i].wpm+' wpm) ';
+                if (result[i].newWpmRecord === 1){
+                    output += '\:champagne: **NEW WPM PB**'
+                }
+                output += '\n';
             }
             
             msg.say(output);
