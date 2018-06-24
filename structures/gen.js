@@ -1,4 +1,6 @@
 const fs = require('fs');
+const path = require('path');
+
 const maxLimit = 25;
 
 class NameGenerator
@@ -23,17 +25,18 @@ class NameGenerator
         }
         
         // Load the source
-        var path = 'assets/json/gen_'+type+'.json';
-        
+        var filepath = 'assets/json/gen_'+type+'.json';
+                
         try {
             
-            let result = fs.statSync('./'+path);
-            
+            let result = fs.statSync('./'+filepath);
+                        
             // Exists
             if (result.isFile()){
-                
+                                                
                 // Get the contents of the json file
-                var source = require('./../../'+path);
+                var source = require('./../'+filepath);
+                                
                 var results = [];
                 var retries = 0;
                                 
@@ -110,6 +113,7 @@ class NameGenerator
             }
             
         } catch(e){
+            console.log(e);
             return null;
         }
         
