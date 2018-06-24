@@ -26,3 +26,4 @@ $RECYCLE.BIN/
 nbproject/
 package-lock.json
 node_modules/
+data/
