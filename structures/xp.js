@@ -8,8 +8,9 @@ class XP
     {
         
         // Exp amounts
-        this.XP_COMPLETE_SPRINT = 10;
+        this.XP_COMPLETE_SPRINT = 25;
         this.XP_WIN_SPRINT = 100;
+        this.XP_COMPLETE_CHALLENGE = 50;
         
         this.msg = msg;
         this.data = new Data(msg.guild);

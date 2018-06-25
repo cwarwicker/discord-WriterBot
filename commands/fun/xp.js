@@ -9,8 +9,8 @@ module.exports = class XPCommand extends Command {
             aliases: ['level'],
             group: 'fun',
             memberName: 'xp',
-            description: 'Checks your server Experience Points and Level',
-            examples: ['xp'],
+            description: 'Checks your server Experience Points and Level. Use the "top" flag to see the top 10 on this server.',
+            examples: ['xp', 'xp top'],
             args: [
                 {
                     key: 'who',
@@ -49,15 +49,16 @@ module.exports = class XPCommand extends Command {
             
             var output = `\:trophy: LEADERBOARD\n\n`;
             
-            for (var i = 0; i < 10; i++){
+            for (var i = 0; i < show; i++){
                 
                 var pos = i + 1;
                 var record = all[i];
                 
                 if (record !== undefined){
                 
+                    var userObj = msg.guild.members.find('id', record.user);
                     var lvl = xp.calcLvl(record.xp);
-                    output += `\`${pos}.\` <@${record.user}> - **Level ${lvl}** (${record.xp}xp)\n`;
+                    output += `\`${pos}.\` ${userObj.user.username} - **Level ${lvl}** (${record.xp}xp)\n`;
                 
                 }
                 
