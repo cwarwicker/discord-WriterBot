@@ -1,6 +1,7 @@
 const { Command } = require('discord.js-commando');
 const Data = require('./../../structures/data.js');
 const lib = require('./../../lib.js');
+const XP = require('./../../structures/xp.js');
 
 /**
  * sprint start - Starts one with default settings (20 min length, starting in 2 mins) - DONE
@@ -229,7 +230,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             var userRecord = records[index];
         }
         
-        return msg.say(`${msg.author}, your WPM personal best is **${userRecord.value}**`);                                
+        return msg.say(`${msg.author}, your personal best is **${userRecord.value}** words-per-minute`);                                
         
     }
         
@@ -271,7 +272,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             this.data.s(this.guildSettings);
             
             msg.say(`${msg.author} word count updated: ${user.e_wc} (${written} new)`);
-            
+                        
             // Are all users declared now?
             if (this.is_declaration_finished()){
                 this.finish(msg);
@@ -460,9 +461,9 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 sIn = this.defaults.delay;
             }
             
-//            sFor = Math.ceil(sFor);
-//            sIn = Math.ceil(sIn);
-            
+            sFor = Math.ceil(sFor);
+            sIn = Math.ceil(sIn);
+                        
             var start = now + (sIn * 60);
             var end = start + (sFor * 60);
             var delay = (start - now) * 1000;
@@ -587,6 +588,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
         var now = Math.floor(new Date() / 1000);
         var sprint = this.guildSettings.sprint;
         var records = this.guildSettings.records;
+        var xp = new XP(msg);
         
         if (this.is_sprinting()){
             
@@ -626,30 +628,60 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                         userRecord.value = wpm;
                         newWpmRecord = 1;
                     }
-                                        
-                    result.push({user: usr.user, count: count, wpm: wpm, newWpmRecord: newWpmRecord});
                     
+                    
+                    // Add the xp to their user record
+                    xp.add(usr.user, xp.XP_COMPLETE_SPRINT);
+                    
+                    // Push to result dataset
+                    result.push({user: usr.user, count: count, wpm: wpm, newWpmRecord: newWpmRecord, xp: xp.XP_COMPLETE_SPRINT});
+                                        
                 }
 
             }
+            
             
             // Sort results
             result.sort(function(a, b){ 
                 return a.count < b.count;
             });
+                                   
+            
+            // Now we loop through them and apply extra xp
+            for(var k = 0; k < result.length; k++){
+                
+                // If finished in top 5 and more than 1 person took part, get more exp
+                if (k >= 0 && k <= 4 && result.length > 1){
+                    
+                    var pos = k + 1;
+                    var newXp = Math.ceil(xp.XP_WIN_SPRINT / pos);
+                                        
+                    // Add to user record
+                    xp.add(result[k].user, newXp);
+                    result[k].xp += newXp;
+                    
+                }
+                
+            }
+                        
                         
             // Unset the sprint data
             this.guildSettings.sprint = {};
             this.data.s(this.guildSettings);
             
             // Post the message
-            var output = '\:trophy: **THE RESULTS ARE IN**\n\nCongratulations to everyone:\n';
+            var output = '\:checkered_flag: **THE RESULTS ARE IN**\n\nCongratulations to everyone:\n';
             for (var i = 0; i < result.length; i++){
+                
                 output += '`'+(i+1)+'`. <@' + result[i].user + '> - **' + result[i].count + ' words** ('+result[i].wpm+' wpm) ';
+                
                 if (result[i].newWpmRecord === 1){
-                    output += '\:champagne: **NEW WPM PB**'
+                    output += '\:champagne: **NEW PB**'
                 }
+                
+                output += '     +' + result[i].xp + 'xp';
                 output += '\n';
+                
             }
             
             msg.say(output);

@@ -22,14 +22,14 @@ function secsToMins(secs){
 
 
 function isInt(val){
-    return (typeof val === "number" && (val % 1) === 0)
+    return (typeof val === "number" && (val % 1) === 0);
 }
 
 function isNumeric(val){
     if (typeof val === 'string'){
         val = val.trim();
     }
-    return (val !== '' && !isNaN(+val));
+    return (val !== '' && !isNaN(+val) && (val % 1) === 0);
 }
 
 module.exports = {secsToMins, isInt, isNumeric};
