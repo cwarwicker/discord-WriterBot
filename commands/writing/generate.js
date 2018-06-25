@@ -9,8 +9,8 @@ module.exports = class GenerateCommand extends Command {
             aliases: ['gen'],
             group: 'writing',
             memberName: 'generate',
-            description: 'Generates a random fantasy name for a character, place or land. Define the type of name you wanted generated and then optionally, the amount of names to generate (max 50).',
-            examples: ['generate', 'generate char', 'generate place', 'generate land', 'generate char 25'],
+            description: 'Random generator for various things (character names, place names, land names, book titles, writing prompts). Define the type of item you wanted generated and then optionally, the amount of items to generate.',
+            examples: ['generate', 'generate char', 'generate place 20', 'generate land', 'generate book', 'generate book_fantasy'],
             args: [
                 {
                     key: 'type',

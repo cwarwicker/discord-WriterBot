@@ -23,6 +23,7 @@ class NameGenerator
         if (limit < 1){
             limit = this.defaultLimit;
         }
+                
         
         // Load the source
         var filepath = 'assets/json/gen_'+type+'.json';
@@ -39,6 +40,11 @@ class NameGenerator
                                 
                 var results = [];
                 var retries = 0;
+                
+                // Writing Prompts slightly different
+                if (type === 'prompt'){
+                    limit = 1;
+                }
                                 
                 
                 // Loop through n number of times
@@ -68,13 +74,15 @@ class NameGenerator
                     });
                                         
                     // Capitalise first letter of each word
-                    var arr = str.split(" ");
-                                        
-                    for (var k in arr){
-                        arr[k] = arr[k].charAt(0).toUpperCase() + arr[k].slice(1).toLowerCase();
+                    if (type !== 'prompt'){
+                        var arr = str.split(" ");
+
+                        for (var k in arr){
+                            arr[k] = arr[k].charAt(0).toUpperCase() + arr[k].slice(1).toLowerCase();
+                        }
+
+                        str = arr.join(" ");
                     }
-                    
-                    str = arr.join(" ");
                     
                     // If we haven't already got this exact one, append to results array
                     if (results.indexOf(str) < 0){
@@ -104,7 +112,13 @@ class NameGenerator
                     resp += 'Here are your ' + limit + ' fantasy land names:\n\n';
                 } else if(type === 'book'){
                     resp += 'Here are your ' + limit + ' book titles:\n\n';
-                }
+                } else if(type === 'book_fantasy'){
+                    resp += 'Here are your ' + limit + ' fantasy book titles:\n\n';
+                } else if(type === 'book_sf'){
+                    resp += 'Here are your ' + limit + ' sci-fi book titles:\n\n';
+                } else if(type === 'prompt'){
+                    resp += 'Here is your Writing Prompt:\n\n';
+                } 
                 
                 resp += results.join('\n');
                 

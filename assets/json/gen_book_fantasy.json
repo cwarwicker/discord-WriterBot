@@ -1,0 +1,15 @@
+{
+    "names": {
+    
+        "thing": ["one", "shadow", "dragon", "knight", "wizard", "mage", "witch", "hunter", "thief", "warrior", "soldier", "assassin", "magician", "sorcerer", "saint", "prophet", "wolf", "monster", "lion", "creature", "light", "demon", "angel", "world", "star", "king", "queen", "prince", "princess", "lord", "lady", "god", "goddess", "heart", "eye", "hand", "moon", "sword", "city", "wheel", "rune", "empire", "ash", "bone", "war", "dream", "book", "storm", "gate", "wind", "rain", "blade", "year", "apprentice", "maid", "servant", "teacher", "man", "woman", "tree", "throne", "desert", "daylight", "ghost", "crystal", "mountain", "glacier", "sea", "soul", "mind", "magic", "shard", "guardian", "snake", "army", "ruin"],
+        "things": ["ones", "shadows", "dragons", "knights", "wizards", "mages", "witches", "hunters", "thieves", "warriors", "soldiers", "assassins", "magicians", "sorcerers", "saints", "prophets", "wolves", "monsters", "lions", "creatures", "lights", "demons", "angels", "worlds", "stars", "kings", "queens", "princes", "princesses", "lords", "ladies", "gods", "goddesses", "hearts", "eyes", "hands", "moons", "swords", "cities", "wheels", "runes", "empires", "ashes", "bones", "wars", "dreams", "books", "storms", "gates", "winds", "rains", "blades", "years", "apprentices", "maids", "servants", "teachers", "men", "women", "trees", "thrones", "deserts", "ghosts", "crystals", "mountains", "glaicers", "seas", "souls", "minds", "magics", "shards", "guardians", "snakes", "armies", "ruins"],
+        "suf": ["of night", "of light", "of day", "of darkness", "of autumn", "of winter", "of summer", "of spring", "of shadows", "of dawn", "of dusk", "of twilight", "of desire", "of despair", "of doom", "of fire", "of eternity", "of fortune", "of gold", "of blood", "of hope", "of ice", "of infinity", "of all", "of sorrow", "of power", "of stone", "of the king", "of the queen", "of the forsaken", "of the land", "of the night", "of the skull", "of the stars", "of the sky", "of the wind", "of the void", "of the end", "of time", "of tomorrow", "of whispers", "of yesterday", "of old"],
+        "verb": ["rising", "falling", "accepting", "awakening", "dying", "dreaming", "binding", "forsaking", "losing", "painting", "whispering"],
+        "adj": ["blue", "white", "black", "red", "green", "emerald", "ruby", "sapphire", "violet", "orange", "yellow", "gold", "silver", "gray", "old", "new", "painted", "warded", "novice"],
+        "rand": ["feast", "legacy", "cycle", "end", "beginning", "watching", "time", "colour", "sound"]
+    
+    },
+    
+    "formats": ["$things and $things", "The $thing and the $things", "$thing $suf", "$things $suf", "$things of the $thing", "The $adj $thing", "$rand $suf", "$verb $thing"]
+        
+}
