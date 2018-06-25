@@ -25,7 +25,8 @@ bot.setProvider(
 ).catch(console.error);
 
 
-bot.on('ready', () => {
+bot.on('ready', () => {    
+    bot.user.setActivity('you all write', {type: 'WATCHING'});
     console.log('I am ready to serve');    
 });
 
