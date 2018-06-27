@@ -1,10 +1,10 @@
-const Data = require('./data.js');
+const Database = require('./../structures/db.js');
 const lib = require('./../lib.js');
 
 class XP
 {
     
-    constructor(msg)
+    constructor(guild, user)
     {
         
         // Exp amounts
@@ -12,37 +12,42 @@ class XP
         this.XP_WIN_SPRINT = 100;
         this.XP_COMPLETE_CHALLENGE = 50;
         
-        this.msg = msg;
-        this.data = new Data(msg.guild);
-        this.guildSettings = this.data.g();
+        this.guild = guild;
+        this.user = user;
         
-        // Create xp object, if there isn't one
-        if (this.guildSettings.xp === undefined){
-            this.guildSettings.xp = [];
-        } 
-        
-        
+        this.load();
         
     }
     
-    find(id){
+    load(){
         
-        // Check if you are already in the sprint
-        var userArray = this.guildSettings.xp;
+        var db = new Database();
+        
+        var record = db.conn.prepare('SELECT * FROM [user_xp] WHERE [guild] = ? AND [user] = ?').get([this.guild, this.user]);
+        
+        // Insert if doesn't exist
+        if (record == undefined){
+            
+            db.conn.prepare('INSERT INTO [user_xp] (guild, user) VALUES (:g, :u)').run({
+                g: this.guild,
+                u: this.user
+            });
+            
+            record = db.conn.prepare('SELECT * FROM [user_xp] WHERE [guild] = ? AND [user] = ?').get([this.guild, this.user]);
+            
+        }
+        
+        this.record = record;
+        
+        db.close();
 
-        var index = userArray.findIndex(function(i){
-            return (i.user == id);
-        });
-        
-        return (index >= 0) ? userArray[index] : false;
-        
     }
     
-    get(id){
+    
+    get(){
         
-        var user = this.find(id);
-        if (user){
-            return {xp: user.xp, lvl: this.calcLvl(user.xp)};
+        if (this.record !== undefined){
+            return {xp: this.record.xp, lvl: this.calcLvl(this.record.xp)};
         } else {
             return false;
         }
@@ -57,36 +62,39 @@ class XP
         return ((lvl * 100)+1) - xp;
     }
     
-    add(usr, exp){
+    add(exp){
         
-        // Find the user in the guildSettings
-        var userXP = this.find(usr);
+        if (this.record !== undefined){
+            
+            // Current level
+            var curLvl = this.calcLvl(this.record.xp);
+
+            // Add amount
+            if (!lib.isInt(exp) || exp < 0){
+                exp = 0;
+            }
+
+            var newExp = this.record.xp + exp;
+
+            // Update
+            var db = new Database();
+            db.conn.prepare('UPDATE [user_xp] SET [xp] = :xp WHERE id = :id').run({
+                xp: newExp,
+                id: this.record.id
+            });
+            db.close();
+            
+            // Load new record
+            this.load();
+
+            // New level
+            var newLvl = this.calcLvl(newExp);
+
+            // If gone up, display a message
+            if (newLvl > curLvl && curLvl > 0){
+                this.msg.say(`\:tada: Congratulations <@${this.user}>, you are now **Level ${newLvl}**`);
+            }
         
-        // If not there, add a record
-        if (!userXP){
-            userXP = {user: usr, xp: 0};
-            this.guildSettings.xp.push(userXP);
-        }
-        
-        // Current level
-        var curLvl = this.calcLvl(userXP.xp);
-        
-        // Add amount
-        if (!lib.isInt(exp) || exp < 0){
-            exp = 0;
-        }
-        
-        userXP.xp += exp;
-                
-        // Update settings
-        this.data.s(this.guildSettings);
-        
-        // New level
-        var newLvl = this.calcLvl(userXP.xp);
-        
-        // If gone up, display a message
-        if (newLvl > curLvl && curLvl > 0){
-            this.msg.say(`\:tada: Congratulations <@${usr}>, you are now **Level ${newLvl}**`);
         }
         
         

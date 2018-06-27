@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS 'main'.'guilds' (
+    id INTEGER PRIMARY KEY,
+    guild TEXT NOT NULL
+);

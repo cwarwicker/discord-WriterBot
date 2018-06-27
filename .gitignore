@@ -26,6 +26,6 @@ $RECYCLE.BIN/
 nbproject/
 package-lock.json
 node_modules/
-data/
+data/db
 todo
 settings.json

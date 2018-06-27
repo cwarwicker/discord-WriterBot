@@ -1,4 +1,4 @@
-function secsToMins(secs){
+module.exports.secsToMins = function(secs){
     
     var result = {m: 0, s: 0};
     
@@ -18,24 +18,45 @@ function secsToMins(secs){
     
     return result;  
        
-}
+};
 
-function isInt(val){
+module.exports.isInt = function(val){
     return (typeof val === "number" && (val % 1) === 0);
-}
+};
 
-function isNumeric(val){
+module.exports.isNumeric = function(val){
     if (typeof val === 'string'){
         val = val.trim();
     }
     return (val !== '' && !isNaN(+val) && (val % 1) === 0);
-}
+};
 
-function getMember(msg, id){
-    
-    var userObj = msg.guild.members.find('id', id);
-    return userObj;
-    
-}
+module.exports.getMember = function(msg, id){
+    return msg.guild.members.find('id', id);
+};
 
-module.exports = {secsToMins, isInt, isNumeric, getMember};
+module.exports.getBotServer = function(bot, id){
+    return bot.guilds.find('id', id);
+};
+
+module.exports.getServerChannel = function(server, id){
+    return server.channels.find('id', id);
+};
+
+module.exports.findObjectByKey = function(array, key, value) {
+    for (var i = 0; i < array.length; i++) {
+        if (array[i][key] === value) {
+            return array[i];
+        }
+    }
+    return null;
+};
+
+module.exports.findObjectArrayKeyByKey = function(array, key, value) {
+    for (var i = 0; i < array.length; i++) {
+        if (array[i][key] === value) {
+            return i;
+        }
+    }
+    return null;
+};
