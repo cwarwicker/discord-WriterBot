@@ -7,7 +7,10 @@ module.exports = class QuoteCommand extends Command {
             name: 'quote',
             group: 'fun',
             memberName: 'quote',
-            description: 'Gives you random motivational quote'
+            description: 'Gives you random motivational quote',
+            examples: [
+                '`quote`'
+            ]
         });
     }
 

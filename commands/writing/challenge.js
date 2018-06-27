@@ -11,11 +11,29 @@ module.exports = class ChallengeCommand extends Command {
             aliases: [],
             group: 'writing',
             memberName: 'challenge',
-            description: 'Generates a random writing challenge for you. e.g. "Write 400 words in 15 minutes". You can add the flags "easy", "hard", "hardcore", or "insane" to choose a pre-set wpm, or just add your chosen wpm as the flag.',
-            examples: ['challenge', 'challenge cancel', 'challenge done', 'challenge easy', 'challenge hard', 'challenge hardcore', 'challenge insane', 'challenge 10'],
+            description: 'Generates a random writing challenge for you. e.g. "Write 400 words in 15 minutes". You can add the flags "easy", "normal", "hard", "hardcore", or "insane" to choose a pre-set wpm, or add your chosen wpm as the flag, or you can specify a time instead by adding a the time in minutes, prefixed with a "t", e.g. "t15"',
+            examples: [
+                '`challenge` - Generates a random writing challenge', 
+                '`challenge cancel` - Cancels your current challenge', 
+                '`challenge done` - Completes your current challenge', 
+                '`challenge easy` - Generates a random writing challenge, at 5 wpm', 
+                '`challenge normal` - Generates a random writing challenge, at 10 wpm', 
+                '`challenge hard` - Generates a random writing challenge, at 20 wpm', 
+                '`challenge hardcore` - Generates a random writing challenge, at 40 wpm', 
+                '`challenge insane` - Generates a random writing challenge, at 60 wpm', 
+                '`challenge 10` - Generates a random writing challenge, at 10 wpm', 
+                '`challenge t15` - Generates a random writing challenge, with a duration of 15 minutes', 
+                '`challenge hard t30` - Generates a writing challenge at 20 wpm, with a duration of 30 minutes'
+            ],
             args: [
                 {
                     key: 'flag',
+                    prompt: '',
+                    default : '',
+                    type: 'string'
+                },
+                {
+                    key: 'flag2',
                     prompt: '',
                     default : '',
                     type: 'string'
@@ -24,7 +42,7 @@ module.exports = class ChallengeCommand extends Command {
         });
         
         this.wpm = {min: 5, max: 30};
-        this.times = {min: 5, max: 60};
+        this.times = {min: 5, max: 45};
         this.guildSettings = [];
         this.waiting = [];
         
@@ -106,7 +124,7 @@ module.exports = class ChallengeCommand extends Command {
             }), 1);
 
             // Update settings
-            this.guildSettings.sprint.challenges = userArray;
+            this.guildSettings.challenges = userArray;
             this.data.s(this.guildSettings);
             
             msg.say('Challenge cancelled.');
@@ -117,7 +135,7 @@ module.exports = class ChallengeCommand extends Command {
         
     }
     
-    run_challenge(msg, userChallenge, flag){
+    run_challenge(msg, userChallenge, flag, flag2){
                 
         if (!userChallenge){
 
@@ -129,8 +147,11 @@ module.exports = class ChallengeCommand extends Command {
             
             var wpm = Math.floor(Math.random()*(this.wpm.max - this.wpm.min + 1) + this.wpm.min);
             
+            // Specify the wpm by name or number
             if (flag === 'easy'){
                 wpm = 5;
+            } else if (flag === 'normal'){
+                wpm = 10;
             } else if (flag === 'hard'){
                 wpm = 20;
             } else if (flag === 'hardcore'){
@@ -141,7 +162,18 @@ module.exports = class ChallengeCommand extends Command {
                 wpm = flag;
             }
             
+            
             var time = Math.floor(Math.random()*(this.times.max - this.times.min + 1) + this.times.min);
+            
+            // Specify the time
+            if (flag.startsWith('t')){
+                time = flag.replace(/[^0-9]/, '');
+            } else if (flag2.startsWith('t')){
+                time = flag2.replace(/[^0-9]/, '');
+            }
+            
+            
+            
             var goal = wpm * time;
 
             // Round it down to a neater number
@@ -196,7 +228,7 @@ module.exports = class ChallengeCommand extends Command {
             for(var k in challenges){
                 
                 var record = challenges[k];
-                var userObj = msg.guild.members.find('id', record.user);
+                var userObj = lib.getMember(msg, record.user);
                 if (userObj){
                     output += `**${userObj.user.username}** : ${record.challenge}\n`;
                 }
@@ -212,7 +244,7 @@ module.exports = class ChallengeCommand extends Command {
         
     }
 
-    async run(msg, {flag}) {
+    async run(msg, {flag, flag2}) {
         
         this.data = new Data(msg.guild);
         this.guildSettings = this.data.g();
@@ -232,7 +264,7 @@ module.exports = class ChallengeCommand extends Command {
         } else if (flag === 'list'){
             this.run_list(msg);
         } else {
-            this.run_challenge(msg, userChallenge, flag);
+            this.run_challenge(msg, userChallenge, flag, flag2);
         }
         
         

@@ -8,6 +8,9 @@ module.exports = class ReassureCommand extends Command {
             group: 'fun',
             memberName: 'reassure',
             description: 'Gives you reassurance/motivation',
+            examples: [
+                '`reassure`'
+            ],
             args: [
                 {
                     key: 'user',

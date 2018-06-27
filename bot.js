@@ -26,16 +26,15 @@ bot.setProvider(
 
 
 bot.on('ready', () => {    
-    bot.user.setActivity('you all write', {type: 'WATCHING'});
-    console.log('I am ready to serve');    
+    console.log(`[READY] Logged in as ${bot.user.tag} (${bot.user.id})`);
 });
 
-bot.on('exit', () => {
-    console.log('I am gone');    
+bot.on('disconnect', (event) => {
+    console.error(`[DISCONNECT] Disconnected with code (${event.code})`);
 });
 
 bot.on('reconnecting', () => {
-    console.log('I am coming back');    
+    console.log('[RECONNECT] I am coming back online');    
 });
 
 bot.on('error', console.error);

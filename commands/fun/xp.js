@@ -10,7 +10,7 @@ module.exports = class XPCommand extends Command {
             group: 'fun',
             memberName: 'xp',
             description: 'Checks your server Experience Points and Level. Use the "top" flag to see the top 10 on this server.',
-            examples: ['xp', 'xp top'],
+            examples: ['`xp` Shows your level/xp', '`xp top` Shows the top 10 users on the server'],
             args: [
                 {
                     key: 'who',
@@ -34,6 +34,8 @@ module.exports = class XPCommand extends Command {
                 var left = xp.calcNextLvl(user.lvl, user.xp);
                 var output = `${msg.author}, you are **Level ${user.lvl}** (${user.xp}/${user.xp+left})`;        
                 msg.say(output);
+            } else {
+                msg.say(`${msg.author}, you haven't earned any xp on this server yet. You can earn xp by doing writing challenges and sprints.`);
             }
         
         } else if (who === 'top'){
@@ -48,17 +50,20 @@ module.exports = class XPCommand extends Command {
             
             
             var output = `\:trophy: LEADERBOARD\n\n`;
+            var pos = 0;
             
             for (var i = 0; i < show; i++){
                 
-                var pos = i + 1;
                 var record = all[i];
-                
+                                
                 if (record !== undefined){
                 
                     var userObj = msg.guild.members.find('id', record.user);
-                    var lvl = xp.calcLvl(record.xp);
-                    output += `\`${pos}.\` ${userObj.user.username} - **Level ${lvl}** (${record.xp}xp)\n`;
+                    if (userObj){        
+                        pos++;
+                        var lvl = xp.calcLvl(record.xp);
+                        output += `\`${pos}.\` ${userObj.user.username} - **Level ${lvl}** (${record.xp}xp)\n`;
+                    }
                 
                 }
                 

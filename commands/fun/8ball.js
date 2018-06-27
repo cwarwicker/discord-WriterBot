@@ -8,6 +8,9 @@ module.exports = class EightBallCommand extends Command {
             group: 'fun',
             memberName: '8ball',
             description: 'Ask the magic 8-ball a question. Your question will be routed to a text-processing AI and broken down into character sets, in order to properly analyze the content of the question and provide a meaningful answer.',
+            examples: [
+                '`8ball Should I do some writing?`'
+            ],
             args: [
                 {
                     key: "question",
@@ -22,9 +25,9 @@ module.exports = class EightBallCommand extends Command {
         
         var answers = new Array(
             '\:large_blue_circle: It is certain',
-            '\:large_blue_circle: It is deciededly so',
+            '\:large_blue_circle: It is decidedly so',
             '\:large_blue_circle: Without a doubt',
-            '\:large_blue_circle: Yes - defintely',
+            '\:large_blue_circle: Yes - definitely',
             '\:large_blue_circle: You may rely on it',
             '\:large_blue_circle: As I see it, yes',
             '\:large_blue_circle: Most likely',

@@ -11,7 +11,7 @@ module.exports = class LookupCommand extends Command {
             group: 'writing',
             memberName: 'lookup',
             description: 'Looks up the definitions of a given word, using the Oxford English Dictionary API. Add the flag "s" to search for synonymns instead of definitions.',
-            examples: ['lookup happy', 'lookup happy s'],
+            examples: ['`lookup happy` Looks up the definition of the word "happy"', '`lookup happy s` Looks up synonyms for the word "happy"'],
             args: [
                 {
                     key: 'word',

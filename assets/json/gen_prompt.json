@@ -10,6 +10,6 @@
         
 	},
 	
-    "formats": ["** Genre:** $genres \n** Setting:** $setting \n** Underlying Theme:** $theme", "** Genre:** $genres\n** Period:** $period\n** Theme:** $theme", "** Setting:** $setting\n** Theme:** $theme", "$lines"]
+    "formats": ["** Genre:** $genres \n** Setting:** $setting \n** Underlying Theme:** $theme", "** Genre:** $genres\n** Period:** $period\n** Theme:** $theme", "** Setting:** $setting\n** Theme:** $theme", "$lines", "$lines"]
 
 }

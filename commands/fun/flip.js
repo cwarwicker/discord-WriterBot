@@ -7,8 +7,12 @@ module.exports = class FlipCommand extends Command {
             aliases: ['coin'],
             group: 'fun',
             memberName: 'flip',
-            description: 'Flips a coin'
+            description: 'Flips a coin',
+            examples: [
+                '`flip`'
+            ]
         });
+                
     }
 
     run(msg) {

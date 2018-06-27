@@ -24,7 +24,19 @@ module.exports = class SprintCommand extends Command {
             group: 'writing',
             memberName: 'sprint',
             description: 'Write with your friends and see who can write the most in the time limit!',
-            examples: ['`sprint start` Quickstart a sprint with the default settings'],
+            examples: [
+                '`sprint start` Quickstart a sprint with the default settings',
+                '`sprint for 20 in 3` Schedules a sprint for 20 minutes, to start in 3 minutes',
+                '`sprint cancel` Cancels the current sprint. This can only be done by the person who created the sprint, or any users with the MANAGE_MESSAGES permission',
+                '`sprint join` Joins the current sprint',
+                '`sprint join 100` Joins the current sprint, with a starting word count of 100',
+                '`sprint leave` Leaves the current sprint',
+                '`sprint wc 250` Declares your final word count at 250',
+                '`sprint time` Displays the time left in the current sprint',
+                '`sprint users` Displays a list of the users taking part in the current sprint',
+                '`sprint pb` Displays your personal best wpm from sprints on this server',
+                '`sprint help` Displays a similar help screen to this one, with a few added bits of info'
+            ],
             args: [
                 {
                     key: 'opt1',
@@ -134,6 +146,10 @@ module.exports = class SprintCommand extends Command {
             this.run_pb(msg);
         }
         
+        else if (opt1 === 'end'){
+            this.run_end(msg);
+        }
+        
     }
     
     is_sprinting(){
@@ -209,6 +225,24 @@ If you join the sprint with a starting wordcount, remember to declare your total
 e.g. if you joined with 1000 words, and during the sprint you wrote another 500 words, your final wordcount you should declare would be 1500
 `;
         msg.say(output);
+        
+    }
+    
+    run_end(msg){
+        
+        // Check to make sure there is an active sprint on this guild/server
+        if (this.is_sprinting()){
+                        
+            // We can only cancel it if we are the creator of it, or we have the manage messages permission
+            if (msg.author.id == this.guildSettings.sprint.createdBy || msg.member.hasPermission('MANAGE_MESSAGES')){
+                this.post_end_message(msg);                
+            } else {
+                msg.say('You do not have the permission to end this sprint. Only the sprint creator or a server moderator can do this.');
+            }
+                                    
+        } else {
+            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
+        }
         
     }
     
@@ -289,19 +323,28 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             
             // Check if you are already in the sprint
             var userArray = this.guildSettings.sprint.users;
+            
+            if (userArray){
 
-            var users = [];
-            for (var i = 0; i < userArray.length; i++){
-                var user = msg.guild.member(userArray[i].user);
-                if (user !== null){
-                    users.push(user.user.username);
+                var users = [];
+                for (var i = 0; i < userArray.length; i++){
+                    var user = lib.getMember(msg, userArray[i].user);
+                    if (user){
+                        users.push(user.user.username);
+                    }
                 }
-            }
 
-            var output = 'Sprint Participants: ';
-            output += users.join(', ');
+                var output = 'Sprint Participants: ';
+                output += users.join(', ');
+            
+            } else {
+                var output = 'There is no active sprint.';
+            }
+            
             msg.say(output);
         
+        } else {
+            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
         }
         
     }
@@ -394,6 +437,8 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                var diff = sprint.end - now;
                var left = lib.secsToMins(diff);
                msg.say(left.m + ' minutes, ' + left.s + ' seconds remaining');
+           } else {
+               msg.say('Hmm. The sprint appears to be finished. If it hasn\'t asked you to declare your word-counts, try forcing it to end with `sprint end`');            
            }
                                     
         } else {
@@ -415,7 +460,10 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                                 
                 var users = [];
                 for (var i = 0; i < userArray.length; i++){
-                    users.push('<@'+userArray[i].user+'>');
+                    var u = lib.getMember(msg, userArray[i].user);
+                    if (u){
+                        users.push('<@'+u.id+'>');
+                    }
                 }
                                 
                 // Unset the sprint data
@@ -434,6 +482,8 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 msg.say('You do not have the permission to cancel this sprint.');
             }
                                     
+        } else {
+            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
         }
         
     }
@@ -522,7 +572,10 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
 
             var users = [];
             for (var i = 0; i < userArray.length; i++){
-                users.push('<@'+userArray[i].user+'>');
+                var u = lib.getMember(msg, userArray[i].user);
+                if (u){
+                    users.push('<@'+u.id+'>');
+                }
             }
 
             var diff = sprint.end - sprint.start;
@@ -560,7 +613,10 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
 
             var users = [];
             for (var i = 0; i < userArray.length; i++){
-                users.push('<@'+userArray[i].user+'>');
+                var u = lib.getMember(msg, userArray[i].user);
+                if(u){
+                    users.push('<@'+userArray[i].user+'>');
+                }
             }
 
             // Clear the message timeout
@@ -602,8 +658,10 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             // Loop through the users and add their wordcount and wpm into the results array
             for (var i = 0; i < userArray.length; i++){
                 
+                var u = lib.getMember(msg, userArray[i].user);
                 var usr = userArray[i];
-                if (usr.e_wc > 0){
+                
+                if (u && usr.e_wc > 0){
                     
                     var count = usr.e_wc - usr.s_wc;
                     var wpm = count / ((sprint.end - sprint.start) / 60);

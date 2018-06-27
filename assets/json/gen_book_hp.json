@@ -1,0 +1,12 @@
+{
+    "names": {
+    
+        "obj": ["sword", "shield", "staff", "lute", "banjo", "hat", "shoes", "cloak", "jacket", "gloves", "chamber", "corridor", "room", "castle", "tower", "clock", "bed", "chair", "stone", "gemstone", "crystal", "ruby", "diamond", "prisoner", "warden", "wizard", "muggle", "forest", "mountain", "sea", "night", "day", "cabin", "shack", "art", "law", "cave", "hallows", "snake", "griffin", "spider", "monster", "unicorn", "orb", "sphere", "crown", "torch", "school", "medallion", "mirror", "window", "secrets", "voice", "silence", "hero", "protector", "spectre", "demon", "rock", "dragon", "wyrm", "basilisk", "sigil", "serpent"],
+        "of": ["secrets", "shadows", "uncertainty", "virginity", "fire", "ice", "death", "life", "time", "knowledge", "azkaban", "forever", "desire", "erised", "darkness", "light", "tomorrow", "yesterday", "hogwarts", "Gryffyndor", "Hufflepuff", "Ravenclaw", "Slytherin", "the dark lord"],
+        "desc": ["silent", "deathly", "huge", "first", "last", "other", "whirling", "distant", "dark", "light", "mysterious", "twisted", "abandoned", "cold", "wizard's", "inquisitor's", "spy's", "professor's"]
+        
+    },
+    
+    "formats": ["Harry Potter and the $obj of $of", "Harry Potter and the $desc $obj"]
+        
+}

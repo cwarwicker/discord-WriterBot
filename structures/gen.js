@@ -116,6 +116,8 @@ class NameGenerator
                     resp += 'Here are your ' + limit + ' fantasy book titles:\n\n';
                 } else if(type === 'book_sf'){
                     resp += 'Here are your ' + limit + ' sci-fi book titles:\n\n';
+                } else if(type === 'book_hp'){
+                    resp += 'Here are your ' + limit + ' Harry Potter book titles:\n\n';
                 } else if(type === 'prompt'){
                     resp += 'Here is your Writing Prompt:\n\n';
                 } 
