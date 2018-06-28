@@ -4,7 +4,7 @@ const lib = require('./../lib.js');
 class XP
 {
     
-    constructor(guild, user)
+    constructor(guild, user, msg)
     {
         
         // Exp amounts
@@ -14,6 +14,7 @@ class XP
         
         this.guild = guild;
         this.user = user;
+        this.msg = msg;
         
         this.load();
         
@@ -51,6 +52,18 @@ class XP
         } else {
             return false;
         }
+        
+    }
+    
+    all(){
+        
+        var db = new Database();
+        var records = db.conn.prepare('SELECT * FROM [user_xp] WHERE [guild] = :guild ORDER BY xp DESC LIMIT 10').all({
+            guild: this.guild
+        });
+        db.close();
+        
+        return records;
         
     }
     

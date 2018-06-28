@@ -13,7 +13,6 @@ class Database
         // Connect to/Create database
         try {
             this.conn = new SQLITE(path.resolve(__dirname + '/../data/db/', 'bot.db'));
-            console.log('[DB] Connected to bot.db');
         } catch (e){
             console.error(e.message);
             this.conn = false;
@@ -49,7 +48,6 @@ class Database
     close()
     {
         this.conn.close();
-        console.log('[DB] Closed connection to bot.db');
     }
     
     

@@ -24,11 +24,11 @@ module.exports = class XPCommand extends Command {
 
     run(msg, {who}) {
         
-        var xp = new XP(msg);
+        var xp = new XP(msg.guild.id, msg.author.id, msg);
         
         if (who === 'me'){
         
-            var user = xp.get(msg.author.id);
+            var user = xp.get();
             
             if (user){
                 var left = xp.calcNextLvl(user.lvl, user.xp);
@@ -40,35 +40,21 @@ module.exports = class XPCommand extends Command {
         
         } else if (who === 'top'){
             
-            var all = xp.guildSettings.xp;
-            var show = 10;
-            
-            // Sort by xp
-            all.sort(function(a, b){ 
-                return a.xp < b.xp;
-            });
-            
-            
+            var all = xp.all();
+
             var output = `\:trophy: LEADERBOARD\n\n`;
-            var pos = 0;
             
-            for (var i = 0; i < show; i++){
+            for (var i = 0; i < all.length; i++){
                 
-                var record = all[i];
-                                
-                if (record !== undefined){
-                
-                    var userObj = msg.guild.members.find('id', record.user);
-                    if (userObj){        
-                        pos++;
-                        var lvl = xp.calcLvl(record.xp);
-                        output += `\`${pos}.\` ${userObj.user.username} - **Level ${lvl}** (${record.xp}xp)\n`;
-                    }
-                
+                var row = all[i];
+                var userObj = msg.guild.members.find('id', row.user);
+                if (userObj){
+                    var lvl = xp.calcLvl(row.xp);
+                    output += `\`${i+1}.\` ${userObj.user.username} - **Level ${lvl}** (${row.xp})\n`;
                 }
                 
             }
-            
+
             msg.say(output);
             
         } 

@@ -1,6 +1,7 @@
 const { Command } = require('discord.js-commando');
 const Database = require('./../../structures/db.js');
 const XP = require('./../../structures/xp.js');
+const Record = require('./../../structures/record.js');
 const lib = require('./../../lib.js');
 
 /**
@@ -161,7 +162,7 @@ module.exports = class SprintCommand extends Command {
         });
         db.close();
         
-        return (result !== undefined);
+        return (result);
         
     }
     
@@ -172,22 +173,24 @@ module.exports = class SprintCommand extends Command {
         
     }
     
-    is_declaration_finished(){
+    is_declaration_finished(sprint){
         
-//        var sprint = this.guildSettings.sprint;
-//        var userArray = sprint.users;
-//        var declared = 0;
-//
-//        for (var i = 0; i < userArray.length; i++){
-//            var usr = userArray[i];
-//            if (usr.e_wc > 0){
-//                declared++;
-//            }
-//
-//        }
-//        
-//        return (declared === userArray.length);
+        // Check all users
+        var declared = 0;
         
+        var db = new Database();
+        var users = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [id] = :sp').all({ sp: sprint.id });
+        
+        for (var i = 0; i < users.length; i++){
+            if (users[i].ending_wc > 0){
+                declared++;
+            }
+        }
+        
+        db.close();
+        
+        return (declared === users.length);        
+         
     }
     
     run_help(msg){
@@ -223,262 +226,296 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
     
     run_end(msg){
         
-//        // Check to make sure there is an active sprint on this guild/server
-//        if (this.is_sprinting()){
-//                        
-//            // We can only cancel it if we are the creator of it, or we have the manage messages permission
-//            if (msg.author.id == this.guildSettings.sprint.createdBy || msg.member.hasPermission('MANAGE_MESSAGES')){
-//                this.post_end_message(msg);                
-//            } else {
-//                msg.say('You do not have the permission to end this sprint. Only the sprint creator or a server moderator can do this.');
-//            }
-//                                    
-//        } else {
-//            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
-//        }
+        let guildID = msg.guild.id;
+        let userID = msg.author.id;
+        var sprint = this.get(guildID);
         
+        if (sprint){
+            
+            // We can only cancel it if we are the creator of it, or we have the manage messages permission
+            if (userID == sprint.createdby || msg.member.hasPermission('MANAGE_MESSAGES')){
+                this.post_end_message(msg);                
+            } else {
+                msg.say('Only the sprint creator or a moderator can end this sprint.');
+            }
+            
+        } else {
+            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
+        }
+                
     }
     
     run_pb(msg){
         
-//        var records = this.guildSettings.records;
-//
-//        // First check if they even have a record
-//        var index = records.findIndex(function(i){
-//            return (i.user == msg.author.id && i.record === 'wpm');
-//        });
-//
-//        // If they don't have one, create one now
-//        if (index < 0){
-//            var userRecord = {user: msg.author.id, record: 'wpm', value: 0};
-//            records.push(userRecord);
-//            this.data.s(this.guildSettings);
-//        } else {
-//            var userRecord = records[index];
-//        }
-//        
-//        return msg.say(`${msg.author}, your personal best is **${userRecord.value}** words-per-minute`);                                
+        let userID = msg.author.id;
+        let guildID = msg.guild.id;
         
+        var record = new Record();
+        var userRecord = record.get(guildID, userID, 'wpm');
+        if (userRecord){
+            return msg.say(`${msg.author}, your personal best is **${userRecord.value}** words-per-minute`);     
+        } else {
+            return msg.say('You do not yet have a words-per-minute personal best');
+        }
+                
     }
         
     run_declare(msg, amount){
         
-//        if (this.is_sprinting() && this.is_user_sprinting(msg.author)){
-//            
-//            // Is the sprint finished?
-//            if (!this.is_sprint_finished()){
-//                msg.say('The sprint hasn\'t finished yet. Please wait and declare your word count at the end.');
-//                return null;
-//            }
-//            
-//            
-//            // Check amount is valid
-//            if (!lib.isNumeric(amount)){
-//                msg.say('Please enter a valid word count');
-//                return null;
-//            }
-//            
-//            amount = Math.floor(amount);
-//            
-//            // Find user in the list
-//            var userArray = this.guildSettings.sprint.users;
-//
-//            var index = userArray.findIndex(function(i){
-//                return (i.user == msg.author.id);
-//            });
-//            
-//            var user = userArray[index];
-//            
-//            // Updated declared word count
-//            user.e_wc = amount;
-//            
-//            var written = user.e_wc - user.s_wc;
-//            
-//            // Update settings
-//            this.guildSettings.sprint.users = userArray;
-//            this.data.s(this.guildSettings);
-//            
-//            msg.say(`${msg.author} word count updated: ${user.e_wc} (${written} new)`);
-//                        
-//            // Are all users declared now?
-//            if (this.is_declaration_finished()){
-//                this.finish(msg);
-//            }
-//                        
-//        }
+        let userID = msg.author.id;
+        let guildID = msg.guild.id;
+                        
+        var sprint = this.get(guildID);
+        
+        if (sprint){
+            
+            var userSprint = this.is_user_sprinting(sprint.id, userID);
+            
+            if (userSprint){
+
+                // Is the actually sprint finished yet?
+                if (!this.is_sprint_finished(sprint)){
+                    msg.say('The sprint hasn\'t finished yet. Please wait and declare your word count at the end.');
+                    return null;
+                }
+
+                // Check amount is valid
+                if (!lib.isNumeric(amount)){
+                    msg.say('Please enter a valid word count');
+                    return null;
+                }
+
+                amount = Math.floor(amount);
+                
+                // If the submitted wordcount is less than they started with, show error
+                if (amount < userSprint.starting_wc){
+                    return msg.say(`Word count ${amount} is less than the wordcount you started with (${userSprint.starting_wc})! If you joined with a starting wordcount, make sure to declare your new total wordcount, not just the amount you wrote in this sprint.`);
+                }
+
+                var db = new Database();
+
+                // Update record
+                db.conn.prepare('UPDATE [sprint_users] SET [ending_wc] = :wc WHERE [sprint] = :sp AND [user] = :usr').run({
+                    wc: amount,
+                    sp: sprint.id,
+                    usr: userID
+                });
+
+                // Get user record
+                var user = this.is_user_sprinting(sprint.id, userID);
+
+                db.close();
+
+                var written = user.ending_wc - user.starting_wc;
+
+                msg.say(`${msg.author} word count updated: ${user.ending_wc} (${written} new)`);
+
+                // Are all users declared now?
+                if (this.is_declaration_finished(sprint)){
+                    this.finish(msg);
+                }
+            
+            }
+            
+        }
+        
         
     }
     
     
     run_users(msg){
         
-//        if (this.is_sprinting()){
-//            
-//            // Check if you are already in the sprint
-//            var userArray = this.guildSettings.sprint.users;
-//            
-//            if (userArray){
-//
-//                var users = [];
-//                for (var i = 0; i < userArray.length; i++){
-//                    var user = lib.getMember(msg, userArray[i].user);
-//                    if (user){
-//                        users.push(user.user.username);
-//                    }
-//                }
-//
-//                var output = 'Sprint Participants: ';
-//                output += users.join(', ');
-//            
-//            } else {
-//                var output = 'There is no active sprint.';
-//            }
-//            
-//            msg.say(output);
-//        
-//        } else {
-//            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
-//        }
+        let guildID = msg.guild.id;
+        var sprint = this.get(guildID);
+        
+        if (sprint){
+            
+            
+            var db = new Database();
+            var records = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [id] = :sp').all({ sp: sprint.id });
+            db.close();
+            
+            if (records){
+                
+                // Get all the users
+                var users = [];
+                
+                for (var i = 0; i < records.length; i++){
+                    var user = lib.getMember(msg, records[i].user);
+                    if (user){
+                        users.push( user.user.username + ' ('+records[i].starting_wc+')');
+                    }
+                }
+                                
+                var output = (users.length > 0) ? 'Sprint Participants: ' + users.join(', ') : 'There are no users currently taking part in this sprint.';
+                
+            } else {
+                var output = 'There are no users currently taking part in this sprint.';
+            }
+            
+            msg.say(output);            
+            
+        } else {
+            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
+        }
+        
         
     }
     
     run_leave(msg){
         
-//        if (this.is_sprinting()){
-//            
-//            // Check if you are already in the sprint
-//            var userArray = this.guildSettings.sprint.users;
-//             
-//            if (this.is_user_sprinting(msg.author)){
-//                
-//                userArray.splice(userArray.findIndex(function(i){
-//                    return (i.user == msg.author.id);
-//                }), 1);
-//                
-//                // Update settings
-//                this.guildSettings.sprint.users = userArray;
-//                this.data.s(this.guildSettings);
-//                
-//                msg.say('You have left the sprint.');
-//                
-//            } 
-//            
-//        }
+        let userID = msg.author.id;
+        let guildID = msg.guild.id;
+                        
+        var sprint = this.get(guildID);
         
+        if (sprint && this.is_user_sprinting(sprint.id, userID)){
+            
+            var db = new Database();
+            db.conn.prepare('DELETE FROM [sprint_users] WHERE [sprint] = :sp AND [user] = :usr').run({
+                sp: sprint.id,
+                usr: userID
+            });
+            db.close();
+            
+            msg.say('You have left the sprint.');
+            
+        } else {
+            msg.say('You are not taking part in a sprint at the moment.');
+        }
+                
     }
     
     
     run_join(msg, start){
         
-//        if (this.is_sprinting()){
-//            
-//            // Check if you are already in the sprint
-//            var userArray = this.guildSettings.sprint.users;
-//
-//            var users = [];
-//            for (var i = 0; i < userArray.length; i++){
-//                users.push(userArray[i].user);
-//            }
-//            
-//            if (users.indexOf(msg.author.id) < 0){
-//                
-//                if (start < 0 || start === undefined || start === ''){
-//                    start = 0;
-//                }
-//                                
-//                userArray.push({
-//                    user: msg.author.id,
-//                    s_wc: start,
-//                    e_wc: 0
-//                });
-//                
-//                // Update settings
-//                this.guildSettings.sprint.users = userArray;
-//                this.data.s(this.guildSettings);
-//                
-//                msg.say('You have joined the sprint, with ' + start + ' words.');
-//                
-//            } else {
-//                msg.say('You have already joined this sprint.');            
-//            }
-//            
-//        } else {
-//            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
-//        }
+        let userID = msg.author.id;
+        let guildID = msg.guild.id;
+                        
+        var sprint = this.get(guildID);
+        
+        if (!lib.isNumeric(start)){
+            start = 0;
+        }
+        
+        if (sprint){
+            
+            var db = new Database();
+
+            if (!this.is_user_sprinting(sprint.id, userID)){
+                
+                // Join sprint
+                db.conn.prepare('INSERT INTO [sprint_users] (sprint, user, starting_wc, ending_wc) VALUES (:sp, :usr, :st, :end)').run({
+                    sp: sprint.id,
+                    usr: userID,
+                    st: start,
+                    end: 0
+                });
+                
+                msg.say('You have joined the sprint, with ' + start + ' words.');
+                
+            } else {
+                
+                // Update their starting wordcount
+                db.conn.prepare('UPDATE [sprint_users] SET [starting_wc] = :strt WHERE [sprint] = :sp AND [user] = :usr').run({
+                    strt: start,
+                    sp: sprint.id,
+                    usr: userID
+                });
+                
+                msg.say('Updated your starting wordcount to: ' + start);  
+            }
+            
+            db.close();
+            
+        } else {
+            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');
+        }
         
     }
     
     
     run_time(msg){
         
-//        var now = Math.floor(new Date() / 1000);
-//                
-//        // Check to make sure there is an active sprint on this guild/server
-//        if (this.is_sprinting()){
-//            
-//           var sprint = this.guildSettings.sprint;
-//           
-//           // Has it not started yet?
-//           if (now < sprint.start){
-//               var diff = sprint.start - now;
-//               var left = lib.secsToMins(diff);
-//               msg.say('Sprint begins in ' + left.m + ' minutes, ' + left.s + ' seconds');
-//           }
-//           
-//           // Or is it currently running?
-//           else if (now < sprint.end){
-//               var diff = sprint.end - now;
-//               var left = lib.secsToMins(diff);
-//               msg.say(left.m + ' minutes, ' + left.s + ' seconds remaining');
-//           } else {
-//               msg.say('Hmm. The sprint appears to be finished. If it hasn\'t asked you to declare your word-counts, try forcing it to end with `sprint end`');            
-//           }
-//                                    
-//        } else {
-//            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
-//        }
+        var now = Math.floor(new Date() / 1000);
+        let guildID = msg.guild.id;
+        var sprint = this.get(guildID);
         
+        if (sprint){
+            
+            // Has it not started yet?
+           if (now < sprint.start){
+               var diff = sprint.start - now;
+               var left = lib.secsToMins(diff);
+               msg.say('Sprint begins in ' + left.m + ' minutes, ' + left.s + ' seconds');
+           }
+           
+           // Or is it currently running?
+           else if (now < sprint.end){
+               var diff = sprint.end - now;
+               var left = lib.secsToMins(diff);
+               msg.say(left.m + ' minutes, ' + left.s + ' seconds remaining');
+           } else {
+               msg.say('Hmm. The sprint appears to be finished. If it hasn\'t asked you to declare your word-counts, try forcing it to end with `sprint end`');            
+           }
+            
+        } else {
+            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
+        }
+                    
     }
     
     run_cancel(msg){
                 
         // Check to make sure there is an active sprint on this guild/server
-//        if (this.is_sprinting()){
-//                        
-//            // We can only cancel it if we are the creator of it, or we have the manage messages permission
-//            if (msg.author.id == this.guildSettings.sprint.createdBy || msg.member.hasPermission('MANAGE_MESSAGES')){
-//                
-//                // Get all the users to notify
-//                var userArray = this.guildSettings.sprint.users;
-//                                
-//                var users = [];
-//                for (var i = 0; i < userArray.length; i++){
-//                    var u = lib.getMember(msg, userArray[i].user);
-//                    if (u){
-//                        users.push('<@'+u.id+'>');
-//                    }
-//                }
-//                                
-//                // Unset the sprint data
-//                this.guildSettings.sprint = {};
-//                this.data.s(this.guildSettings);
-//                
-//                // Clear the message timeout
-//                this.clear();
-//                
-//                var output = '\:disappointed: **SPRINT CANCELLED**\n\n';
-//                output += users.join(', ');
-//                
-//                msg.say(output);
-//                
-//            } else {
-//                msg.say('You do not have the permission to cancel this sprint.');
-//            }
-//                                    
-//        } else {
-//            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
-//        }
+        let userID = msg.author.id;
+        let guildID = msg.guild.id;
+                        
+        var sprint = this.get(guildID);
         
+        if (sprint){
+            
+            if (userID === sprint.createdby || msg.member.hasPermission('MANAGE_MESSAGES')){
+                
+                // Get the users to notify
+                var users = [];
+                var db = new Database();
+                
+                var records = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [id] = :sp').all({ sp: sprint.id });
+
+                if (records){
+                    for (var i = 0; i < records.length; i++){
+                        var u = lib.getMember(msg, records[i].user);
+                        if (u){
+                            users.push(`<@${u.id}>`);
+                        }
+                    }
+                }
+                
+                // Delete sprint
+                db.conn.prepare('DELETE FROM [sprints] WHERE [id] = ?').run([sprint.id]);
+                
+                // Delete sprint users
+                db.conn.prepare('DELETE FROM [sprint_users] WHERE [sprint] = ?').run([sprint.id]);
+                
+                db.close();
+                
+                // Clear the timeout
+                this.clear();
+                
+                var output = '\:disappointed: **SPRINT CANCELLED**\n\n';
+                output += users.join(', ');
+                msg.say(output);
+                
+            } else {
+                msg.say('Only the sprint creator or a moderator can cancel this sprint.');
+            }
+            
+        } else {
+            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
+        }
+         
+                 
     }
     
     
@@ -490,7 +527,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
         var obj = this;
         var now = Math.floor(new Date() / 1000);
         
-        var sprint = this.get();
+        var sprint = this.get(guildID);
           
         // Check if there is a sprint, but it's finished, we can remove it
         if ( sprint && this.is_sprint_finished(sprint) ){
@@ -514,22 +551,25 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                         
             var start = now + (sIn * 60);
             var end = start + (sFor * 60);
+            var length = end - start;
             var delay = (start - now) * 1000;
-            
+                        
             var db = new Database();
             
             // Create sprint
-            db.conn.prepare('INSERT INTO [sprints] (guild, end, createdby, created) VALUES (:g, :e, :cb, :c)').run({
+            db.conn.prepare('INSERT INTO [sprints] (guild, start, end, length, createdby, created) VALUES (:g, :s, :e, :l, :cb, :c)').run({
                 g: guildID,
+                s: start,
+                l: length,
                 e: end,
                 cb: userID,
                 c: now
             });
             
-            var sprint = this.get();
+            sprint = this.get(guildID);
             
             // Join sprint
-            db.conn.prepare('INSERT INTO [sprint_users] (sprint, user, start, end) VALUES (:sp, :usr, :st, :end)').run({
+            db.conn.prepare('INSERT INTO [sprint_users] (sprint, user, starting_wc, ending_wc) VALUES (:sp, :usr, :st, :end)').run({
                 sp: sprint.id,
                 usr: userID,
                 st: 0,
@@ -565,21 +605,27 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
     
     post_start_message(msg){
         
+        let guildID = msg.guild.id;
+        
         var obj = this;
+        var sprint = this.get(guildID);
         
         // Check to make sure there is an active sprint on this guild/server
-        if (this.is_sprinting()){
+        if (sprint){
                             
-            var sprint = this.guildSettings.sprint;
-            
             // Get all the users to notify
-            var userArray = sprint.users;
-
             var users = [];
-            for (var i = 0; i < userArray.length; i++){
-                var u = lib.getMember(msg, userArray[i].user);
-                if (u){
-                    users.push('<@'+u.id+'>');
+            
+            var db = new Database();
+            var records = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [id] = :sp').all({ sp: sprint.id });
+            db.close();
+            
+            if (records){
+                for (var i = 0; i < records.length; i++){
+                    var u = lib.getMember(msg, records[i].user);
+                    if (u){
+                        users.push(`<@${u.id}>`);
+                    }
                 }
             }
 
@@ -606,24 +652,34 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
     
     post_end_message(msg){
         
+        let guildID = msg.guild.id;
         var obj = this;
-        var now = Math.floor(new Date() / 1000);
-        var sprint = this.guildSettings.sprint;
+        var sprint = this.get(guildID);
         
-        // Check to make sure there is an active sprint on this guild/server
-        if (this.is_sprinting()){
-                            
-            // Get all the users to notify
-            var userArray = sprint.users;
+        if (sprint){
+            
+            var db = new Database();
 
+            // Update the end timestamp to 0, just so we know it's defintely ended
+            if (sprint.end > 0){
+                db.conn.prepare('UPDATE [sprints] SET [end] = 0 WHERE [id] = ?').run([sprint.id]);
+            }
+            
+            // Get users to notify
             var users = [];
-            for (var i = 0; i < userArray.length; i++){
-                var u = lib.getMember(msg, userArray[i].user);
-                if(u){
-                    users.push('<@'+userArray[i].user+'>');
+            
+            var records = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [id] = :sp').all({ sp: sprint.id });
+            db.close();
+            
+            if (records){
+                for (var i = 0; i < records.length; i++){
+                    var u = lib.getMember(msg, records[i].user);
+                    if (u){
+                        users.push(`<@${u.id}>`);
+                    }
                 }
             }
-
+            
             // Clear the message timeout
             this.clear();
             
@@ -637,7 +693,8 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             var output = '\:octagonal_sign: **TIME IS UP**\n\nPlease submit your word count. e.g. `sprint wc 320`. You have ' + Math.round(this.defaults.post_delay / 60) + ' minutes.\n';
             output += users.join(', ');
             msg.say(output);
-                                                    
+                        
+            
         }
         
     }
@@ -645,111 +702,102 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
     
     finish(msg){
         
-        var obj = this;
+        let guildID = msg.guild.id;
+        var sprint = this.get(guildID);
         var now = Math.floor(new Date() / 1000);
-        var sprint = this.guildSettings.sprint;
-        var records = this.guildSettings.records;
-        var xp = new XP(msg);
+        var record = new Record();
         
-        if (this.is_sprinting()){
+        if (sprint){
+            
+            var db = new Database();
             
             // Clear the timeout, in case we've finished before the ending timer
             this.clear();
             
-            // Calculate positions
+            // Get users & calculate positions
             var result = [];
-            var userArray = sprint.users;
             
-            // Loop through the users and add their wordcount and wpm into the results array
-            for (var i = 0; i < userArray.length; i++){
+            var records = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [id] = :sp').all({ sp: sprint.id });
+            if (records){
                 
-                var u = lib.getMember(msg, userArray[i].user);
-                var usr = userArray[i];
-                
-                if (u && usr.e_wc > 0){
+                for (var i = 0; i < records.length; i++){
                     
-                    var count = usr.e_wc - usr.s_wc;
-                    var wpm = count / ((sprint.end - sprint.start) / 60);
-                    var newWpmRecord = 0;
-                    
-                    // Check their record to see if they beat it
-                    // First check if they even have a record
-                    var index = records.findIndex(function(i){
-                        return (i.user == usr.user && i.record === 'wpm');
-                    });
-                    
-                    // If they don't have one, create one now
-                    if (index < 0){
-                        var userRecord = {user: usr.user, record: 'wpm', value: 0};
-                        records.push(userRecord);
-                    } else {
-                        var userRecord = records[index];
-                    }
-                                        
-                    // Compare it to their wpm from this sprint and update if necessary
-                    if (wpm > userRecord.value){
-                        userRecord.value = wpm;
-                        newWpmRecord = 1;
+                    var guildUser = lib.getMember(msg, records[i].user);
+                    var user = records[i];
+                    if (guildUser && user.ending_wc > 0){
+                        
+                        var count = user.ending_wc - user.starting_wc;
+                        var wpm = Math.round( (count / (sprint.length / 60)) * 100 ) / 100;
+                        var newWpmRecord = 0;
+                        
+                        // Check record
+                        var userRecord = record.get(guildID, user.user, 'wpm');
+                        if (!userRecord || userRecord.value < wpm){
+                            record.set(guildID, user.user, 'wpm', wpm);
+                            newWpmRecord = 1;
+                        }
+                                                
+                        // Give them xp
+                        var xp = new XP(guildID, user.user, msg);
+                        xp.add(xp.XP_COMPLETE_SPRINT);
+                        
+                        // Push to result dataset
+                        result.push({user: user.user, count: count, wpm: wpm, newWpmRecord: newWpmRecord, xp: xp.XP_COMPLETE_SPRINT});                                        
+                        
                     }
                     
-                    
-                    // Add the xp to their user record
-                    xp.add(usr.user, xp.XP_COMPLETE_SPRINT);
-                    
-                    // Push to result dataset
-                    result.push({user: usr.user, count: count, wpm: wpm, newWpmRecord: newWpmRecord, xp: xp.XP_COMPLETE_SPRINT});
-                                        
+                }
+                
+                // Sort results
+                result.sort(function(a, b){ 
+                    return a.count < b.count;
+                });
+                
+                // Now we loop through them and apply extra xp
+                for(var k = 0; k < result.length; k++){
+
+                    // If finished in top 5 and more than 1 person took part, get more exp
+                    if (k >= 0 && k <= 4 && result.length > 1){
+
+                        var pos = k + 1;
+                        var newXp = Math.ceil(xp.XP_WIN_SPRINT / pos);
+
+                        // Add to user record
+                        var xp = new XP(guildID, result[k].user);
+                        xp.add(result[k].user, newXp);
+                        result[k].xp += newXp;
+
+                    }
+
+                }
+                
+                // Mark the sprint as complete
+                db.conn.prepare('UPDATE [sprints] SET [completed] = ? WHERE [id] = ?').run([now, sprint.id]);
+                
+                // Post the message
+                var output = '\:trophy: **THE RESULTS ARE IN**\n\nCongratulations to everyone:\n';
+                for (var i = 0; i < result.length; i++){
+
+                    output += '`'+(i+1)+'`. <@' + result[i].user + '> - **' + result[i].count + ' words** ('+result[i].wpm+' wpm) ';
+
+                    if (result[i].newWpmRecord === 1){
+                        output += '\:champagne: **NEW PB**'
+                    }
+
+                    output += '     +' + result[i].xp + 'xp';
+                    output += '\n';
+
                 }
 
-            }
-            
-            
-            // Sort results
-            result.sort(function(a, b){ 
-                return a.count < b.count;
-            });
-                                   
-            
-            // Now we loop through them and apply extra xp
-            for(var k = 0; k < result.length; k++){
-                
-                // If finished in top 5 and more than 1 person took part, get more exp
-                if (k >= 0 && k <= 4 && result.length > 1){
-                    
-                    var pos = k + 1;
-                    var newXp = Math.ceil(xp.XP_WIN_SPRINT / pos);
-                                        
-                    // Add to user record
-                    xp.add(result[k].user, newXp);
-                    result[k].xp += newXp;
-                    
-                }
+                msg.say(output);
                 
             }
                         
-                        
-            // Unset the sprint data
-            this.guildSettings.sprint = {};
-            this.data.s(this.guildSettings);
             
-            // Post the message
-            var output = '\:checkered_flag: **THE RESULTS ARE IN**\n\nCongratulations to everyone:\n';
-            for (var i = 0; i < result.length; i++){
-                
-                output += '`'+(i+1)+'`. <@' + result[i].user + '> - **' + result[i].count + ' words** ('+result[i].wpm+' wpm) ';
-                
-                if (result[i].newWpmRecord === 1){
-                    output += '\:champagne: **NEW PB**'
-                }
-                
-                output += '     +' + result[i].xp + 'xp';
-                output += '\n';
-                
-            }
-            
-            msg.say(output);
+            db.close();
             
         }
+        
         
     }
     

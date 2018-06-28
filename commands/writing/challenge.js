@@ -102,7 +102,7 @@ module.exports = class ChallengeCommand extends Command {
             });
             
             // Add xp
-            var xp = new XP(guildID, userID); 
+            var xp = new XP(guildID, userID, msg); 
             xp.add(xp.XP_COMPLETE_CHALLENGE);
 
             return msg.say(`${msg.author} has completed the challenge **${userChallenge.challenge}**     +${xp.XP_COMPLETE_CHALLENGE} xp`);            
