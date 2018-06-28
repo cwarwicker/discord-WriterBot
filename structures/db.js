@@ -39,6 +39,7 @@ class Database
             this.conn.prepare( fs.readFileSync(install_path + '/user_records.sql', 'utf-8') ).run();
             this.conn.prepare( fs.readFileSync(install_path + '/user_xp.sql', 'utf-8') ).run();
             this.conn.prepare( fs.readFileSync(install_path + '/user_challenges.sql', 'utf-8') ).run();
+            this.conn.prepare( fs.readFileSync(install_path + '/user_stats.sql', 'utf-8') ).run();
 
         this.conn.prepare('COMMIT');
         

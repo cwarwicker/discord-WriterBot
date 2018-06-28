@@ -1,31 +1,28 @@
 const { Command } = require('discord.js-commando');
 const moment = require('moment');
 require('moment-duration-format');
+const version = require('./../../version.json');
 
-module.exports = class StatsCommand extends Command {
+module.exports = class InfoCommand extends Command {
 	constructor(client) {
 		super(client, {
-			name: 'stats',
-			aliases: ['statistics'],
+			name: 'info',
+			aliases: [],
 			group: 'util',
-			memberName: 'stats',
-			description: 'Displays statistics about the bot.',
-			guildOnly: true,
-			throttling: {
-				usages: 2,
-				duration: 3
-			}
+			memberName: 'info',
+			description: 'Displays information and statistics about the bot.',
+			guildOnly: true
 		});
 	}
 
 	run(msg) {
 		return msg.embed({
 			color: 3447003,
-                        title: 'Writer-Bot Statistics',
+                        title: 'Writer-Bot Info/Statistics',
 			fields: [
                                 {
 					name: 'Version',
-					value: `v0.1`,
+					value: `v${version.version}`,
 					inline: true
 				},
 				{

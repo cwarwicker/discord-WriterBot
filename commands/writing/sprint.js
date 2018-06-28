@@ -2,7 +2,10 @@ const { Command } = require('discord.js-commando');
 const Database = require('./../../structures/db.js');
 const XP = require('./../../structures/xp.js');
 const Record = require('./../../structures/record.js');
+const Stats = require('./../../structures/stats.js');
 const lib = require('./../../lib.js');
+
+const STAT_SPRINT_NOTIFY = 3;
 
 /**
  * sprint start - Starts one with default settings (20 min length, starting in 2 mins) - DONE
@@ -78,6 +81,7 @@ module.exports = class SprintCommand extends Command {
         
         this.guildSettings = [];
         this.messageTimeout = null;
+        this.stats = new Stats();
                 
     }
 
@@ -136,6 +140,14 @@ module.exports = class SprintCommand extends Command {
         
         else if (opt1 === 'end'){
             this.run_end(msg);
+        } 
+        
+        else if (opt1 === 'notify'){
+            this.run_notify(msg);
+        }  
+        
+        else if (opt1 === 'forget'){
+            this.run_forget(msg);
         }
         
     }
@@ -197,7 +209,7 @@ module.exports = class SprintCommand extends Command {
        
         var output = `
 **Sprint Info**
-Write with your friends and see who can write the most in the time limit!                        
+Write with your friends and see who can write the most in the time limit! Earn extra XP for finishing in the top 5!                    
                         
 **Sprint Default Settings**
 \`length\` ${this.defaults.length} minutes
@@ -214,13 +226,41 @@ Write with your friends and see who can write the most in the time limit!
 \`sprint users\` Display a list of the users taking part in the sprint
 \`sprint cancel\` Cancel the current sprint for all users (you must be the sprint creator or a server moderator to do this)
 \`sprint wc 2000\` Declare your finished word count is 2000 words (total written by the end of the sprint)
-\`sprint pb\` Shows you your Personal Best words-per-minute from sprints done on this server                        
+\`sprint pb\` Shows you your Personal Best words-per-minute from sprints done on this server             
+\`sprint notify\` You will be notified of any sprints which start on this server
+\`sprint forget\` You will no longer be notified of any sprints which start on this server                        
                         
 **Sprint Tips**
 If you join the sprint with a starting wordcount, remember to declare your total word count at the end, not just the amount of words you wrote in the sprint.
-e.g. if you joined with 1000 words, and during the sprint you wrote another 500 words, your final wordcount you should declare would be 1500
+e.g. if you joined with 1000 words, and during the sprint you wrote another 500 words, the final wordcount you should declare would be 1500
 `;
         msg.say(output);
+        
+    }
+    
+    run_notify(msg){
+        
+        let guildID = msg.guild.id;
+        let userID = msg.author.id;
+        
+        // Set them to be notified about upcoming sprints
+        var stats = new Stats();
+        stats.set(guildID, userID, 'sprint_notify', 1);
+        
+        msg.say(`Okay ${msg.author.username}, you will be notified of any upcoming sprints. \`sprint forget\` to no longer be notified.`);        
+        
+    }
+    
+    run_forget(msg){
+        
+        let guildID = msg.guild.id;
+        let userID = msg.author.id;
+        
+        // Set them to be notified about upcoming sprints
+        var stats = new Stats();
+        stats.set(guildID, userID, 'sprint_notify', 0);
+        
+        msg.say(`Okay ${msg.author.username}, you will no longer be notified of upcoming sprints.`);        
         
     }
     
@@ -475,7 +515,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
         
         if (sprint){
             
-            if (userID === sprint.createdby || msg.member.hasPermission('MANAGE_MESSAGES')){
+            if (userID == sprint.createdby || msg.member.hasPermission('MANAGE_MESSAGES')){
                 
                 // Get the users to notify
                 var users = [];
@@ -502,6 +542,11 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 
                 // Clear the timeout
                 this.clear();
+                
+                // Decrement their stat
+                if (userID == sprint.createdby){
+                    this.stats.dec(guildID, userID, 'sprints_started', 1);
+                }
                 
                 var output = '\:disappointed: **SPRINT CANCELLED**\n\n';
                 output += users.join(', ');
@@ -576,7 +621,9 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 end: 0
             });
             
-            db.close();
+            // Increment sprint_started stat
+            this.stats.inc(guildID, userID, 'sprints_started', 1);
+            
                        
             // If we are starting immediately, display that message instead of the standard one
             if (delay === 0){
@@ -586,8 +633,21 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 var left = lib.secsToMins( (delay / 1000) );
 
                 var output = '\:alarm_clock:  **STARTING SPRINT**\n\nThe next sprint starts in ' + left.m + ' minute(s) and will run for ' + sFor + ' minute(s). `sprint join` to join this sprint.\n';
-                output += `${msg.author}`;
-
+                var notify = ['<@'+userID+'>'];
+                
+                // Who else wants to be notified?
+                var notifyUsers = db.conn.prepare('SELECT [user] FROM [user_stats] WHERE [guild] = :guild AND name = :name AND VALUE = 1').all({
+                    guild: guildID,
+                    name: 'sprint_notify'
+                });
+                
+                for (var i = 0; i < notifyUsers.length; i++){
+                    if (notify.indexOf('<@'+notifyUsers[i].user+'>') < 0){
+                        notify.push('<@'+notifyUsers[i].user+'>');
+                    }
+                }
+                
+                output += notify.join(', ');
                 msg.say(output);
 
                 // Set timeout to alert users when it starts
@@ -596,6 +656,8 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 }, delay);
             
             }
+            
+            db.close();
             
         } else {
             msg.say('There is already a sprint running on this server. Please wait until it has finished before creating a new one.');
@@ -742,8 +804,13 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                         xp.add(xp.XP_COMPLETE_SPRINT);
                         
                         // Push to result dataset
-                        result.push({user: user.user, count: count, wpm: wpm, newWpmRecord: newWpmRecord, xp: xp.XP_COMPLETE_SPRINT});                                        
+                        result.push({user: user.user, count: count, wpm: wpm, newWpmRecord: newWpmRecord, xp: xp.XP_COMPLETE_SPRINT});       
                         
+                        // Increment their stats
+                        this.stats.inc(guildID, user.user, 'sprints_completed', 1);
+                        this.stats.inc(guildID, user.user, 'sprints_words_written', count);
+                        this.stats.inc(guildID, user.user, 'total_words_written', count);
+                                                
                     }
                     
                 }
@@ -766,6 +833,11 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                         var xp = new XP(guildID, result[k].user);
                         xp.add(result[k].user, newXp);
                         result[k].xp += newXp;
+                        
+                        // If they won, increment that stat
+                        if (pos === 1){
+                            this.stats.inc(guildID, user.user, 'sprints_won', 1);
+                        }
 
                     }
 
