@@ -17,6 +17,8 @@ module.exports = class GenerateCommand extends Command {
                 '`generate book` Generates 10 general fiction book titles', 
                 '`generate book_fantasy` Generates 10 fantasy book titles', 
                 '`generate book_sf` Generates 10 sci-fi book titles', 
+                '`generate book_horror` Generates 10 horror book titles', 
+                '`generate book_rom` Generates 10 romance/erotic book titles', 
                 '`generate book_hp` Generates 10 Harry Potter book titles'
             ],
             args: [
@@ -31,7 +33,7 @@ module.exports = class GenerateCommand extends Command {
                     default: '10',
                     prompt: 'How many names do you want to generate?',
                     type: 'integer',
-                    max: '50'
+                    max: '25'
                 }
             ]
         });

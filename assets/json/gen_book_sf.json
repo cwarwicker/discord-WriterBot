@@ -1,14 +1,14 @@
 {
     "names": {
     
-        "thing": ["star", "sky", "planet", "moon", "agent", "robot", "house", "enemy", "child", "space", "ark", "earth", "wake", "sun", "rain", "night", "day", "world", "sunlight", "starlight", "noise", "time", "sleep", "snow", "dust", "flower", "dream", "memory", "pod", "ship", "bullet", "map", "player", "game", "detail", "weapon", "expanse", "hammer", "fire", "bubble", "slip", "vortex", "dimension", "portal", "machine", "end", "beginning", "orbit", "nest", "fall", "nebula", "war"],
-        "things": ["stars", "skies", "planets", "moons", "agents", "robots", "houses", "enemies", "children", "arks", "wakes", "suns", "rains", "nights", "days", "worlds", "noises", "times", "sleeps", "snows", "dusts", "flowers", "dreams", "memories", "pods", "ships", "bullets", "maps", "players", "games", "details", "weapons", "expanses", "hammers", "fires", "bubbles", "slips", "vortexes", "dimensions", "portals", "machines", "ends", "beginnings", "orbits", "nests", "falls", "nebulas", "wars"],
+        "thing": ["star", "sky", "planet", "moon", "agent", "robot", "house", "enemy", "child", "space", "ark", "earth", "wake", "sun", "rain", "night", "day", "world", "sunlight", "starlight", "noise", "time", "sleep", "snow", "dust", "flower", "dream", "memory", "pod", "ship", "bullet", "map", "player", "game", "detail", "weapon", "expanse", "hammer", "fire", "bubble", "slip", "vortex", "dimension", "portal", "machine", "end", "beginning", "orbit", "nest", "fall", "nebula", "war", "exile", "journey", "dusk", "daybreak", "word", "eye"],
+        "things": ["stars", "skies", "planets", "moons", "agents", "robots", "houses", "enemies", "children", "arks", "wakes", "suns", "rains", "nights", "days", "worlds", "noises", "times", "sleeps", "snows", "dusts", "flowers", "dreams", "memories", "pods", "ships", "bullets", "maps", "players", "games", "details", "weapons", "expanses", "hammers", "fires", "bubbles", "slips", "vortexes", "dimensions", "portals", "machines", "ends", "beginnings", "orbits", "nests", "falls", "nebulas", "wars", "words", "eyes"],
         "verb": ["rising", "falling", "awakening", "dying", "dreaming", "whispering", "blinding", "everlasting", "burning", "living"],
-        "adj": ["black", "white", "diamond", "emerald", "ruby", "blue", "red", "dark", "light"],
+        "adj": ["black", "white", "diamond", "emerald", "ruby", "blue", "red", "dark", "light", "new", "old", "broken", "blighted", "corrupt", "bronze"],
         "rand": ["revelation", "aurora", "redemption", "century", "millenium", "terminal", "eternal", "trauma", "transition", "raven", "tiger", "lion", "leviathon", "satellite", "celestial", "crescent", "deep", "gravity", "nova", "lunar", "parallel", "phase", "solar", "zenith", "understanding", "forgetting", "annihilation"]
     
     },
     
-    "formats": ["$thing of $things", "$verb $thing", "The $verb $thing", "The $adj $thing", "$rand $thing", "$rand $verb"]
+    "formats": ["$thing of $things", "$verb $thing", "The $verb $thing", "$adj $thing", "$rand $thing", "$rand $verb"]
         
 }

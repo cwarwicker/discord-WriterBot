@@ -1,0 +1,13 @@
+{
+    "names": {
+    
+        "noun": ["dead", "undead", "outside", "bite", "blight", "curse", "death", "grave", "madness", "nightmare", "prey", "night", "wood", "forest", "cavern", "cave", "house", "crypt", "library", "castle", "village", "attic", "mirror", "knife", "blade", "blood", "hill", "hills", "mountain", "hospital", "cabin", "street", "song", "whisper", "tree", "sky", "eye", "hand", "sound", "garden", "monster", "room", "road", "exit", "school", "island", "shock", "painting", "museum", "picture", "photograph", "ice", "snow", "winter", "summer", "day", "breath", "beat", "heart", "game", "bridge", "circus", "fire", "bone", "train", "plane", "boat", "water", "air", "mist", "fog"],
+        "ppl": ["man", "boy", "woman", "girl", "ghost", "wolf", "raven", "spider", "snake", "butcher", "demon", "figure", "beast", "creature", "predator", "one", "outsider", "stranger"],
+        "adj": ["dark", "black", "dead", "undead", "evil", "beautiful", "white", "blue", "red", "violet", "forsaken", "savage", "naked", "cold", "freezing", "burning", "unknown", "empty", "invisible", "apex", "thin", "young", "old", "ancient", "slow", "fast", "forbidden", "sleeping", "waking", "damned"],
+        "prep": ["who", "in", "in the", "on the", "of the", "beyond the", "before the"]
+        
+    },
+    
+    "formats": ["$adj $noun", "The $adj $ppl", "The $ppl $prep $noun", "The $noun $prep $noun"]
+        
+}
