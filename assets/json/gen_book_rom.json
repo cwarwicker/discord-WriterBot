@@ -1,11 +1,11 @@
 {
     "names": {
     
-        "noun": ["wind", "air", "water", "eye", "heart", "gift", "love", "door", "gate", "maid", "butler", "servant", "storm", "flower", "flame", "spark", "dream", "secret", "light", "lover", "soul", "mist", "slave", "thorn", "scent", "stream", "lake", "river", "wave", "tears", "stone", "star", "stars", "tale"],
+        "noun": ["wind", "air", "water", "eye", "heart", "gift", "love", "door", "gate", "maid", "butler", "servant", "storm", "flower", "flame", "spark", "dream", "secret", "light", "lover", "soul", "mist", "slave", "thorn", "scent", "stream", "lake", "river", "wave", "tears", "stone", "star", "stars", "tale", "sex", "pleasure", "bed", "touch"],
         "ppl": ["man", "boy", "woman", "girl", "one", "outsider", "stranger", "child", "consort", "teacher"],
         "place": ["village", "town", "city", "library", "musuem", "garden", "beach"],
-        "adj": ["secret", "silent", "white", "black", "blue", "red", "yellow", "green", "invisible", "undying", "hidden", "forbidden", "missing", "stolen"],
-        "prep": ["of", "who"],
+        "adj": ["secret", "silent", "white", "black", "blue", "red", "yellow", "green", "invisible", "undying", "hidden", "forbidden", "missing", "stolen", "beautiful", "loving", "last", "first", "only", "name of the", "sound of the", "touch of the"],
+        "prep": ["who"],
         "verb": ["stole", "left", "ran", "walked", "swum", "had", "broke", "killed", "took"]
         
     },
