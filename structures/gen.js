@@ -106,7 +106,7 @@ class NameGenerator
                 var resp = '';
                 
                 if (type === 'char'){
-                    resp += 'Here are your ' + limit + ' fantasy character names:\n\n';
+                    resp += 'Here are your ' + limit + ' character names:\n\n';
                 } else if(type === 'place'){
                     resp += 'Here are your ' + limit + ' fantasy place names:\n\n';
                 } else if(type === 'land'){

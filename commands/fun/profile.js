@@ -46,7 +46,6 @@ module.exports = class ProfileCommand extends Command {
             
             var xp = new XP(guildID, userID, msg);
             var userXp = xp.get();
-            var left = xp.calcNextLvl(userXp.lvl, userXp.xp);
             
             var stats = new Stats();
             var goal = new Goal(msg, guildID, userID);

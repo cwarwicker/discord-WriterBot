@@ -151,6 +151,10 @@ module.exports = class SprintCommand extends Command {
             return this.run_forget(msg);
         }
         
+        else if (opt1 === ''){
+            return msg.say('Did you mean `sprint start`?');
+        }
+        
         else {
             
             var replyArray = ['Er...what?', 'I\'m too tired', 'I can\'t do that', 'That sounds like a cool feature, maybe I should add it?', 'Do you even know what you\'re doing?'];

@@ -209,7 +209,7 @@ module.exports = class ChallengeCommand extends Command {
                 if (answer === 'yes'){
 
                     this.set_challenge(msg, userID, challenge);
-                    msg.say(`Challenge accepted: **${challenge}**\n\n\`challenge done\` to complete the challenge      \`challenge cancel\` to cancel the challenge.`);
+                    msg.say(`${msg.author} accetpted the challenge: **${challenge}**\n\n\`challenge done\` to complete the challenge      \`challenge cancel\` to cancel the challenge.`);
 
                 } else {
                     msg.say(`Challenge declined.`);

@@ -35,7 +35,7 @@ module.exports = class XPCommand extends Command {
                 var output = `${msg.author}, you are **Level ${user.lvl}** (${user.xp}/${user.xp+left})`;        
                 msg.say(output);
             } else {
-                msg.say(`${msg.author}, you haven't earned any xp on this server yet. You can earn xp by doing writing challenges and sprints.`);
+                msg.say(`${msg.author}, you haven't earned any xp on this server yet. You can earn xp by doing writing challenges, sprints and meeting your daily goal.`);
             }
         
         } else if (who === 'top'){

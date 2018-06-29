@@ -10,7 +10,7 @@ module.exports = class PromptCommand extends Command {
             aliases: [],
             group: 'writing',
             memberName: 'prompt',
-            description: 'Generates a random writing prompt',
+            description: 'Generates a random writing prompt. Initial prompts taken from (https://thewritersacademy.co.uk)',
             examples: [
                 '`prompt` Generates a random writing prompt'
             ]
