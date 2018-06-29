@@ -13,6 +13,6 @@
     
     },
     
-    "formats": ["The $ppl with the $obj $obj", "The $ppl who $verb $rand", "The $ppl who $verb $prep $objpl", "The $adj $obj", "$pre $objpl", "The $obj $obj", "The $obj of the $objpl", "$adj $objpl", "$nouns"]
+    "formats": ["The $ppl with the $obj $obj", "The $ppl who $verb $rand", "The $ppl who $verb $prep $objpl", "The $adj $obj", "$pre $objpl", "The $obj of the $objpl", "$adj $objpl", "$nouns"]
         
 }

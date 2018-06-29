@@ -134,8 +134,8 @@ class NameGenerator
             var replyArray = ['Er...what?', 'Generate what, now?', 'I can\'t do that', 'That sounds like a cool feature, maybe I should add it?'];
             var rand = Math.round(Math.random() * (replyArray.length - 1));
             msg.say( replyArray[rand] );
-            console.error(e);
             return null;
+            
         }
         
         
