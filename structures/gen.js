@@ -27,14 +27,14 @@ class NameGenerator
         
         // Load the source
         var filepath = 'assets/json/gen_'+type+'.json';
-                
+                        
         try {
             
             let result = fs.statSync('./'+filepath);
-                        
+                                    
             // Exists
             if (result.isFile()){
-                                                
+                                                                
                 // Get the contents of the json file
                 var source = require('./../'+filepath);
                                 
@@ -42,10 +42,10 @@ class NameGenerator
                 var retries = 0;
                 
                 // Writing Prompts slightly different
-                if (type === 'prompt'){
+                if (type === 'idea'){
                     limit = 1;
                 }
-                                
+                                                                
                 
                 // Loop through n number of times
                 for (var i = 0; i < limit; i++)
@@ -55,13 +55,14 @@ class NameGenerator
                     
                     // Pick a random format
                     var format = source.formats[Math.floor(Math.random()*source.formats.length)];
-                    
+                                                                                
                     // Build the string
                     var str = format.replace(/\$(\d+|[a-z]+)/g, function(match, capture){
 
                         var arr = source.names[capture];
+                                                                        
                         var el = arr[Math.floor(Math.random()*arr.length)];
-                        
+                                                
                         // We don't want the same string twice in a row, e.g. "riverriver", although it it's 2 or less characters, we can accept that.
                         while (el.length > 2 && el === last){
                             el = arr[Math.floor(Math.random()*arr.length)];
@@ -74,7 +75,7 @@ class NameGenerator
                     });
                                         
                     // Capitalise first letter of each word
-                    if (type !== 'prompt'){
+                    if (type !== 'idea'){
                         var arr = str.split(" ");
 
                         for (var k in arr){
@@ -118,8 +119,6 @@ class NameGenerator
                     resp += 'Here are your ' + limit + ' sci-fi book titles:\n\n';
                 } else if(type === 'book_hp'){
                     resp += 'Here are your ' + limit + ' Harry Potter book titles:\n\n';
-                } else if(type === 'prompt'){
-                    resp += 'Here is your Writing Prompt:\n\n';
                 } 
                 
                 resp += results.join('\n');
@@ -131,7 +130,11 @@ class NameGenerator
             }
             
         } catch(e){
-            console.log(e);
+            
+            var replyArray = ['Er...what?', 'Generate what, now?', 'I can\'t do that', 'That sounds like a cool feature, maybe I should add it?'];
+            var rand = Math.round(Math.random() * (replyArray.length - 1));
+            msg.say( replyArray[rand] );
+            console.error(e);
             return null;
         }
         

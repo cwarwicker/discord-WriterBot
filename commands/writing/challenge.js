@@ -1,6 +1,7 @@
 const { Command } = require('discord.js-commando');
 const XP = require('./../../structures/xp.js');
 const Database = require('./../../structures/db.js');
+const Stats = require('./../../structures/stats.js');
 const lib = require('./../../lib.js');
 
 module.exports = class ChallengeCommand extends Command {
@@ -44,7 +45,7 @@ module.exports = class ChallengeCommand extends Command {
         this.wpm = {min: 5, max: 30};
         this.times = {min: 5, max: 45};
         this.waiting = [];
-        
+        this.stats = new Stats();
                 
     }
 
@@ -104,6 +105,9 @@ module.exports = class ChallengeCommand extends Command {
             // Add xp
             var xp = new XP(guildID, userID, msg); 
             xp.add(xp.XP_COMPLETE_CHALLENGE);
+            
+            // Increment stat
+            this.stats.inc(guildID, userID, 'challenges_completed', 1);
 
             return msg.say(`${msg.author} has completed the challenge **${userChallenge.challenge}**     +${xp.XP_COMPLETE_CHALLENGE} xp`);            
             
@@ -126,10 +130,10 @@ module.exports = class ChallengeCommand extends Command {
             db.conn.prepare('DELETE FROM [user_challenges] WHERE id = :id').run({ id: userChallenge.id });
             db.close();
             
-            return msg.say('Challenge cancelled.');
+            return msg.say(`${msg.author} has given up on their challenge.`);
             
         } else {
-            return msg.say('You do not have a current challenge.');
+            return msg.say('You do not have an active challenge. Perhaps you should start one? `challenge`');
         }
         
     }
@@ -205,10 +209,10 @@ module.exports = class ChallengeCommand extends Command {
                 if (answer === 'yes'){
 
                     this.set_challenge(msg, userID, challenge);
-                    msg.say(`${msg.author}, Challenge accepted: **${challenge}**\n\`challenge done\` to complete the challenge.\n\`challenge cancel\` to cancel the challenge.`);
+                    msg.say(`Challenge accepted: **${challenge}**\n\n\`challenge done\` to complete the challenge      \`challenge cancel\` to cancel the challenge.`);
 
                 } else {
-                    msg.say(`${msg.author}, Challenge declined`);
+                    msg.say(`Challenge declined.`);
                 }
                 
                 // Remove waiting

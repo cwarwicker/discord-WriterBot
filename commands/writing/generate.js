@@ -9,7 +9,7 @@ module.exports = class GenerateCommand extends Command {
             aliases: ['gen'],
             group: 'writing',
             memberName: 'generate',
-            description: 'Random generator for various things (character names, place names, land names, book titles, writing prompts). Define the type of item you wanted generated and then optionally, the amount of items to generate.',
+            description: 'Random generator for various things (character names, place names, land names, book titles, story ideas). Define the type of item you wanted generated and then optionally, the amount of items to generate.',
             examples: [
                 '`generate char` Generates 10 character names', 
                 '`generate place 20` Generates 20 fantasy place names', 
@@ -19,7 +19,8 @@ module.exports = class GenerateCommand extends Command {
                 '`generate book_sf` Generates 10 sci-fi book titles', 
                 '`generate book_horror` Generates 10 horror book titles', 
                 '`generate book_rom` Generates 10 romance/erotic book titles', 
-                '`generate book_hp` Generates 10 Harry Potter book titles'
+                '`generate book_hp` Generates 10 Harry Potter book titles',
+                '`generate idea` Generates a random story idea'
             ],
             args: [
                 {

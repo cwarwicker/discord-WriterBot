@@ -35,6 +35,20 @@ module.exports.getMember = function(msg, id){
     return msg.guild.members.find('id', id);
 };
 
+module.exports.getMemberByName = function(msg, name){
+    
+    var userArray = msg.guild.members.array();
+    for (var i = 0; i < userArray.length; i++){
+        var user = userArray[i];
+        if (user.user.username === name){
+            return user.user;
+        }
+    }
+    
+    return false;
+    
+};
+
 module.exports.getBotServer = function(bot, id){
     return bot.guilds.find('id', id);
 };

@@ -89,66 +89,75 @@ module.exports = class SprintCommand extends Command {
                                                                                         
         // Start a sprint
         if (opt1 === 'start'){
-            this.run_start(msg);
+            return this.run_start(msg);
         }
         
         else if (opt1 === 'for'){
             if (opt3 === 'now'){
                 opt4 = 0;
             }
-            this.run_start(msg, opt2, opt4);
+            return this.run_start(msg, opt2, opt4);
         }
         
         // Cancel the sprint
         else if (opt1 === 'cancel' || opt1 === 'stop'){
-            this.run_cancel(msg);
+            return this.run_cancel(msg);
         }
         
         // Check time remaining
         else if (opt1 === 'time' || opt1 === 'tc'){
-            this.run_time(msg);
+            return this.run_time(msg);
         }
         
         // Join the sprint
         else if (opt1 === 'join'){
-            this.run_join(msg, opt2);
+            return this.run_join(msg, opt2);
         }
         
         else if (opt1 === 'leave'){
-            this.run_leave(msg);
+            return this.run_leave(msg);
         }
         
         else if (opt1 === 'users'){
-            this.run_users(msg);
+            return this.run_users(msg);
         }
         
         else if (opt1 === 'wc' || opt1 === 'declare'){
-            this.run_declare(msg, opt2);
+            return this.run_declare(msg, opt2);
         }
         
         else if (opt1 === 'end'){
-            this.run_end(msg);
+            return this.run_end(msg);
         }
         
         else if (opt1 === 'help'){
-            this.run_help(msg);
+            return this.run_help(msg);
         }
         
         else if (opt1 === 'pb' || opt1 === 'record'){
-            this.run_pb(msg);
+            return this.run_pb(msg);
         }
         
         else if (opt1 === 'end'){
-            this.run_end(msg);
+            return this.run_end(msg);
         } 
         
         else if (opt1 === 'notify'){
-            this.run_notify(msg);
+            return this.run_notify(msg);
         }  
         
         else if (opt1 === 'forget'){
-            this.run_forget(msg);
+            return this.run_forget(msg);
         }
+        
+        else {
+            
+            var replyArray = ['Er...what?', 'I\'m too tired', 'I can\'t do that', 'That sounds like a cool feature, maybe I should add it?', 'Do you even know what you\'re doing?'];
+            var rand = Math.round(Math.random() * (replyArray.length - 1));
+            return msg.say( replyArray[rand] );
+            
+        }
+        
         
     }
     
@@ -234,7 +243,7 @@ Write with your friends and see who can write the most in the time limit! Earn e
 If you join the sprint with a starting wordcount, remember to declare your total word count at the end, not just the amount of words you wrote in the sprint.
 e.g. if you joined with 1000 words, and during the sprint you wrote another 500 words, the final wordcount you should declare would be 1500
 `;
-        msg.say(output);
+        return msg.say(output);
         
     }
     
@@ -247,7 +256,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
         var stats = new Stats();
         stats.set(guildID, userID, 'sprint_notify', 1);
         
-        msg.say(`Okay ${msg.author.username}, you will be notified of any upcoming sprints. \`sprint forget\` to no longer be notified.`);        
+        return msg.say(`Okay ${msg.author.username}, you will be notified of any upcoming sprints. \`sprint forget\` to no longer be notified.`);        
         
     }
     
@@ -260,7 +269,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
         var stats = new Stats();
         stats.set(guildID, userID, 'sprint_notify', 0);
         
-        msg.say(`Okay ${msg.author.username}, you will no longer be notified of upcoming sprints.`);        
+        return msg.say(`Okay ${msg.author.username}, you will no longer be notified of upcoming sprints.`);        
         
     }
     
@@ -274,13 +283,13 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             
             // We can only cancel it if we are the creator of it, or we have the manage messages permission
             if (userID == sprint.createdby || msg.member.hasPermission('MANAGE_MESSAGES')){
-                this.post_end_message(msg);                
+                return this.post_end_message(msg);                
             } else {
-                msg.say('Only the sprint creator or a moderator can end this sprint.');
+                return msg.say('Only the sprint creator or a moderator can end this sprint.');
             }
             
         } else {
-            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
+            return msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
         }
                 
     }
