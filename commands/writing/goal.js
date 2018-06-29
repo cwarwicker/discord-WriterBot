@@ -11,7 +11,7 @@ module.exports = class GoalCommand extends Command {
             aliases: [],
             group: 'writing',
             memberName: 'goal',
-            description: '',
+            description: 'Sets a daily goal which resets every 24 hours',
             examples: [
                 '`goal` - Checks how close you are to your daily goal',
                 '`goal set 500` - Sets your daily goal to be 500 words',
