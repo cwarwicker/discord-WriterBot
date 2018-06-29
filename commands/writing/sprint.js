@@ -40,6 +40,8 @@ module.exports = class SprintCommand extends Command {
                 '`sprint time` Displays the time left in the current sprint',
                 '`sprint users` Displays a list of the users taking part in the current sprint',
                 '`sprint pb` Displays your personal best wpm from sprints on this server',
+                '`sprint notify` You will be notified when someone starts a new sprint',
+                '`sprint forget` You will no longer be notified when someone starts a new sprint',
                 '`sprint help` Displays a similar help screen to this one, with a few added bits of info'
             ],
             args: [
