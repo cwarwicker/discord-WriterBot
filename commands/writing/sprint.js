@@ -3,6 +3,7 @@ const Database = require('./../../structures/db.js');
 const XP = require('./../../structures/xp.js');
 const Record = require('./../../structures/record.js');
 const Stats = require('./../../structures/stats.js');
+const Goal = require('./../../structures/goal.js');
 const lib = require('./../../lib.js');
 
 const STAT_SPRINT_NOTIFY = 3;
@@ -812,14 +813,17 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                         var xp = new XP(guildID, user.user, msg);
                         xp.add(xp.XP_COMPLETE_SPRINT);
                         
-                        // Push to result dataset
-                        result.push({user: user.user, count: count, wpm: wpm, newWpmRecord: newWpmRecord, xp: xp.XP_COMPLETE_SPRINT});       
-                        
                         // Increment their stats
                         this.stats.inc(guildID, user.user, 'sprints_completed', 1);
                         this.stats.inc(guildID, user.user, 'sprints_words_written', count);
                         this.stats.inc(guildID, user.user, 'total_words_written', count);
+                        
+                        // Increment their words towards their daily goal
+                        var goal = new Goal(msg, guildID, user.user);
+                        goal.inc(count);
                                                 
+                        // Push to result dataset
+                        result.push({user: user.user, count: count, wpm: wpm, newWpmRecord: newWpmRecord, xp: xp.XP_COMPLETE_SPRINT});       
                     }
                     
                 }
@@ -845,11 +849,16 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                         
                         // If they won, increment that stat
                         if (pos === 1){
-                            this.stats.inc(guildID, user.user, 'sprints_won', 1);
+                            this.stats.inc(guildID, result.user, 'sprints_won', 1);
                         }
 
                     }
 
+                }
+                
+                // If we were the only one taking part, may as well mark it as a win
+                if (result.length === 1){
+                    this.stats.inc(guildID, result[0].user, 'sprints_won', 1);
                 }
                 
                 // Mark the sprint as complete

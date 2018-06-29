@@ -11,7 +11,9 @@ class XP
         this.XP_COMPLETE_SPRINT = 25;
         this.XP_WIN_SPRINT = 100;
         this.XP_COMPLETE_CHALLENGE = 50;
-        this.XP_PER_500_WORDS = 10;
+        this.XP_COMPLETE_GOAL = {
+            'daily': 100
+        };
         
         this.guild = guild;
         this.user = user;

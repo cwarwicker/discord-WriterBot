@@ -1,6 +1,7 @@
 const { Command } = require('discord.js-commando');
 const Stats = require('./../../structures/stats.js');
 const XP = require('./../../structures/xp.js');
+const Goal = require('./../../structures/goal.js');
 const lib = require('./../../lib.js');
 
 module.exports = class ProfileCommand extends Command {
@@ -8,7 +9,7 @@ module.exports = class ProfileCommand extends Command {
 		super(client, {
                     name: 'profile',
                     aliases: [],
-                    group: 'util',
+                    group: 'fun',
                     memberName: 'profile',
                     description: 'Displays your user statistics for this server',
                     guildOnly: true,
@@ -48,6 +49,7 @@ module.exports = class ProfileCommand extends Command {
             var left = xp.calcNextLvl(userXp.lvl, userXp.xp);
             
             var stats = new Stats();
+            var goal = new Goal(msg, guildID, userID);
             
             var total_wc = stats.get(guildID, userID, 'total_words_written');
             var sprint_wc = stats.get(guildID, userID, 'sprints_words_written');
@@ -55,6 +57,9 @@ module.exports = class ProfileCommand extends Command {
             var sprints_completed = stats.get(guildID, userID, 'sprints_completed');
             var sprints_won = stats.get(guildID, userID, 'sprints_won');
             var challenges_completed = stats.get(guildID, userID, 'challenges_completed');
+            var daily_goals_completed = stats.get(guildID, userID, 'daily_goals_completed');
+            var dailyGoal = goal.get('daily');
+            
         
             return msg.embed({
                 color: 3066993,
@@ -93,6 +98,16 @@ module.exports = class ProfileCommand extends Command {
                     {
                         name: 'Challenges Completed',
                         value: (challenges_completed) ? challenges_completed.value : 0,
+                        inline: true
+                    },
+                    {
+                        name: 'Daily Goals Completed',
+                        value: (daily_goals_completed) ? daily_goals_completed.value : 0,
+                        inline: true
+                    },
+                    {
+                        name: 'Daily Goal Progress',
+                        value: (dailyGoal) ? ((Math.floor((dailyGoal.current / dailyGoal.goal) * 100))) + '%' : 0 + '%',
                         inline: true
                     }
                 ]                        

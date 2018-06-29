@@ -30,7 +30,7 @@ module.exports = class XPCommand extends Command {
         
             var user = xp.get();
             
-            if (user){
+            if (user && user.xp > 0){
                 var left = xp.calcNextLvl(user.lvl, user.xp);
                 var output = `${msg.author}, you are **Level ${user.lvl}** (${user.xp}/${user.xp+left})`;        
                 msg.say(output);
