@@ -9,7 +9,7 @@ module.exports = class AskCommand extends Command {
             aliases: [],
             group: 'writing',
             memberName: 'ask',
-            description: 'Asks you a random question about your character or your world, to get the creative juices flowing.\nInitial questions taken from (https://www.novel-software.com).',
+            description: 'Asks you a random question about your character or your world, to get the creative juices flowing.\nInitial questions taken from (novel-software).',
             examples: [
                 '`ask c` - Asks you a question about your character',
                 '`ask w` - Asks you a question about your world'

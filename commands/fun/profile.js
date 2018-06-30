@@ -34,6 +34,7 @@ module.exports = class ProfileCommand extends Command {
                 var find = lib.getMemberByName(msg, who);
                 if (find !== null){
                     var userID = find.id;
+                    var userName = who;
                 } else {
                     return msg.say('Could not find that user.');
                 }
@@ -41,6 +42,7 @@ module.exports = class ProfileCommand extends Command {
             } else {
                 var user = msg.author;
                 var userID = user.id;
+                var userName = user.username;
             }
                     
             
@@ -62,7 +64,7 @@ module.exports = class ProfileCommand extends Command {
         
             return msg.embed({
                 color: 3066993,
-                title: msg.author.username,
+                title: userName,
                 fields: [
                     {
                         name: 'Lvl (XP)',

@@ -85,6 +85,7 @@ module.exports = class SprintCommand extends Command {
         this.guildSettings = [];
         this.messageTimeout = null;
         this.stats = new Stats();
+        this.finished = 0;
                 
     }
 
@@ -159,7 +160,7 @@ module.exports = class SprintCommand extends Command {
         
         else {
             
-            var replyArray = ['Er...what?', 'I\'m too tired', 'I can\'t do that', 'That sounds like a cool feature, maybe I should add it?', 'Do you even know what you\'re doing?'];
+            var replyArray = ['Er...what?', 'I\'m too tired.', 'I can\'t do that Dave.', 'That sounds like a cool feature, maybe I should add it?', 'What are you trying to do?'];
             var rand = Math.round(Math.random() * (replyArray.length - 1));
             return msg.say( replyArray[rand] );
             
@@ -207,7 +208,7 @@ module.exports = class SprintCommand extends Command {
         var declared = 0;
         
         var db = new Database();
-        var users = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [id] = :sp').all({ sp: sprint.id });
+        var users = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [sprint] = :sp').all({ sp: sprint.id });
         
         for (var i = 0; i < users.length; i++){
             if (users[i].ending_wc > 0){
@@ -263,7 +264,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
         var stats = new Stats();
         stats.set(guildID, userID, 'sprint_notify', 1);
         
-        return msg.say(`Okay ${msg.author.username}, you will be notified of any upcoming sprints. \`sprint forget\` to no longer be notified.`);        
+        return msg.say(`${msg.author.username}: You will be notified of any upcoming sprints. \`sprint forget\` to no longer be notified.`);        
         
     }
     
@@ -276,7 +277,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
         var stats = new Stats();
         stats.set(guildID, userID, 'sprint_notify', 0);
         
-        return msg.say(`Okay ${msg.author.username}, you will no longer be notified of upcoming sprints.`);        
+        return msg.say(`${msg.author.username}: You will no longer be notified of upcoming sprints.`);        
         
     }
     
@@ -296,7 +297,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             }
             
         } else {
-            return msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
+            return msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`.');            
         }
                 
     }
@@ -309,14 +310,16 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
         var record = new Record();
         var userRecord = record.get(guildID, userID, 'wpm');
         if (userRecord){
-            return msg.say(`${msg.author}, your personal best is **${userRecord.value}** words-per-minute`);     
+            return msg.say(`${msg.author}: Your personal best is **${userRecord.value}** wpm.`);     
         } else {
-            return msg.say('You do not yet have a words-per-minute personal best');
+            return msg.say(`${msg.author}: You do not yet have a wpm personal best on this server.`);
         }
                 
     }
         
     run_declare(msg, amount){
+        
+        var obj = this;
         
         let userID = msg.author.id;
         let guildID = msg.guild.id;
@@ -337,7 +340,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
 
                 // Check amount is valid
                 if (!lib.isNumeric(amount)){
-                    msg.say('Please enter a valid word count');
+                    msg.say('Please enter a valid word count, greater than 0.');
                     return null;
                 }
 
@@ -364,11 +367,17 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
 
                 var written = user.ending_wc - user.starting_wc;
 
-                msg.say(`${msg.author} word count updated: ${user.ending_wc} (${written} new)`);
+                msg.say(`${msg.author}: You updated your word count to: ${user.ending_wc}. Total written in this sprint: ${written}.`);
 
                 // Are all users declared now?
-                if (this.is_declaration_finished(sprint)){
-                    this.finish(msg);
+                if (this.is_declaration_finished(sprint) && this.finished === 0){
+                    
+                    msg.say('The word counts are in. Results coming up shortly...');
+                    this.finished = 1;
+                    
+                    this.messageTimeout = setTimeout(function(){
+                        obj.finish(msg);
+                    }, 10000);
                 }
             
             }
@@ -388,14 +397,14 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             
             
             var db = new Database();
-            var records = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [id] = :sp').all({ sp: sprint.id });
+            var records = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [sprint] = :sp').all({ sp: sprint.id });
             db.close();
             
             if (records){
                 
                 // Get all the users
                 var users = [];
-                
+                                
                 for (var i = 0; i < records.length; i++){
                     var user = lib.getMember(msg, records[i].user);
                     if (user){
@@ -409,10 +418,10 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 var output = 'There are no users currently taking part in this sprint.';
             }
             
-            msg.say(output);            
+            return msg.say(output);            
             
         } else {
-            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
+            return msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`.');            
         }
         
         
@@ -432,12 +441,32 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 sp: sprint.id,
                 usr: userID
             });
-            db.close();
             
-            msg.say('You have left the sprint.');
+            msg.say(`${msg.author}: You have abandoned the sprint.`);
+            
+            // Are there any participants left? If not, cancel it
+            var participants = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [sprint] = :sp').all({ sp: sprint.id });
+            if (participants.length === 0){
+                
+                // Delete sprint
+                db.conn.prepare('DELETE FROM [sprints] WHERE [id] = ?').run([sprint.id]);
+                                
+                // Clear the timeout
+                this.clear();
+                
+                // Decrement the creator's stat
+                this.stats.dec(guildID, sprint.createdby, 'sprints_started', 1);
+                
+                var output = '**Sprint has been cancelled**\nEverybody left and I\'m not doing this alone.';
+                msg.say(output);
+                
+            }
+            
+            db.close();
+
             
         } else {
-            msg.say('You are not taking part in a sprint at the moment.');
+            msg.say(`${msg.author}: You are not taking part in a sprint at the moment.`);
         }
                 
     }
@@ -468,7 +497,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                     end: 0
                 });
                 
-                msg.say('You have joined the sprint, with ' + start + ' words.');
+                msg.say(`${msg.author}: You have joined the sprint with ${start} words.`);
                 
             } else {
                 
@@ -479,13 +508,13 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                     usr: userID
                 });
                 
-                msg.say('Updated your starting wordcount to: ' + start);  
+                msg.say(`${msg.author}: Your starting word count has been set to ${start}.`);  
             }
             
             db.close();
             
         } else {
-            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');
+            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`.');
         }
         
     }
@@ -512,11 +541,11 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                var left = lib.secsToMins(diff);
                msg.say(left.m + ' minutes, ' + left.s + ' seconds remaining');
            } else {
-               msg.say('Hmm. The sprint appears to be finished. If it hasn\'t asked you to declare your word-counts, try forcing it to end with `sprint end`');            
+               msg.say('Waiting for word counts. If the results haven\'t been posted within 2 minutes, try forcing the sprint to end with\`sprint end\`.');            
            }
             
         } else {
-            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
+            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`.');            
         }
                     
     }
@@ -537,7 +566,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 var users = [];
                 var db = new Database();
                 
-                var records = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [id] = :sp').all({ sp: sprint.id });
+                var records = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [sprint] = :sp').all({ sp: sprint.id });
 
                 if (records){
                     for (var i = 0; i < records.length; i++){
@@ -564,7 +593,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                     this.stats.dec(guildID, userID, 'sprints_started', 1);
                 }
                 
-                var output = '\:disappointed: **SPRINT CANCELLED**\n\n';
+                var output = '**Sprint has been cancelled**: ';
                 output += users.join(', ');
                 msg.say(output);
                 
@@ -573,7 +602,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             }
             
         } else {
-            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`');            
+            msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`.');            
         }
          
                  
@@ -598,6 +627,8 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
           
         // Check to make sure there is no active sprint on this guild/server
         if (!sprint){
+            
+            this.finished = 0;
             
             if (!lib.isNumeric(sFor) || sFor < 0 || sFor > this.max.length){
                 sFor = this.defaults.length;
@@ -648,7 +679,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             
                 var left = lib.secsToMins( (delay / 1000) );
 
-                var output = '\:alarm_clock:  **STARTING SPRINT**\n\nThe next sprint starts in ' + left.m + ' minute(s) and will run for ' + sFor + ' minute(s). `sprint join` to join this sprint.\n';
+                var output = '\**A new sprint has been scheduled**\nSprint will start in ' + left.m + ' minute(s) and will run for ' + sFor + ' minute(s). Use `sprint join <wordcount>` to join this sprint.\n';
                 var notify = ['<@'+userID+'>'];
                 
                 // Who else wants to be notified?
@@ -695,7 +726,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             var users = [];
             
             var db = new Database();
-            var records = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [id] = :sp').all({ sp: sprint.id });
+            var records = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [sprint] = :sp').all({ sp: sprint.id });
             db.close();
             
             if (records){
@@ -720,7 +751,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             }, delay);
             
             // Post the starting message
-            var output = '\:writing_hand: **THE SPRINT BEGINS**\n\nGet writing, you have ' + left.m + ' minute(s).\n';
+            var output = '**Sprint has started**\nGet writing, you have ' + left.m + ' minute(s).\n';
             output += users.join(', ');
             msg.say(output);
                                                     
@@ -746,7 +777,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             // Get users to notify
             var users = [];
             
-            var records = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [id] = :sp').all({ sp: sprint.id });
+            var records = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [sprint] = :sp').all({ sp: sprint.id });
             db.close();
             
             if (records){
@@ -768,7 +799,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             }, delay);
             
             // Post the ending message
-            var output = '\:octagonal_sign: **TIME IS UP**\n\nPlease submit your word count. e.g. `sprint wc 320`. You have ' + Math.round(this.defaults.post_delay / 60) + ' minutes.\n';
+            var output = '**Time is up**\nPens down. Use `sprint wc <amount>` to submit your final word counts, you have ' + Math.round(this.defaults.post_delay / 60) + ' minutes.\n';
             output += users.join(', ');
             msg.say(output);
                         
@@ -795,7 +826,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             // Get users & calculate positions
             var result = [];
             
-            var records = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [id] = :sp').all({ sp: sprint.id });
+            var records = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [sprint] = :sp').all({ sp: sprint.id });
             if (records){
                 
                 for (var i = 0; i < records.length; i++){
@@ -855,7 +886,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                         
                         // If they won, increment that stat
                         if (pos === 1){
-                            this.stats.inc(guildID, result.user, 'sprints_won', 1);
+                            this.stats.inc(guildID, result[k].user, 'sprints_won', 1);
                         }
 
                     }
@@ -871,7 +902,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 db.conn.prepare('UPDATE [sprints] SET [completed] = ? WHERE [id] = ?').run([now, sprint.id]);
                 
                 // Post the message
-                var output = '\:trophy: **THE RESULTS ARE IN**\n\nCongratulations to everyone:\n';
+                var output = '\:trophy: **Sprint Results** \:trophy:\nCongratulations to everyone.\n';
                 for (var i = 0; i < result.length; i++){
 
                     output += '`'+(i+1)+'`. <@' + result[i].user + '> - **' + result[i].count + ' words** ('+result[i].wpm+' wpm) ';

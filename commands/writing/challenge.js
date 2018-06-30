@@ -68,7 +68,7 @@ module.exports = class ChallengeCommand extends Command {
         
        var userChallenge = this.get_challenge(msg.guild.id, usr);
        if (userChallenge){
-           return msg.say('You already have an active challenge. You will need to either complete or cancel it first.');
+           return msg.say(`${msg.author}: You already have an active challenge. You will need to either complete or cancel it first.`);
        } else {
            
            var db = new Database();
@@ -109,10 +109,10 @@ module.exports = class ChallengeCommand extends Command {
             // Increment stat
             this.stats.inc(guildID, userID, 'challenges_completed', 1);
 
-            return msg.say(`${msg.author} has completed the challenge **${userChallenge.challenge}**     +${xp.XP_COMPLETE_CHALLENGE} xp`);            
+            return msg.say(`${msg.author}: You have completed the challenge **${userChallenge.challenge}**     +${xp.XP_COMPLETE_CHALLENGE} xp`);            
             
         } else {
-            return msg.say('You do not have an active challenge. Perhaps you should start one? `challenge`');
+            return msg.say(`${msg.author}: You do not have an active challenge. Perhaps you should start one? \`challenge\``);
         }
         
     }
@@ -130,10 +130,10 @@ module.exports = class ChallengeCommand extends Command {
             db.conn.prepare('DELETE FROM [user_challenges] WHERE id = :id').run({ id: userChallenge.id });
             db.close();
             
-            return msg.say(`${msg.author} has given up on their challenge.`);
+            return msg.say(`${msg.author} has given up on their challenge. Boo.`);
             
         } else {
-            return msg.say('You do not have an active challenge. Perhaps you should start one? `challenge`');
+            return msg.say(`${msg.author}: You do not have an active challenge. Perhaps you should start one? \`challenge\``);
         }
         
     }
@@ -146,7 +146,7 @@ module.exports = class ChallengeCommand extends Command {
         var userChallenge = this.get_challenge(guildID, userID);
         
         if (userChallenge){
-            return msg.say(`${msg.author}, your current challenge is: **${userChallenge.challenge}**\n\`challenge done\` to complete the challenge.\n\`challenge cancel\` to cancel the challenge.`);
+            return msg.say(`${msg.author}: Your current challenge is: **${userChallenge.challenge}**\n\`challenge done\` to complete the challenge.\n\`challenge cancel\` to cancel the challenge.`);
         } else {
                         
             var key = lib.findObjectArrayKeyByKey(this.waiting, 'guild', guildID);
@@ -193,7 +193,7 @@ module.exports = class ChallengeCommand extends Command {
 
             var challenge = `Write at least ${goal} words, in ${time} minutes (${wpm} wpm)`;
 
-            msg.say(`${msg.author}, Your challenge is to: ${challenge}. Will you accept this challenge? \`yes\` or \`no\` (You have 30 seconds to decide)`);
+            msg.say(`${msg.author}: Your challenge is to: ${challenge}. Will you accept this challenge? \`yes\` or \`no\` (You have 30 seconds to decide)`);
             
             // Push them into waiting array
             this.waiting[key].users.push(userID);
@@ -209,10 +209,10 @@ module.exports = class ChallengeCommand extends Command {
                 if (answer === 'yes'){
 
                     this.set_challenge(msg, userID, challenge);
-                    msg.say(`${msg.author} accetpted the challenge: **${challenge}**\n\n\`challenge done\` to complete the challenge      \`challenge cancel\` to cancel the challenge.`);
+                    msg.say(`${msg.author}: You have accepted the challenge: **${challenge}**\n\`challenge done\` to complete the challenge.\n\`challenge cancel\` to cancel the challenge.`);
 
                 } else {
-                    msg.say(`Challenge declined.`);
+                    msg.say(`Fine.`);
                 }
                 
                 // Remove waiting

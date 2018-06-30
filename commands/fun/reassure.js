@@ -24,7 +24,7 @@ module.exports = class ReassureCommand extends Command {
 
     run(msg, {user}) {
         
-        return msg.say(`${user}...${reassurances[Math.floor(Math.random() * reassurances.length)]}`);
+        return msg.say(`${user}, ${reassurances[Math.floor(Math.random() * reassurances.length)]}`);
         
     }
 };

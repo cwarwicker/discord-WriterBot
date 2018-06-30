@@ -69,10 +69,10 @@ module.exports = class GoalCommand extends Command {
             
             var percentStr = '[' + ('- '.repeat(progressDone)) + ('  '.repeat(progressLeft)) +  ']';
             
-            return msg.say(`${msg.author}, you are ${percentStr} **${percent}%** of the way to your ${type} goal. (${record.current}/${record.goal})`);            
+            return msg.say(`${msg.author}: You are ${percentStr} **${percent}%** of the way to your ${type} goal. (${record.current}/${record.goal})`);            
             
         } else {
-            return msg.say(`${msg.author}, you do not currently have a ${type} goal. I think you should set one, e.g. \`goal set 500\``);
+            return msg.say(`${msg.author}: You do not currently have a ${type} goal. I think you should set one, e.g. \`goal set <wordcount>\``);
         }
     
     }
@@ -85,7 +85,7 @@ module.exports = class GoalCommand extends Command {
         var goal = new Goal(msg, msg.guild.id, msg.author.id);
         goal.delete(type);
         
-        return msg.say(`${msg.author} has given up on their ${type} goal.`);
+        return msg.say(`${msg.author} has given up on their ${type} goal. Boo.`);
         
     }
     
@@ -104,7 +104,7 @@ module.exports = class GoalCommand extends Command {
         var result = goal.set(type, value);
         
         if (result){
-            return msg.say(`${msg.author}, ${type} goal set to **${value}** words. Get writing!`);
+            return msg.say(`${msg.author}: ${type} goal set to **${value}** words. Get writing!`);
         } else {
             return msg.say('Something went wrong.');
         }
