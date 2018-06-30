@@ -114,7 +114,7 @@ class Goal
                 var xp = new XP(this.guildID, this.userID, this.msg);
                 xp.add(xp.XP_COMPLETE_GOAL[type]);
                 
-                this.msg.say(`<@${this.userID}> met their ${type} goal of ${record.goal} words!`);
+                this.msg.say(`<@${this.userID}> met their ${type} goal of ${record.goal} words!     +${xp.XP_COMPLETE_GOAL[type]}xp`);
                 
             }
             
