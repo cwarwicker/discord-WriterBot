@@ -880,8 +880,8 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                         var newXp = Math.ceil(xp.XP_WIN_SPRINT / pos);
 
                         // Add to user record
-                        var xp = new XP(guildID, result[k].user);
-                        xp.add(result[k].user, newXp);
+                        var xp = new XP(guildID, result[k].user, msg);
+                        xp.add(newXp);
                         result[k].xp += newXp;
                         
                         // If they won, increment that stat
