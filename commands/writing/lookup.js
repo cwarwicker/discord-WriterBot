@@ -10,8 +10,8 @@ module.exports = class LookupCommand extends Command {
             aliases: ['define'],
             group: 'writing',
             memberName: 'lookup',
-            description: 'Looks up the definitions of a given word, using the Oxford English Dictionary API. Add the flag "s" to search for synonymns instead of definitions.',
-            examples: ['`lookup happy` Looks up the definition of the word "happy"', '`lookup happy s` Looks up synonyms for the word "happy"'],
+            description: 'Looks up the definitions of a given word, using the Oxford English Dictionary API. Add the flag `s` to search for synonymns, or `a` for antonyms.',
+            examples: ['`lookup happy` Looks up the definition of the word "happy"', '`lookup happy s` Looks up synonyms for the word "happy"', '`lookup happy a` Looks up antonyms for the word "happy"'],
             args: [
                 {
                     key: 'word',
@@ -34,10 +34,18 @@ module.exports = class LookupCommand extends Command {
 
     run(msg, {word, flag}) {
         
+        var type = 'definitions';
+        var url = 'https://od-api.oxforddictionaries.com:443/api/v1/entries/en/'+word;
         
-        var type = (flag === 's') ? 'synonyms' : 'definitions';
-        var url = (flag === 's') ? 'https://od-api.oxforddictionaries.com:443/api/v1/entries/en/'+word+'/synonyms' : 'https://od-api.oxforddictionaries.com:443/api/v1/entries/en/'+word;
-
+        // Synonyms
+        if (flag === 's'){
+            type = 'synonyms';
+            url += '/synonyms';
+        } else if (flag === 'a'){
+            type = 'antonyms';
+            url += '/antonyms';
+        }
+        
         var message = '';
 
         message += '**'+word+'** ['+type+']\n\n';
@@ -90,6 +98,33 @@ module.exports = class LookupCommand extends Command {
 
                         }
                         
+                    } else if (type === 'antonyms'){
+                        
+                        output[lexicalCategory]['examples'] = new Array();
+                        output[lexicalCategory]['results'] = new Array();
+
+                                                
+                        for (var k = 0; k < entries.length; k++){
+
+                            var entry = entries[k];                                                        
+                            
+                            if (entry.antonyms !== undefined){
+                                
+                                // Examples
+                                var example = entry.examples[0];
+                                output[lexicalCategory]['examples'][k] = example.text;
+                                output[lexicalCategory]['results'][k] = new Array();
+                                
+                                for (var j = 0; j < entry.antonyms.length; j++){
+                                    
+                                    output[lexicalCategory]['results'][k].push(entry.antonyms[j].text);
+                                    
+                                }
+                                
+                            }
+
+                        }
+                        
                     } else {
                     
                         // Definitions                    
@@ -113,7 +148,7 @@ module.exports = class LookupCommand extends Command {
                     message += '('+key+')\n';
                     
                     // Synonymns
-                    if (type === 'synonyms'){
+                    if (type === 'synonyms' || type === 'antonyms'){
 
                         // Loop through examples
                         for (var ek = 0; ek < output[key]['examples'].length; ek++){
