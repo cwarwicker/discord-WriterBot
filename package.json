@@ -1,13 +1,19 @@
 {
-  "name": "newbot",
+  "name": "Writer-Bot",
   "version": "0.0.1",
-  "description": "",
+  "description": "A discord bot for writing-related servers, with tools such as: sprints, challenges, daily goals, word look-ups, random name generators, writing prompts/ideas, etc...",
   "main": "bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cwarwicker/discord-WriterBot.git"
+  },
+  "homepage": "https://github.com/cwarwicker/discord-WriterBot",
+  "bugs": "https://github.com/cwarwicker/discord-WriterBot/issues",
+  "author": "Conn Warwicker",
+  "license": "GPL-3.0",
   "dependencies": {
     "axios": "^0.18.0",
     "better-sqlite3": "^4.1.4",
@@ -17,6 +23,7 @@
     "moment-duration-format": "^2.2.2",
     "node-cron": "^1.2.1",
     "node-gyp": "^3.7.0",
-    "sqlite": "^2.9.2"
+    "sqlite": "^2.9.2",
+    "sqlite3": "^4.0.1"
   }
 }

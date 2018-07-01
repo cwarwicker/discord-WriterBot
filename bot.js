@@ -24,10 +24,6 @@ bot.registry
     .registerDefaultCommands()
     .registerCommandsIn(path.join(__dirname, 'commands'));
        
-bot.setProvider(
-    sql.open(path.join(__dirname, '/data/db/settings.sqlite')).then(db => new Commando.SQLiteProvider(db))
-).catch(console.error);
-
 bot.on('ready', () => { 
     
     // Initialise database
@@ -53,5 +49,9 @@ bot.on('commandRun', command => console.log(`[COMMAND] Ran command ${command.gro
 bot.on('error', err => console.error('[ERROR]', err));
 bot.on('warn', err => console.warn('[WARNING]', err));
 bot.on('commandError', (command, err) => console.error('[COMMAND ERROR]', command.name, err));
+
+bot.setProvider(
+    sql.open(path.join(__dirname, '/data/db/settings.db')).then(db => new Commando.SQLiteProvider(db))
+).catch(console.error);
 
 bot.login(settings.token);

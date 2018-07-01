@@ -27,6 +27,6 @@ nbproject/
 package-lock.json
 node_modules/
 data/db/bot.db
-data/db/settings.sqlite
+data/db/settings.db
 todo
 settings.json
