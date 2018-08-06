@@ -40,6 +40,8 @@ module.exports = class GoalCommand extends Command {
 
     run (msg, {option, value}){
                 
+        option = option.toLowerCase();
+                
        // Daily goal
        if (option === 'set'){
            return this.run_set(msg, value);

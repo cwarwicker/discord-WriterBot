@@ -140,6 +140,8 @@ module.exports = class ChallengeCommand extends Command {
     
     run_challenge(msg, flag, flag2){
                 
+        flag = flag.toLowerCase();
+                
         let userID = msg.author.id;
         let guildID = msg.guild.id;
                 
@@ -206,7 +208,7 @@ module.exports = class ChallengeCommand extends Command {
             } ).then(mg => {
 
                 var answer = mg.first().content;
-                if (answer === 'yes'){
+                if (answer.toLowerCase() === 'yes'){
 
                     this.set_challenge(msg, userID, challenge);
                     msg.say(`${msg.author}: You have accepted the challenge: **${challenge}**\n\`challenge done\` to complete the challenge.\n\`challenge cancel\` to cancel the challenge.`);
@@ -280,6 +282,8 @@ module.exports = class ChallengeCommand extends Command {
             this.waiting.push({guild: msg.guild.id, users: []});
             key = lib.findObjectArrayKeyByKey(this.waiting, 'guild', msg.guild.id);
         }
+        
+        flag = flag.toLowerCase();
                         
         // Cancel
         if (flag === 'cancel'){

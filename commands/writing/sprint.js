@@ -90,7 +90,10 @@ module.exports = class SprintCommand extends Command {
     }
 
     async run(msg, {opt1, opt2, opt3, opt4}) {
-                                                                                        
+                                    
+        opt1 = opt1.toLowerCase();
+        opt3 = opt3.toLowerCase();
+        
         // Start a sprint
         if (opt1 === 'start'){
             return this.run_start(msg);

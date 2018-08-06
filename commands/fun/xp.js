@@ -25,6 +25,7 @@ module.exports = class XPCommand extends Command {
     run(msg, {who}) {
         
         var xp = new XP(msg.guild.id, msg.author.id, msg);
+        who = who.toLowerCase();        
         
         if (who === 'me'){
         

@@ -34,6 +34,8 @@ module.exports = class LookupCommand extends Command {
 
     run(msg, {word, flag}) {
         
+        flag = flag.toLowerCase();
+        
         var type = 'definitions';
         var url = 'https://od-api.oxforddictionaries.com:443/api/v1/entries/en/'+word;
         

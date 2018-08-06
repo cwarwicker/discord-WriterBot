@@ -28,6 +28,7 @@ module.exports = class AskCommand extends Command {
     run (msg, {type}){
                 
         var options = [];
+        type = type.toLowerCase();
                 
         if (type === 'c'){
             options = require('./../../assets/json/q_char.json');
