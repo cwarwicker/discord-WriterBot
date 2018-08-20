@@ -378,9 +378,14 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                     msg.say('The word counts are in. Results coming up shortly...');
                     this.finished = 1;
                     
+                    // Clear original timeout
+                    this.clear();
+                    
+                    // Set new one
                     this.messageTimeout = setTimeout(function(){
                         obj.finish(msg);
                     }, 10000);
+                    
                 }
             
             }
