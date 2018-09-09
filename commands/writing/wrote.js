@@ -30,8 +30,8 @@ module.exports = class WroteCommand extends Command {
         
         var stats = new Stats();
         
-        if (!lib.isNumeric(amount) || amount < 1){
-            return msg.say('Please enter a valid number, greater than 0.');
+        if (!lib.isNumeric(amount)){
+            return msg.say('Please enter a valid number');
         }
         
         // Increment their words written stat
