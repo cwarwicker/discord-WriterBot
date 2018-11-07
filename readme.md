@@ -1,4 +1,4 @@
-# Writer-Bot (0.0.1)
+# Writer-Bot (0.3)
 
 Writer-Bot is a discord bot for writing-based servers.
 
