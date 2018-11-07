@@ -28,7 +28,7 @@ module.exports = class SprintCommand extends Command {
             aliases: [],
             group: 'writing',
             memberName: 'sprint',
-            description: 'Write with your friends and see who can write the most in the time limit!',
+            description: 'Write with your friends and see who can write the most in the time limit! Run `help sprint` for more information.',
             examples: [
                 '`sprint start` Quickstart a sprint with the default settings',
                 '`sprint for 20 in 3` Schedules a sprint for 20 minutes, to start in 3 minutes',
@@ -39,7 +39,7 @@ module.exports = class SprintCommand extends Command {
                 '`sprint wc 250` Declares your final word count at 250',
                 '`sprint time` Displays the time left in the current sprint',
                 '`sprint users` Displays a list of the users taking part in the current sprint',
-                '`sprint pb` Displays your personal best wpm from sprints on this server',
+                '`sprint pb` Displays your personal best wpm from sprints on this server. Run `sprint pb reset` to reset your personal best to 0 on the current server',
                 '`sprint notify` You will be notified when someone starts a new sprint',
                 '`sprint forget` You will no longer be notified when someone starts a new sprint',
                 '`sprint help` Displays a similar help screen to this one, with a few added bits of info'
@@ -83,14 +83,22 @@ module.exports = class SprintCommand extends Command {
         };
         
         this.guildSettings = [];
-        this.messageTimeout = null;
+        this.messageTimeout = [];
         this.stats = new Stats();
-        this.finished = 0;
+        this.finished = [];
+        this.test = [];
                 
     }
 
-    async run(msg, {opt1, opt2, opt3, opt4}) {
-                                    
+    run(msg, {opt1, opt2, opt3, opt4}) {
+                                              
+        let guildID = msg.guild.id;
+                
+        // Set the default values for finished and messagetimeout, if not set
+        if (this.finished[guildID] === undefined){
+            this.finished[guildID] = 0;
+        }
+                
         opt1 = opt1.toLowerCase();
         opt3 = opt3.toLowerCase();
         
@@ -142,7 +150,7 @@ module.exports = class SprintCommand extends Command {
         }
         
         else if (opt1 === 'pb' || opt1 === 'record'){
-            return this.run_pb(msg);
+            return this.run_pb(msg, opt2);
         }
         
         else if (opt1 === 'end'){
@@ -220,7 +228,7 @@ module.exports = class SprintCommand extends Command {
         }
         
         db.close();
-        
+                
         return (declared === users.length);        
          
     }
@@ -305,17 +313,24 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 
     }
     
-    run_pb(msg){
-        
+    run_pb(msg, option){
+               
         let userID = msg.author.id;
         let guildID = msg.guild.id;
         
         var record = new Record();
-        var userRecord = record.get(guildID, userID, 'wpm');
-        if (userRecord){
-            return msg.say(`${msg.author}: Your personal best is **${userRecord.value}** wpm.`);     
-        } else {
-            return msg.say(`${msg.author}: You do not yet have a wpm personal best on this server.`);
+        
+        // Reset
+        if (option === 'reset'){
+            record.set(guildID, userID, 'wpm', 0);
+            return msg.say(`${msg.author}: Your personal best on this server has been reset to 0.`);     
+        } else {        
+            var userRecord = record.get(guildID, userID, 'wpm');
+            if (userRecord){
+                return msg.say(`${msg.author}: Your personal best is **${userRecord.value}** wpm.`);     
+            } else {
+                return msg.say(`${msg.author}: You do not yet have a wpm personal best on this server.`);
+            }
         }
                 
     }
@@ -326,7 +341,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
         
         let userID = msg.author.id;
         let guildID = msg.guild.id;
-                        
+                                
         var sprint = this.get(guildID);
         
         if (sprint){
@@ -371,20 +386,18 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 var written = user.ending_wc - user.starting_wc;
 
                 msg.say(`${msg.author}: You updated your word count to: ${user.ending_wc}. Total written in this sprint: ${written}.`);
-
+               
                 // Are all users declared now?
-                if (this.is_declaration_finished(sprint) && this.finished === 0){
+                if (this.is_declaration_finished(sprint) && this.finished[guildID] === 0){
                     
                     msg.say('The word counts are in. Results coming up shortly...');
-                    this.finished = 1;
                     
-                    // Clear original timeout
-                    this.clear();
+                    this.finished[guildID] = 1;
                     
-                    // Set new one
-                    this.messageTimeout = setTimeout(function(){
+                    this.timeout(guildID, 10000, function(){
                         obj.finish(msg);
-                    }, 10000);
+                    });
+                    
                     
                 }
             
@@ -635,8 +648,8 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
           
         // Check to make sure there is no active sprint on this guild/server
         if (!sprint){
-            
-            this.finished = 0;
+                        
+            this.finished[guildID] = 0;
             
             if (!lib.isNumeric(sFor) || sFor < 0 || sFor > this.max.length){
                 sFor = this.defaults.length;
@@ -706,9 +719,10 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 msg.say(output);
 
                 // Set timeout to alert users when it starts
-                this.messageTimeout = setTimeout(function(){
+                this.timeout(guildID, delay, function(){
                     obj.post_start_message(msg);
-                }, delay);
+                });
+               
             
             }
             
@@ -728,7 +742,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
         var sprint = this.get(guildID);
         
         // Check to make sure there is an active sprint on this guild/server
-        if (sprint){
+        if (sprint && sprint.end > 0){
                             
             // Get all the users to notify
             var users = [];
@@ -748,15 +762,12 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
 
             var diff = sprint.end - sprint.start;
             var left = lib.secsToMins(diff);
-            
-            // Clear the message timeout
-            this.clear();
-            
+                        
             // Set the new timeout for the ending message
             var delay = diff * 1000;
-            this.messageTimeout = setTimeout(function(){
+            this.timeout(guildID, delay, function(){
                 obj.post_end_message(msg);
-            }, delay);
+            });
             
             // Post the starting message
             var output = '**Sprint has started**\nGet writing, you have ' + left.m + ' minute(s).\n';
@@ -802,10 +813,10 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             
             // Set the new timeout for the ending message
             var delay = this.defaults.post_delay * 1000;
-            this.messageTimeout = setTimeout(function(){
+            this.timeout(guildID, delay, function(){
                 obj.finish(msg);
-            }, delay);
-            
+            });
+                        
             // Post the ending message
             var output = '**Time is up**\nPens down. Use `sprint wc <amount>` to submit your final word counts, you have ' + Math.round(this.defaults.post_delay / 60) + ' minutes.\n';
             output += users.join(', ');
@@ -824,7 +835,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
         var now = Math.floor(new Date() / 1000);
         var record = new Record();
         
-        if (sprint){
+        if (sprint && sprint.completed == 0){
             
             var db = new Database();
             
@@ -928,6 +939,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 
             }
                         
+            this.finished[guildID] = 0;            
             
             db.close();
             
@@ -936,8 +948,14 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
         
     }
     
-    clear(){
-        clearTimeout(this.messageTimeout);
+    timeout(guildID, delay, callback){
+        this.clear();
+        this.messageTimeout[guildID] = setTimeout(callback, delay);
+    }
+    
+    // This basically doesn't work, I don't know why
+    clear(guildID){
+        clearTimeout(this.messageTimeout[guildID]);
     }
     
     complete_record(sprint){

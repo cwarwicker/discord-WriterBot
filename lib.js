@@ -1,3 +1,6 @@
+const fs = require('fs');
+
+
 module.exports.secsToMins = function(secs){
     
     var result = {m: 0, s: 0};
@@ -74,3 +77,12 @@ module.exports.findObjectArrayKeyByKey = function(array, key, value) {
     }
     return null;
 };
+
+module.exports.log = function(data){
+    
+    fs.appendFile('data/logs', data + '\n', (err) => {  
+        // throws an error, you could also catch it here
+        if (err) throw err;
+    });
+    
+}
