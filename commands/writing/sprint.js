@@ -473,7 +473,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 db.conn.prepare('DELETE FROM [sprints] WHERE [id] = ?').run([sprint.id]);
                                 
                 // Clear the timeout
-                this.clear();
+                this.clear(guildID);
                 
                 // Decrement the creator's stat
                 this.stats.dec(guildID, sprint.createdby, 'sprints_started', 1);
@@ -607,7 +607,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 db.close();
                 
                 // Clear the timeout
-                this.clear();
+                this.clear(guildID);
                 
                 // Decrement their stat
                 if (userID == sprint.createdby){
@@ -809,7 +809,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             }
             
             // Clear the message timeout
-            this.clear();
+            this.clear(guildID);
             
             // Set the new timeout for the ending message
             var delay = this.defaults.post_delay * 1000;
@@ -840,7 +840,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             var db = new Database();
             
             // Clear the timeout, in case we've finished before the ending timer
-            this.clear();
+            this.clear(guildID);
             
             // Get users & calculate positions
             var result = [];
@@ -949,7 +949,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
     }
     
     timeout(guildID, delay, callback){
-        this.clear();
+        this.clear(guildID);
         this.messageTimeout[guildID] = setTimeout(callback, delay);
     }
     

@@ -2,6 +2,7 @@ const { Command } = require('discord.js-commando');
 const moment = require('moment');
 require('moment-duration-format');
 const version = require('./../../version.json');
+const Stats = require('./../../structures/stats.js');
 
 module.exports = class InfoCommand extends Command {
 	constructor(client) {
@@ -16,6 +17,9 @@ module.exports = class InfoCommand extends Command {
 	}
 
 	run(msg) {
+            
+            var stats = new Stats();
+            
 		return msg.embed({
 			color: 3447003,
                         title: 'Writer-Bot Info/Statistics',
@@ -34,7 +38,9 @@ module.exports = class InfoCommand extends Command {
                                 {
 					name: 'General Stats',
 					value: `
-• Servers: ${this.client.guilds.size}`,
+• Servers: ${this.client.guilds.size}
+• Active Sprints: ${stats.getTotalActiveSprints()}
+`,
 					inline: false
 				}
 			],

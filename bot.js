@@ -39,7 +39,7 @@ bot.on('ready', () => {
         goal.reset();
     });
         
-    console.log(`[READY] Logged in as ${bot.user.tag} (${bot.user.id})`); 
+    console.log(`[READY] Logged in as ${bot.user.tag} (${bot.user.id})`);        
     
 });
 

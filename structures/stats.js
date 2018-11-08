@@ -58,6 +58,19 @@ class Stats
         
     }
     
+    getTotalActiveSprints(){
+        
+        var now = Math.floor(new Date() / 1000);
+        var db = new Database();
+        var record = db.conn.prepare('SELECT COUNT(id) as ttl FROM [sprints] WHERE [end] > :end AND [completed] = 0').get({
+            end: now
+        });
+        db.close();
+        
+        return (record) ? record.ttl : false;
+        
+    }
+    
 }
 
 module.exports = Stats;
