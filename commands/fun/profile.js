@@ -32,7 +32,7 @@ module.exports = class ProfileCommand extends Command {
             if (who !== 'me'){
                 
                 var find = lib.getMemberByName(msg, who);
-                if (find !== null){
+                if (find !== false){
                     var userID = find.id;
                     var userName = who;
                 } else {
@@ -44,7 +44,7 @@ module.exports = class ProfileCommand extends Command {
                 var userID = user.id;
                 var userName = user.username;
             }
-                    
+                                
             
             var xp = new XP(guildID, userID, msg);
             var userXp = xp.get();
