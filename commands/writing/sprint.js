@@ -695,7 +695,26 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                        
             // If we are starting immediately, display that message instead of the standard one
             if (delay === 0){
+                
+                // Notify users first
+                var notify = [];
+                var notifyUsers = db.conn.prepare('SELECT [user] FROM [user_stats] WHERE [guild] = :guild AND name = :name AND VALUE = 1').all({
+                    guild: guildID,
+                    name: 'sprint_notify'
+                });
+                
+                for (var i = 0; i < notifyUsers.length; i++){
+                    if (notify.indexOf('<@'+notifyUsers[i].user+'>') < 0){
+                        notify.push('<@'+notifyUsers[i].user+'>');
+                    }
+                }
+                
+                output = notify.join(', ');
+                output += ' (You asked to be notified of upcoming sprints)';
+                msg.say(output);
+                
                 this.post_start_message(msg);
+                                
             } else {
             
                 var left = lib.secsToMins( (delay / 1000) );
