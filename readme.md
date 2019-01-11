@@ -1,4 +1,6 @@
-# Writer-Bot (0.4)[https://github.com/cwarwicker/discord-WriterBot/blob/master/patch.notes]
+# Writer-Bot (0.4)
+
+https://github.com/cwarwicker/discord-WriterBot/wiki/Patch-Notes
 
 Writer-Bot is a discord bot for writing-based servers.
 
