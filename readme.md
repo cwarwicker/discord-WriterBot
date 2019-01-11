@@ -1,4 +1,4 @@
-# Writer-Bot (0.3)
+# Writer-Bot (0.4)[https://github.com/cwarwicker/discord-WriterBot/blob/master/patch.notes]
 
 Writer-Bot is a discord bot for writing-based servers.
 
@@ -15,6 +15,8 @@ It has many features, such as writing sprints, word count goals, xp/levels, prom
 `!goal`: Sets a daily goal which resets every 24 hours
 
 `!lookup`: Looks up the definitions of a given word, using the Oxford English Dictionary API. Add the flag s to search for synonymns, or a for antonyms.
+
+`!project`: Using these commands, you can create different projects and store word counts against them seperately. They also integrate with the wrote and sprint commands. See the help information for those commands for more info.
 
 `!prompt`: Generates a random writing prompt. Initial prompts taken from (thewritersacademy and /r/writingprompts)
 

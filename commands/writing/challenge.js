@@ -12,6 +12,7 @@ module.exports = class ChallengeCommand extends Command {
             aliases: [],
             group: 'writing',
             memberName: 'challenge',
+            guildOnly: true,
             description: 'Generates a random writing challenge for you. e.g. "Write 400 words in 15 minutes". You can add the flags "easy", "normal", "hard", "hardcore", or "insane" to choose a pre-set wpm, or add your chosen wpm as the flag, or you can specify a time instead by adding a the time in minutes, prefixed with a "t", e.g. "t15"',
             examples: [
                 '`challenge` - Generates a random writing challenge', 

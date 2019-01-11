@@ -4,6 +4,7 @@ const XP = require('./../../structures/xp.js');
 const Record = require('./../../structures/record.js');
 const Stats = require('./../../structures/stats.js');
 const Goal = require('./../../structures/goal.js');
+const Project = require('./../../structures/project.js');
 const lib = require('./../../lib.js');
 
 const STAT_SPRINT_NOTIFY = 3;
@@ -28,6 +29,7 @@ module.exports = class SprintCommand extends Command {
             aliases: [],
             group: 'writing',
             memberName: 'sprint',
+            guildOnly: true,
             description: 'Write with your friends and see who can write the most in the time limit! Run `help sprint` for more information.',
             examples: [
                 '`sprint start` Quickstart a sprint with the default settings',
@@ -35,7 +37,9 @@ module.exports = class SprintCommand extends Command {
                 '`sprint cancel` Cancels the current sprint. This can only be done by the person who created the sprint, or any users with the MANAGE_MESSAGES permission',
                 '`sprint join` Joins the current sprint',
                 '`sprint join 100` Joins the current sprint, with a starting word count of 100',
+                '`sprint join 100 sword` Joins the current sprint, with a starting word count of 100 and sets your sprint to count towards your Project with the shortname "sword" (See: Projects for more info)',
                 '`sprint leave` Leaves the current sprint',
+                '`sprint project sword` Sets your sprint to count towards your Project with the shortname "sword" (See: Projects for more info)',
                 '`sprint wc 250` Declares your final word count at 250',
                 '`sprint time` Displays the time left in the current sprint',
                 '`sprint users` Displays a list of the users taking part in the current sprint',
@@ -126,7 +130,7 @@ module.exports = class SprintCommand extends Command {
         
         // Join the sprint
         else if (opt1 === 'join'){
-            return this.run_join(msg, opt2);
+            return this.run_join(msg, opt2, opt3);
         }
         
         else if (opt1 === 'leave'){
@@ -163,6 +167,10 @@ module.exports = class SprintCommand extends Command {
         
         else if (opt1 === 'forget'){
             return this.run_forget(msg);
+        }
+        
+        else if(opt1 === 'project'){
+            return this.run_set_project(msg, opt2);
         }
         
         else if (opt1 === ''){
@@ -249,7 +257,9 @@ Write with your friends and see who can write the most in the time limit! Earn e
 \`sprint for 30 now\` Sprint for 30 minutes, starting immediately
 \`sprint join\` Join the current sprint
 \`sprint join 1000\` Join the current sprint, with a starting wordcount of 1000 (written before the sprint started)
+\`sprint join 1000 shortname\` Join the current sprint, with a starting wordcount of 1000 (written before the sprint started), writing towards one of your projects (specified by its shortname)
 \`sprint leave\` Leave the current sprint
+\`sprint project shortname\` Set your sprint wordcount to count towards one of your projects (specified by its shortname)
 \`sprint time\` Check how long is remaining
 \`sprint users\` Display a list of the users taking part in the sprint
 \`sprint cancel\` Cancel the current sprint for all users (you must be the sprint creator or a server moderator to do this)
@@ -263,6 +273,48 @@ If you join the sprint with a starting wordcount, remember to declare your total
 e.g. if you joined with 1000 words, and during the sprint you wrote another 500 words, the final wordcount you should declare would be 1500
 `;
         return msg.say(output);
+        
+    }
+    
+    run_set_project(msg, shortname){
+        
+        let guildID = msg.guild.id;
+        let userID = msg.author.id;
+        
+        var sprint = this.get(guildID);
+        if (sprint){
+            
+            var userSprint = this.is_user_sprinting(sprint.id, userID);
+            if (userSprint){
+                
+                var project = new Project(msg, guildID, userID);
+                var record = project.get(shortname);                
+                if (record){
+                    
+                    var db = new Database();
+
+                    // Update their starting wordcount
+                    db.conn.prepare('UPDATE [sprint_users] SET [project] = :pID WHERE [sprint] = :sp AND [user] = :usr').run({
+                        pID: record.id,
+                        sp: sprint.id,
+                        usr: userID
+                    });
+                    
+                    db.close();
+
+                    return msg.reply('You are now sprinting in your project **'+record.name+'**');  
+                    
+                } else {
+                    return msg.reply('You do not have a project with that shortname');
+                }
+                
+            } else {
+                return msg.reply('You must have joined the sprint before you can set which project you are writing in');
+            }
+            
+        } else {
+            return msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`.');            
+        }
         
     }
     
@@ -493,7 +545,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
     }
     
     
-    run_join(msg, start){
+    run_join(msg, start, shortname){
         
         let userID = msg.author.id;
         let guildID = msg.guild.id;
@@ -518,7 +570,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                     end: 0
                 });
                 
-                msg.say(`${msg.author}: You have joined the sprint with ${start} words.`);
+                msg.reply(`You have joined the sprint with ${start} words.`);
                 
             } else {
                 
@@ -529,9 +581,31 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                     usr: userID
                 });
                 
-                msg.say(`${msg.author}: Your starting word count has been set to ${start}.`);  
+                msg.reply(`Your starting word count has been set to ${start}.`);  
             }
             
+            // Set which project they are sprinting towards
+            if (shortname !== undefined && shortname.length > 0){
+                
+                var project = new Project(msg, guildID, userID);
+                var record = project.get(shortname);                
+                if (record){
+
+                    // Update their starting wordcount
+                    db.conn.prepare('UPDATE [sprint_users] SET [project] = :pID WHERE [sprint] = :sp AND [user] = :usr').run({
+                        pID: record.id,
+                        sp: sprint.id,
+                        usr: userID
+                    });
+
+                    return msg.reply('You are now sprinting in your project **'+record.name+'**');  
+
+                } else {
+                    return msg.reply('You do not have a project with that shortname ('+shortname+')');
+                }
+
+            }
+                        
             db.close();
             
         } else {
@@ -896,6 +970,17 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                         // Increment their words towards their daily goal
                         var goal = new Goal(msg, guildID, user.user);
                         goal.inc(count);
+                        
+                        // If they were writing to a project, update that word count
+                        if(user.project > 0){
+                            
+                            var project = new Project(msg, guildID, user.user);
+                            var userProject = project.getByID(user.project);
+                            if (userProject){
+                                project.increment(user.project, count);
+                            }
+                            
+                        }
                                                 
                         // Push to result dataset
                         result.push({user: user.user, count: count, wpm: wpm, newWpmRecord: newWpmRecord, xp: xp.XP_COMPLETE_SPRINT});       
@@ -946,7 +1031,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                     output += '`'+(i+1)+'`. <@' + result[i].user + '> - **' + result[i].count + ' words** ('+result[i].wpm+' wpm) ';
 
                     if (result[i].newWpmRecord === 1){
-                        output += '\:champagne: **NEW PB**'
+                        output += '\:champagne: **NEW PB**';
                     }
 
                     output += '     +' + result[i].xp + 'xp';

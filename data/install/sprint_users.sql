@@ -3,5 +3,6 @@ CREATE TABLE IF NOT EXISTS 'main'.'sprint_users' (
     sprint INTEGER NOT NULL,
     user TEXT NOT NULL,
     starting_wc INTEGER DEFAULT 0,
-    ending_wc INTEGER DEFAULT 0
+    ending_wc INTEGER DEFAULT 0,
+    project INTEGER NULL
 );

@@ -1,0 +1,35 @@
+#0.4 - 11-01-2019
+
+Brief
+------------------
+
+- [4](https://github.com/cwarwicker/discord-WriterBot/issues/4) Fixed some commands which should have been guild-only but weren't
+- [7](https://github.com/cwarwicker/discord-WriterBot/issues/7) Added `project` command
+
+
+Detailed
+------------------
+
+**Projects**
+
+`help project` for info and examples on your server
+
+Projects can be created using the command `project create [shortname] [title]`.
+
+Shortname is one word or acronym so that you can reference to that project from other commands.
+Title is the full title of the project.
+
+For example:
+
+`project create sword The Sword in the Stone`
+
+If you already have a wordcount for this project, you can set the word count for it, by running:
+
+`project update [shortname] [amount]` e.g. `project update sword 10000`
+
+From then on, you can start recording your word counts toward a specific project.
+
+If you use the `wrote` command, you can simply append the project shortname to the command, e.g. `wrote 100 sword`
+If you are doing a sprint, you can specify which project you are sprinting for when you join, e.g. `sprint join 0 sword` or alternatively `sprint project sword`
+
+You can view your list of projects and their word counts by running `project view`
