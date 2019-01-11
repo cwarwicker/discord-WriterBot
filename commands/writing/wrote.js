@@ -44,17 +44,6 @@ module.exports = class WroteCommand extends Command {
             return msg.say('Please enter a valid number');
         }
         
-        // Increment their words written stat
-        stats.inc(msg.guild.id, msg.author.id, 'total_words_written', amount);
-        
-        // Increment their words towards their daily goal
-        var goal = new Goal(msg, msg.guild.id, msg.author.id);
-        goal.inc(amount);
-        
-        // Get their new total
-        var total = stats.get(msg.guild.id, msg.author.id, 'total_words_written');
-        
-        var output = `${msg.author} added ${amount} to their total words written **(${total.value})**`;        
         
         // Did they specify a project?
         if (shortname !== undefined && shortname.length > 0){
@@ -65,14 +54,29 @@ module.exports = class WroteCommand extends Command {
                 
                 var words = record.words + amount;
                 project.update(shortname, words);
-                output = `${msg.author} added ${amount} words to their project **${record.name}** (${words})`;        
+                var output = `${msg.author} added ${amount} words to their project **${record.name}** (${words})`;        
                 
             } else {
-                msg.reply('You do not have a project with that shortname ('+shortname+')');
+                return msg.reply('You do not have a project with that shortname ('+shortname+')');
             }
             
         }
                 
+        // Increment their words written stat
+        stats.inc(msg.guild.id, msg.author.id, 'total_words_written', amount);
+        
+        // Increment their words towards their daily goal
+        var goal = new Goal(msg, msg.guild.id, msg.author.id);
+        goal.inc(amount);
+        
+        // Get their new total
+        var total = stats.get(msg.guild.id, msg.author.id, 'total_words_written');
+        
+        // This message is only used if no project was specified
+        if (output === undefined){
+            var output = `${msg.author} added ${amount} to their total words written **(${total.value})**`;        
+        }
+                        
         return msg.say(output);
         
     }
