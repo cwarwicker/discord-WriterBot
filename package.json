@@ -1,6 +1,6 @@
 {
   "name": "Writer-Bot",
-  "version": "0.0.1",
+  "version": "0.5",
   "description": "A discord bot for writing-related servers, with tools such as: sprints, challenges, daily goals, word look-ups, random name generators, writing prompts/ideas, etc...",
   "main": "bot.js",
   "scripts": {

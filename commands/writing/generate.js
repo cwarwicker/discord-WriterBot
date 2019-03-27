@@ -25,8 +25,7 @@ module.exports = class GenerateCommand extends Command {
             args: [
                 {
                     key: 'type',
-                    prompt: 'What type of name do you want to generate? (char, place, land, book, book_fantasy, book_sf, book_hp, prompt)',
-                    default: 'char',
+                    prompt: 'What type of name do you want to generate? (`char`, `place`, `land`, `book`, `book_fantasy`, `book_sf`, `book_horror`, `book_rom`, `book_hp`, `idea`)',
                     type: 'string'
                 },
                 {

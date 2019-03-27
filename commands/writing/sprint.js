@@ -705,7 +705,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
     
     
     run_start(msg, sFor, sIn){
-                
+                                
         let userID = msg.author.id;
         let guildID = msg.guild.id;
                 
@@ -769,8 +769,11 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                        
             // If we are starting immediately, display that message instead of the standard one
             if (delay === 0){
-                
-                // Notify users first
+
+                // Post the normal start message
+                this.post_start_message(msg);
+
+                // Then notify the users below
                 var notify = [];
                 var notifyUsers = db.conn.prepare('SELECT [user] FROM [user_stats] WHERE [guild] = :guild AND name = :name AND VALUE = 1').all({
                     guild: guildID,
@@ -778,16 +781,20 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 });
                 
                 for (var i = 0; i < notifyUsers.length; i++){
-                    if (notify.indexOf('<@'+notifyUsers[i].user+'>') < 0){
+                    
+                    // Make sure they are still in the server
+                    var userObj = msg.guild.members.find('id', notifyUsers[i].user);
+                    
+                    if (userObj && notify.indexOf('<@'+notifyUsers[i].user+'>') < 0){
                         notify.push('<@'+notifyUsers[i].user+'>');
                     }
+                    
                 }
                 
-                output = notify.join(', ');
-                output += ' (You asked to be notified of upcoming sprints)';
+                output = 'Asked to be notified about upcoming sprints: ';
+                output += notify.join(', ');
                 msg.say(output);
                 
-                this.post_start_message(msg);
                                 
             } else {
             
@@ -803,9 +810,14 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 });
                 
                 for (var i = 0; i < notifyUsers.length; i++){
-                    if (notify.indexOf('<@'+notifyUsers[i].user+'>') < 0){
+                    
+                    // Make sure they are still in the server
+                    var userObj = msg.guild.members.find('id', notifyUsers[i].user);
+                    
+                    if (userObj && notify.indexOf('<@'+notifyUsers[i].user+'>') < 0){
                         notify.push('<@'+notifyUsers[i].user+'>');
                     }
+                    
                 }
                 
                 output += notify.join(', ');
@@ -990,7 +1002,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 
                 // Sort results
                 result.sort(function(a, b){ 
-                    return a.count < b.count;
+                    return b.count - a.count;
                 });
                 
                 // Now we loop through them and apply extra xp
