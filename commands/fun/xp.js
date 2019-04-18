@@ -1,6 +1,7 @@
 const { Command } = require('discord.js-commando');
-const XP = require('./../../structures/xp.js');
+const lib = require('./../../lib.js');
 
+const XP = require('./../../structures/xp.js');
 
 module.exports = class XPCommand extends Command {
     constructor(client) {
@@ -33,17 +34,17 @@ module.exports = class XPCommand extends Command {
             
             if (user && user.xp > 0){
                 var left = xp.calcNextLvl(user.lvl, user.xp);
-                var output = `${msg.author}: You are **Level ${user.lvl}** (${user.xp}/${user.xp+left})`;        
+                var output = `${msg.author}: ${lib.get_string(msg.guild.id, 'youare')} **${lib.get_string(msg.guild.id, 'level')} ${user.lvl}** (${user.xp}/${user.xp+left})`;        
                 msg.say(output);
             } else {
-                msg.say(`${msg.author}: You haven't earned any xp on this server yet. You can earn xp by doing writing challenges, sprints and meeting your daily goal.`);
+                msg.say(`${msg.author}: ${lib.get_string(msg.guild.id, 'xp:noxp')}`);
             }
         
         } else if (who === 'top'){
             
             var all = xp.all();
 
-            var output = `\:trophy: **Leaderboard**\n\n`;
+            var output = `\:trophy: **${lib.get_string(msg.guild.id, 'xp:leaderboard?')}**\n\n`;
             
             for (var i = 0; i < all.length; i++){
                 
@@ -51,7 +52,7 @@ module.exports = class XPCommand extends Command {
                 var userObj = msg.guild.members.find('id', row.user);
                 if (userObj){
                     var lvl = xp.calcLvl(row.xp);
-                    output += `\`${i+1}.\` ${userObj.user.username} - **Level ${lvl}** (${row.xp})\n`;
+                    output += `\`${i+1}.\` ${userObj.user.username} - **${lib.get_string(msg.guild.id, 'level')} ${lvl}** (${row.xp})\n`;
                 }
                 
             }

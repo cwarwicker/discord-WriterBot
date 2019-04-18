@@ -1,6 +1,6 @@
 const { Command } = require('discord.js-commando');
+const lib = require('./../../lib.js');
 const Stats = require('./../../structures/stats.js');
-const prompts = require('./../../assets/json/prompts.json');
 
 module.exports = class PromptCommand extends Command {
     constructor(client) {
@@ -20,6 +20,8 @@ module.exports = class PromptCommand extends Command {
 
     run(msg) {
         
+        const prompts = lib.get_asset(msg.guild.id, 'prompts.json');
+
         // Updated stat
         var stats = new Stats();
         stats.inc(msg.guild.id, msg.author.id, 'writing_prompts_generated', 1);

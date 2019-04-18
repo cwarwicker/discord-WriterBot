@@ -1,0 +1,51 @@
+{
+    
+    "err:nouser": "Could not find that user",    
+            
+    "flip:heads": "It landed on heads!!",
+    "flip:tails": "It landed on tails!!",
+    
+    "8ball:1": ":large_blue_circle: It is certain",
+    "8ball:2": ":large_blue_circle: It is decidedly so",
+    "8ball:3": ":large_blue_circle: Without a doubt",
+    "8ball:4": ":large_blue_circle: Yes - definitely",
+    "8ball:5": ":large_blue_circle: You may rely on it",
+    "8ball:6": ":large_blue_circle: Of course",
+    "8ball:7": ":large_blue_circle: Most likely",
+    "8ball:8": ":large_blue_circle: Outlook good",
+    "8ball:9": ":large_blue_circle: Yes",
+    "8ball:10": ":large_blue_circle: Signs point to yes",
+    "8ball:11": ":white_circle: Reply hazy, try again",
+    "8ball:12": ":white_circle: Ask again later",
+    "8ball:13": ":white_circle: Better not tell you now",
+    "8ball:14": ":white_circle: Cannot predict now",
+    "8ball:15": ":white_circle: Concentrate and ask again",
+    "8ball:16": ":red_circle: Don't count on it",
+    "8ball:17": ":red_circle: My reply is no",
+    "8ball:18": ":red_circle: My sources say no",
+    "8ball:19": ":red_circle: Outlook not so good",
+    "8ball:20": ":red_circle: Very doubtful",
+    "8ball:21": ":red_circle: Asbolutely not",
+    
+    "profile:lvlxp": "Lvl (XP)" ,
+    "profile:words": "Words Written" ,
+    "profile:wordssprints": "Words Written in Sprints" ,
+    "profile:sprintsstarted": "Sprints Started" ,
+    "profile:sprintscompleted": "Sprints Completed" ,
+    "profile:sprintswon": "Sprints Won" ,
+    "profile:challengescompleted": "Challenges Completed" ,
+    "profile:goalscompleted": "Daily Goals Completed" ,
+    "profile:goalprogress": "Daily Goal Progress" ,
+    
+    "roll:rolled": "You rolled a",
+    
+    "xp:leaderboard": "Leaderboard",
+    "xp:noxp": "You haven't earned any xp on this server yet. You can earn xp by doing writing challenges, sprints and meeting your daily goal",
+    
+    
+    
+    "level": "Level",
+    "youare": "You are"
+    
+    
+}

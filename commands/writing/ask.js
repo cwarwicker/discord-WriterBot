@@ -31,9 +31,9 @@ module.exports = class AskCommand extends Command {
         type = type.toLowerCase();
                 
         if (type === 'c'){
-            options = require('./../../assets/json/q_char.json');
+            options = lib.get_asset(msg.guild.id, 'q_char.json');
         } else if(type === 'w'){
-            options = require('./../../assets/json/q_world.json');
+            options = lib.get_asset(msg.guild.id, 'q_world.json');
         } else {
             return msg.say('I\'d love to ask you a question about that, but I don\'t know what it is.');
         }

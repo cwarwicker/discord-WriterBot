@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const lib = require('./../lib.js');
 
 const maxLimit = 25;
 
@@ -26,7 +27,7 @@ class NameGenerator
                 
         
         // Load the source
-        var filepath = 'assets/json/gen_'+type+'.json';
+        var filepath = lib.get_asset_path(msg.guild.id, 'gen_'+type+'.json')
                         
         try {
             

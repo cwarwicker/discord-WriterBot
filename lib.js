@@ -1,5 +1,58 @@
 const fs = require('fs');
+const Setting = require('./structures/settings.js');
 
+
+module.exports.get_lang = function(guildID){
+    
+    var settings = new Setting();
+    var lang = settings.get(guildID, 'lang');
+    
+    return (lang) ? lang.value : 'en';
+    
+}
+
+module.exports.get_asset = function(guildID, asset){
+        
+    var lang = this.get_lang(guildID);
+    
+    var path = './assets/json/'+lang+'/'+asset;
+    if (fs.existsSync(path)){
+        return require(path);
+    } else {
+        return require('./assets/json/en/'+asset);
+    }
+
+    
+}
+
+module.exports.get_asset_path = function(guildID, asset){
+        
+    var lang = this.get_lang(guildID);
+    
+    var path = 'assets/json/'+lang+'/'+asset;
+    if (fs.existsSync('./'+path)){
+        return path;
+    } else {
+        return 'assets/json/en/'+asset;
+    }
+
+    
+}
+
+module.exports.get_string = function(guildID, str){
+    
+    var lang = this.get_lang(guildID);
+    
+    var path = './data/lang/'+lang+'.json';
+    if (fs.existsSync(path)){
+        var strings = require(path);
+    } else {
+        var strings = require('./data/lang/en.json');
+    }
+    
+    return (strings[str]) ? strings[str] : '[[str]]';
+    
+}
 
 module.exports.secsToMins = function(secs){
     
