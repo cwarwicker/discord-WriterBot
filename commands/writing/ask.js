@@ -35,7 +35,7 @@ module.exports = class AskCommand extends Command {
         } else if(type === 'w'){
             options = lib.get_asset(msg.guild.id, 'q_world.json');
         } else {
-            return msg.say('I\'d love to ask you a question about that, but I don\'t know what it is.');
+            return msg.say(lib.get_string(msg.guild.id, 'ask:error'));
         }
                 
         var rand = Math.floor( Math.random() * (options.length - 1) );

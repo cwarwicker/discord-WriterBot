@@ -31,13 +31,11 @@ module.exports = class ProfileCommand extends Command {
         
 	run(msg, {setting, value}) {
             
-            var guildID = msg.guild.id;
-            var userID = msg.author.id;
-            
+            var guildID = msg.guild.id;           
             var settings = new Setting();
             
             settings.set(guildID, setting, value);
-            return msg.say(`${msg.author} updated server setting \`${setting}\`:= \`${value}\``);            
+            return msg.say(`${msg.author} ${lib.get_string(msg.guild.id, 'setting:updated')} \`${setting}\`:= \`${value}\``);            
 
             
 	}

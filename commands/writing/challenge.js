@@ -1,8 +1,10 @@
 const { Command } = require('discord.js-commando');
+const util = require('util');
+const lib = require('./../../lib.js');
+
 const XP = require('./../../structures/xp.js');
 const Database = require('./../../structures/db.js');
 const Stats = require('./../../structures/stats.js');
-const lib = require('./../../lib.js');
 
 module.exports = class ChallengeCommand extends Command {
     constructor(client) {
@@ -69,7 +71,7 @@ module.exports = class ChallengeCommand extends Command {
         
        var userChallenge = this.get_challenge(msg.guild.id, usr);
        if (userChallenge){
-           return msg.say(`${msg.author}: You already have an active challenge. You will need to either complete or cancel it first.`);
+           return msg.say(`${msg.author}: ${lib.get_string(msg.guild.id, 'challenge:alreadyactive')}`);
        } else {
            
            var db = new Database();
@@ -110,10 +112,10 @@ module.exports = class ChallengeCommand extends Command {
             // Increment stat
             this.stats.inc(guildID, userID, 'challenges_completed', 1);
 
-            return msg.say(`${msg.author}: You have completed the challenge **${userChallenge.challenge}**     +${xp.XP_COMPLETE_CHALLENGE} xp`);            
+            return msg.say(`${msg.author}: ${lib.get_string(msg.guild.id, 'challenge:completed')} **${userChallenge.challenge}**     +${xp.XP_COMPLETE_CHALLENGE} xp`);            
             
         } else {
-            return msg.say(`${msg.author}: You do not have an active challenge. Perhaps you should start one? \`challenge\``);
+            return msg.say(`${msg.author}: ${lib.get_string(msg.guild.id, 'challenge:noactive')}`);
         }
         
     }
@@ -131,10 +133,10 @@ module.exports = class ChallengeCommand extends Command {
             db.conn.prepare('DELETE FROM [user_challenges] WHERE id = :id').run({ id: userChallenge.id });
             db.close();
             
-            return msg.say(`${msg.author} has given up on their challenge. Boo.`);
+            return msg.say(`${msg.author} ${lib.get_string(msg.guild.id, 'challenge:givenup')}`);
             
         } else {
-            return msg.say(`${msg.author}: You do not have an active challenge. Perhaps you should start one? \`challenge\``);
+            return msg.say(`${msg.author}: ${lib.get_string(msg.guild.id, 'challenge:noactive')}`);
         }
         
     }
@@ -149,7 +151,7 @@ module.exports = class ChallengeCommand extends Command {
         var userChallenge = this.get_challenge(guildID, userID);
         
         if (userChallenge){
-            return msg.say(`${msg.author}: Your current challenge is: **${userChallenge.challenge}**\n\`challenge done\` to complete the challenge.\n\`challenge cancel\` to cancel the challenge.`);
+            return msg.say(`${msg.author}: ${lib.get_string(msg.guild.id, 'challenge:current')}: **${userChallenge.challenge}**\n${lib.get_string(msg.guild.id, 'challenge:tocomplete')}`);
         } else {
                         
             var key = lib.findObjectArrayKeyByKey(this.waiting, 'guild', guildID);
@@ -157,7 +159,7 @@ module.exports = class ChallengeCommand extends Command {
             
             var wait = this.waiting[key].users[uKey];
             if (wait >= 0){
-                msg.say('Please respond with either `yes` or `no` to your current challenge.');
+                msg.say(lib.get_string(msg.guild.id, 'challenge:plsrespond'));
                 return null;
             }
             
@@ -194,9 +196,9 @@ module.exports = class ChallengeCommand extends Command {
             // Round it down to a neater number
             goal = Math.round(goal / 10) * 10;
 
-            var challenge = `Write at least ${goal} words, in ${time} minutes (${wpm} wpm)`;
+            var challenge = util.format( lib.get_string(msg.guild.id, 'challenge:challenge'), goal, time, wpm );
 
-            msg.say(`${msg.author}: Your challenge is to: ${challenge}. Will you accept this challenge? \`yes\` or \`no\` (You have 30 seconds to decide)`);
+            msg.say(`${msg.author}: ${lib.get_string(msg.guild.id, 'challenge:yourchallenge')}: ${challenge}. ${lib.get_string(msg.guild.id, 'challenge:decide')}`);
             
             // Push them into waiting array
             this.waiting[key].users.push(userID);
@@ -212,10 +214,10 @@ module.exports = class ChallengeCommand extends Command {
                 if (answer.toLowerCase() === 'yes'){
 
                     this.set_challenge(msg, userID, challenge);
-                    msg.say(`${msg.author}: You have accepted the challenge: **${challenge}**\n\`challenge done\` to complete the challenge.\n\`challenge cancel\` to cancel the challenge.`);
+                    msg.say(`${msg.author}: ${lib.get_string(msg.guild.id, 'challenge:accepted')}: **${challenge}**\n${lib.get_string(msg.guild.id, 'challenge:tocomplete')}`);
 
                 } else {
-                    msg.say(`Fine.`);
+                    msg.say(`OK`);
                 }
                 
                 // Remove waiting
@@ -262,14 +264,14 @@ module.exports = class ChallengeCommand extends Command {
                     title: '',
                     fields: [
                         {
-                            name: 'Active Challenges',
+                            name: lib.get_string(msg.guild.id, 'challenge:active'),
                             value: output
                         }
                     ]                        
 		});
             
         } else {
-            return msg.say('There are no active challenges on this server.');
+            return msg.say(lib.get_string(msg.guild.id, 'challenge:noactiveserver'));
         }
         
         

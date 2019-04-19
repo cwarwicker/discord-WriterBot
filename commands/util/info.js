@@ -1,6 +1,9 @@
 const { Command } = require('discord.js-commando');
+const lib = require('./../../lib.js');
+
 const moment = require('moment');
 require('moment-duration-format');
+
 const version = require('./../../version.json');
 const Stats = require('./../../structures/stats.js');
 
@@ -22,24 +25,24 @@ module.exports = class InfoCommand extends Command {
             
 		return msg.embed({
 			color: 3447003,
-                        title: 'Writer-Bot Info/Statistics',
+                        title: lib.get_string(msg.guild.id, 'info:bot'),
 			fields: [
                                 {
-					name: 'Version',
+					name: lib.get_string(msg.guild.id, 'info:version'),
 					value: `v${version.version}`,
 					inline: true
 				},
 				{
-					name: 'Uptime',
+					name: lib.get_string(msg.guild.id, 'info:uptime'),
 					value: moment.duration(this.client.uptime)
 						.format('d[ days], h[ hours], m[ minutes, and ]s[ seconds]'),
 					inline: true
 				},
                                 {
-					name: 'General Stats',
+					name: lib.get_string(msg.guild.id, 'info:generalstats'),
 					value: `
-• Servers: ${this.client.guilds.size}
-• Active Sprints: ${stats.getTotalActiveSprints()}
+• ${lib.get_string(msg.guild.id, 'info:servers')}: ${this.client.guilds.size}
+• ${lib.get_string(msg.guild.id, 'info:sprints')}: ${stats.getTotalActiveSprints()}
 `,
 					inline: false
 				}

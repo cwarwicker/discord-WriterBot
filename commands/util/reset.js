@@ -35,12 +35,12 @@ module.exports = class ProfileCommand extends Command {
             if (what === 'pb'){
                 
                 record.set(guildID, userID, 'wpm', 0);
-                return msg.say(`${msg.author}, words-per-minute PB reset to 0`);
+                return msg.say(`${msg.author}, ${lib.get_string(msg.guild.id, 'reset:pb')}`);
                 
             } else if (what === 'wc'){
                 
                 stats.set(guildID, userID, 'total_words_written', 0);
-                return msg.say(`${msg.author}, total word count reset to 0`);
+                return msg.say(`${msg.author}, ${lib.get_string(msg.guild.id, 'reset:wc')}`);
                 
             } else if(what === 'all'){
                 
@@ -59,10 +59,10 @@ module.exports = class ProfileCommand extends Command {
                 var goal = new Goal(msg, msg.guild.id, msg.author.id);
                 goal.delete('daily');
                 
-                return msg.say(`${msg.author}, profile reset`);
+                return msg.say(`${msg.author}, ${lib.get_string(msg.guild.id, 'reset:done')}`);
                                 
             } else {
-                return msg.say('Invalid reset option: `pb`, `wc`, `all`');
+                return msg.say(lib.get_string(msg.guild.id, 'reset:invalid') + ': `pb`, `wc`, `all`');
             }
             
             

@@ -1,8 +1,10 @@
 const { Command } = require('discord.js-commando');
+const util = require('util');
+const lib = require('./../../lib.js');
+
 const Stats = require('./../../structures/stats.js');
 const Goal = require('./../../structures/goal.js');
 const Project = require('./../../structures/project.js');
-const lib = require('./../../lib.js');
 
 module.exports = class WroteCommand extends Command {
     constructor(client) {
@@ -41,7 +43,7 @@ module.exports = class WroteCommand extends Command {
         var stats = new Stats();
         
         if (!lib.isNumeric(amount)){
-            return msg.say('Please enter a valid number');
+            return msg.say(lib.get_string(msg.guild.id, 'err:validamount'));
         }
         
         
@@ -54,10 +56,10 @@ module.exports = class WroteCommand extends Command {
                 
                 var words = record.words + amount;
                 project.update(shortname, words);
-                var output = `${msg.author} added ${amount} words to their project **${record.name}** (${words})`;        
+                var output = `${msg.author} ${util.format(lib.get_string(msg.guild.id, 'wrote:addedtoproject'), amount, record.name, words)}`;        
                 
             } else {
-                return msg.reply('You do not have a project with that shortname ('+shortname+')');
+                return msg.reply(util.format(lib.get_string(msg.guild.id, 'project:noexists'), shortname));
             }
             
         }
@@ -74,7 +76,7 @@ module.exports = class WroteCommand extends Command {
         
         // This message is only used if no project was specified
         if (output === undefined){
-            var output = `${msg.author} added ${amount} to their total words written **(${total.value})**`;        
+            var output = `${msg.author} ${util.format(lib.get_string(msg.guild.id, 'wrote:added'), amount, total.value)}`;        
         }
                         
         return msg.say(output);
