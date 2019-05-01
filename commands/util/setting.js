@@ -36,7 +36,7 @@ module.exports = class ProfileCommand extends Command {
             var settings = new Setting();
             
             settings.set(guildID, setting, value);
-            return msg.say(`${msg.author} ${lib.get_string(guildID, 'setting:updated')} \`${setting}\`to \`${value}\``);    
+            return msg.say(`${msg.author} ${lib.get_string(guildID, 'setting:updated')} \`${setting}\` to \`${value}\``);    
             
 	}
 };
