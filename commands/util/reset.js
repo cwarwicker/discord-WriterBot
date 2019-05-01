@@ -13,6 +13,7 @@ module.exports = class ProfileCommand extends Command {
                     memberName: 'reset',
                     description: 'Reset your server statistics',
                     guildOnly: true,
+                    examples: ['`!reset pb`: Resets your wpm personal best on the server', '`!reset wc`: Resets your total word count on the server', '`!reset all`: Resets all your stats which can be reset on the server'],
                     args: [
                         {
                             key: 'what',
@@ -35,12 +36,12 @@ module.exports = class ProfileCommand extends Command {
             if (what === 'pb'){
                 
                 record.set(guildID, userID, 'wpm', 0);
-                return msg.say(`${msg.author}, words-per-minute PB reset to 0`);
+                return msg.say(`${msg.author}, ${lib.get_string(msg.guild.id, 'reset:pb')}`);
                 
             } else if (what === 'wc'){
                 
                 stats.set(guildID, userID, 'total_words_written', 0);
-                return msg.say(`${msg.author}, total word count reset to 0`);
+                return msg.say(`${msg.author}, ${lib.get_string(msg.guild.id, 'reset:wc')}`);
                 
             } else if(what === 'all'){
                 
@@ -59,10 +60,10 @@ module.exports = class ProfileCommand extends Command {
                 var goal = new Goal(msg, msg.guild.id, msg.author.id);
                 goal.delete('daily');
                 
-                return msg.say(`${msg.author}, profile reset`);
+                return msg.say(`${msg.author}, ${lib.get_string(msg.guild.id, 'reset:done')}`);
                                 
             } else {
-                return msg.say('Invalid reset option: `pb`, `wc`, `all`');
+                return msg.say(lib.get_string(msg.guild.id, 'reset:invalid') + ': `pb`, `wc`, `all`');
             }
             
             

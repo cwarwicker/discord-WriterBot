@@ -34,6 +34,7 @@ class Database
         this.conn.prepare('BEGIN');
 
             this.conn.prepare( fs.readFileSync(install_path + '/guilds.sql', 'utf-8') ).run();
+            this.conn.prepare( fs.readFileSync(install_path + '/guild_settings.sql', 'utf-8') ).run();
             this.conn.prepare( fs.readFileSync(install_path + '/sprints.sql', 'utf-8') ).run();
             this.conn.prepare( fs.readFileSync(install_path + '/sprint_users.sql', 'utf-8') ).run();
             this.conn.prepare( fs.readFileSync(install_path + '/user_records.sql', 'utf-8') ).run();

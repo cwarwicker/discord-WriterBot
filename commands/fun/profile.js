@@ -36,7 +36,7 @@ module.exports = class ProfileCommand extends Command {
                     var userID = find.id;
                     var userName = who;
                 } else {
-                    return msg.say('Could not find that user.');
+                    return msg.say( lib.get_string(msg.guild.id, 'err:nouser') );
                 }
                 
             } else {
@@ -67,47 +67,47 @@ module.exports = class ProfileCommand extends Command {
                 title: userName,
                 fields: [
                     {
-                        name: 'Lvl (XP)',
-                        value: `Level ${userXp.lvl} (${userXp.xp})`,
+                        name: lib.get_string(msg.guild.id, 'profile:lvlxp'),
+                        value: `${lib.get_string(msg.guild.id, 'level')} ${userXp.lvl} (${userXp.xp})`,
                         inline: true
                     },
                     {
-                        name: 'Words Written',
+                        name: lib.get_string(msg.guild.id, 'profile:words'),
                         value: (total_wc) ? total_wc.value : 0,
                         inline: true
                     },
                     {
-                        name: 'Words Written in Sprints',
+                        name: lib.get_string(msg.guild.id, 'profile:wordssprints'),
                         value: (sprint_wc) ? sprint_wc.value : 0,
                         inline: true
                     },
                     {
-                        name: 'Sprints Started',
+                        name: lib.get_string(msg.guild.id, 'profile:sprintsstarted'),
                         value: (sprints_started) ? sprints_started.value : 0,
                         inline: true
                     },
                     {
-                        name: 'Sprints Completed',
+                        name: lib.get_string(msg.guild.id, 'profile:sprintscompleted'),
                         value: (sprints_completed) ? sprints_completed.value : 0,
                         inline: true
                     },
                     {
-                        name: 'Sprints Won',
+                        name: lib.get_string(msg.guild.id, 'profile:sprintswon'),
                         value: (sprints_won) ? sprints_won.value : 0,
                         inline: true
                     },
                     {
-                        name: 'Challenges Completed',
+                        name: lib.get_string(msg.guild.id, 'profile:challengescompleted'),
                         value: (challenges_completed) ? challenges_completed.value : 0,
                         inline: true
                     },
                     {
-                        name: 'Daily Goals Completed',
+                        name: lib.get_string(msg.guild.id, 'profile:goalscompleted'),
                         value: (daily_goals_completed) ? daily_goals_completed.value : 0,
                         inline: true
                     },
                     {
-                        name: 'Daily Goal Progress',
+                        name: lib.get_string(msg.guild.id, 'profile:goalprogress'),
                         value: (dailyGoal) ? ((Math.floor((dailyGoal.current / dailyGoal.goal) * 100))) + '%' : 0 + '%',
                         inline: true
                     }

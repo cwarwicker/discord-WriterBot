@@ -177,7 +177,7 @@ module.exports = class LookupCommand extends Command {
 
           })
           .catch(error => {
-                msg.say('Could not lookup word. Error message: ' + error);
+                msg.say(error);
           });
         
         

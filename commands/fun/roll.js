@@ -1,4 +1,5 @@
 const { Command } = require('discord.js-commando');
+const lib = require('./../../lib.js');
 
 module.exports = class RollCommand extends Command {
     constructor(client) {
@@ -22,9 +23,11 @@ module.exports = class RollCommand extends Command {
 
     run(msg, {max}) {
         
+        var guildID = (msg.guild !== null) ? msg.guild.id : null;
+        
         // Flip the coin
         var rand = Math.floor(Math.random() * max) + 1;
-        return msg.say('You rolled a '+rand+'!');
+        return msg.say(lib.get_string(guildID, 'roll:rolled') + ' ' + rand);
         
     }
 };

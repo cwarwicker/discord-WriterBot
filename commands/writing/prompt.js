@@ -1,6 +1,6 @@
 const { Command } = require('discord.js-commando');
+const lib = require('./../../lib.js');
 const Stats = require('./../../structures/stats.js');
-const prompts = require('./../../assets/json/prompts.json');
 
 module.exports = class PromptCommand extends Command {
     constructor(client) {
@@ -20,12 +20,16 @@ module.exports = class PromptCommand extends Command {
 
     run(msg) {
         
+        var guildID = (msg.guild !== null) ? msg.guild.id : null;
+        var prompts = lib.get_asset(guildID, 'prompts.json');
+
         // Updated stat
-        var stats = new Stats();
-        stats.inc(msg.guild.id, msg.author.id, 'writing_prompts_generated', 1);
+        if (guildID !== null){
+            var stats = new Stats();
+            stats.inc(guildID, msg.author.id, 'writing_prompts_generated', 1);
+        }
         
         var rand = Math.floor(Math.random() * prompts.prompts.length);
-        
         return msg.say(`[${rand + 1}] ${prompts.prompts[rand]}`);
         
     }

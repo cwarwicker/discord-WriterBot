@@ -1,6 +1,9 @@
 const { Command } = require('discord.js-commando');
-const Project = require('./../../structures/project.js');
+const util = require('util');
 const lib = require('./../../lib.js');
+
+const Project = require('./../../structures/project.js');
+
 
 module.exports = class ProjectCommand extends Command {
     constructor(client) {
@@ -44,25 +47,25 @@ module.exports = class ProjectCommand extends Command {
     run(msg, {action, arg1, arg2}) {
         
         // Create a project
-        if (action == 'create'){
+        if (action === 'create'){
             return this.run_create(msg, arg1, arg2);
         }
         
-        else if(action == 'delete'){
+        else if(action === 'delete'){
             return this.run_delete(msg, arg1);
         }
         
-        else if(action == 'view'){
+        else if(action === 'view'){
             return this.run_view(msg);
         }
         
-        else if(action == 'update'){
+        else if(action === 'update'){
             return this.run_update(msg, arg1, arg2);
         }
         
         else
         {
-            return msg.say( 'Invalid command options' );
+            return msg.say( lib.get_string(msg.guild.id, 'err:cmdoptions') );
         }
         
     }
@@ -74,18 +77,18 @@ module.exports = class ProjectCommand extends Command {
                 
         // Make sure shortnbame and title are set
         if (shortname.length < 1 || title.length < 1){
-            return msg.reply('Please make sure your project shortname and title are set: `project create shortname title`');
+            return msg.reply(lib.get_string(msg.guild.id, 'project:setnames'));
         }
         
         // Check they don't already have a project with this shortname
         var project = new Project(msg, guildID, userID);
         var record = project.get(shortname);
         if (record){
-            return msg.reply('You already have a project with that shortname');
+            return msg.reply(lib.get_string(msg.guild.id, 'project:exists'));
         }
         
         project.create(shortname, title);
-        return msg.reply('Project created: ' + title + ' ('+shortname+')');
+        return msg.reply(lib.get_string(msg.guild.id, 'project:created') + ': ' + title + ' ('+shortname+')');
         
     }
     
@@ -98,12 +101,12 @@ module.exports = class ProjectCommand extends Command {
         var project = new Project(msg, guildID, userID);
         var record = project.get(shortname);
         if (!record){
-            return msg.reply('You do not have a project with that shortname');
+            return msg.reply(util.format(lib.get_string(msg.guild.id, 'project:noexists'), shortname));
         }
         
         // Delete it
         project.delete(shortname);
-        return msg.reply('Project deleted: ' + record.name + ' ('+record.shortname+')');
+        return msg.reply(lib.get_string(msg.guild.id, 'project:deleted') + ': ' + record.name + ' ('+record.shortname+')');
         
     }
     
@@ -119,11 +122,11 @@ module.exports = class ProjectCommand extends Command {
         if (projects){
             projects.forEach( function(el){
                 content += '**'+el.name+'** *('+el.shortname+')*\n';
-                content += 'Word count: ' + el.words + '\n\n';
+                content += lib.get_string(msg.guild.id, 'wordcount') + ': ' + el.words + '\n\n';
             } );
         }
         
-        return msg.reply('Here are your current projects:\n\n' + content);
+        return msg.reply(lib.get_string(msg.guild.id, 'project:list') + ':\n\n' + content);
         
     }
     
@@ -135,12 +138,12 @@ module.exports = class ProjectCommand extends Command {
         var project = new Project(msg, guildID, userID);
         var record = project.get(shortname);
         if (!record){
-            return msg.reply('You do not have a project with that shortname ('+shortname+')');
+            return msg.reply(util.format(lib.get_string(msg.guild.id, 'project:noexists'), shortname));
         }
         
         // Update it
         project.update(shortname, words);
-        return msg.reply(record.name + ' word count updated to ' + words);
+        return msg.reply(record.name + ' '+lib.get_string(msg.guild.id, 'project:updated')+' ' + words);
         
     }
     

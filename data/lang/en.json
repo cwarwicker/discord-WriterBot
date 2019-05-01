@@ -1,0 +1,102 @@
+{
+    
+    "err:nouser": "Could not find that user", 
+    "err:validamount": "Please enter a valid amount",
+    "err:unknown": "Something went wrong",
+    "err:cmdoptions": "Invalid command options",
+            
+    "flip:heads": "It landed on heads!!",
+    "flip:tails": "It landed on tails!!",
+    
+    "8ball:0": ":large_blue_circle: It is certain",
+    "8ball:1": ":large_blue_circle: It is decidedly so",
+    "8ball:2": ":large_blue_circle: Without a doubt",
+    "8ball:3": ":large_blue_circle: Yes - definitely",
+    "8ball:4": ":large_blue_circle: You may rely on it",
+    "8ball:5": ":large_blue_circle: Of course",
+    "8ball:6": ":large_blue_circle: Most likely",
+    "8ball:7": ":large_blue_circle: Outlook good",
+    "8ball:8": ":large_blue_circle: Yes",
+    "8ball:9": ":large_blue_circle: Signs point to yes",
+    "8ball:10": ":white_circle: Reply hazy, try again",
+    "8ball:11": ":white_circle: Ask again later",
+    "8ball:12": ":white_circle: Better not tell you now",
+    "8ball:13": ":white_circle: Cannot predict now",
+    "8ball:14": ":white_circle: Concentrate and ask again",
+    "8ball:15": ":red_circle: Don't count on it",
+    "8ball:16": ":red_circle: My reply is no",
+    "8ball:17": ":red_circle: My sources say no",
+    "8ball:18": ":red_circle: Outlook not so good",
+    "8ball:19": ":red_circle: Very doubtful",
+    "8ball:20": ":red_circle: Asbolutely not",
+    
+    "profile:lvlxp": "Lvl (XP)" ,
+    "profile:words": "Words Written" ,
+    "profile:wordssprints": "Words Written in Sprints" ,
+    "profile:sprintsstarted": "Sprints Started" ,
+    "profile:sprintscompleted": "Sprints Completed" ,
+    "profile:sprintswon": "Sprints Won" ,
+    "profile:challengescompleted": "Challenges Completed" ,
+    "profile:goalscompleted": "Daily Goals Completed" ,
+    "profile:goalprogress": "Daily Goal Progress" ,
+    
+    "roll:rolled": "You rolled a",
+    
+    "xp:leaderboard": "Leaderboard",
+    "xp:noxp": "You haven't earned any xp on this server yet. You can earn xp by doing writing challenges, sprints and meeting your daily goal",
+    
+    "feedback:info": "The `feedback` command has been removed due to spam. If you need any help with Writer-Bot please join the Support Server: https://discord.gg/awaC6Vq",
+    
+    "info:bot": "Writer Bot Statistics",
+    "info:version": "Version",
+    "info:uptime": "Uptime",
+    "info:generalstats": "General Stats",
+    "info:servers": "Servers",
+    "info:sprints": "Active Sprints",
+    
+    "reset:pb": "words-per-minute PB reset to 0",
+    "reset:wc": "total word count reset to 0",
+    "reset:done": "profile reset",
+    "reset:invalid": "Invalid reset option",
+    
+    "setting:updated": "updated server setting",
+    
+    "ask:error": "I'd love to ask you a question about that, but I don't know what it is.",
+    
+    "challenge:alreadyactive": "You already have an active challenge. You will need to either complete or cancel it first.",
+    "challenge:completed": "You have completed the challenge",
+    "challenge:noactive": "You do not have an active challenge. Perhaps you should start one? `challenge`",
+    "challenge:givenup": "has given up on their challenge. Boo.",
+    "challenge:current": "Your current challenge is",
+    "challenge:tocomplete": "`challenge done` to complete the challenge.\n`challenge cancel` to cancel the challenge.",
+    "challenge:plsrespond": "Please respond with either `yes` or `no` to your current challenge.",
+    "challenge:challenge": "Write at least %s words, in %s minutes (%s wpm)",
+    "challenge:yourchallenge": "Your challenge is to",
+    "challenge:decide": "Will you accept this challenge? `yes` or `no` (You have 30 seconds to decide)",
+    "challenge:accepted": "You have accepted the challenge",
+    "challenge:active": "Active Challenges",
+    "challenge:noactiveserver": "There are no active challenges on this server.",
+    
+    
+    "goal:status": "You are %s **%s%** of the way to your %s goal. (%s/%s)",
+    "goal:nogoal": "You do not currently have a %s goal. I think you should set one, e.g. `goal set <wordcount>`",
+    "goal:givenup": "has given up on their goal. Boo.",
+    "goal:set": "%s goal set to **%s** words. Get writing!",
+    
+    "project:setnames": "Please make sure your project shortname and title are set: `project create shortname title` (e.g. `project create test My Test Book`)",
+    "project:exists": "You already have a project with that shortname",
+    "project:noexists": "You do not have a project with that shortname (%s)",
+    "project:created": "Project created",        
+    "project:deleted": "Project deleted",   
+    "project:list": "Here are your current projects",
+    "project:updated": "word count updated to",
+    
+    "wrote:addedtoproject": "added %s words to their project **%s** (%s)",
+    "wrote:added": "added %s to their total words written **(%s)**",
+            
+    "level": "Level",
+    "youare": "You are",
+    "wordcount": "Word count"
+    
+    
+}

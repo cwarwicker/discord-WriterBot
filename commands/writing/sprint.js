@@ -403,10 +403,10 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             if (userSprint){
 
                 // Is the actually sprint finished yet?
-                if (!this.is_sprint_finished(sprint)){
-                    msg.say('The sprint hasn\'t finished yet. Please wait and declare your word count at the end.');
-                    return null;
-                }
+//                if (!this.is_sprint_finished(sprint)){
+//                    msg.say('The sprint hasn\'t finished yet. Please wait and declare your word count at the end.');
+//                    return null;
+//                }
 
                 // Check amount is valid
                 if (!lib.isNumeric(amount)){
@@ -439,8 +439,9 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
 
                 msg.say(`${msg.author}: You updated your word count to: ${user.ending_wc}. Total written in this sprint: ${written}.`);
                
+                // Is the sprint over?
                 // Are all users declared now?
-                if (this.is_declaration_finished(sprint) && this.finished[guildID] === 0){
+                if (this.is_sprint_finished(sprint) && this.is_declaration_finished(sprint) && this.finished[guildID] === 0){
                     
                     msg.say('The word counts are in. Results coming up shortly...');
                     
@@ -791,11 +792,14 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                     
                 }
                 
-                output = 'Asked to be notified about upcoming sprints: ';
-                output += notify.join(', ');
-                msg.say(output);
-                
-                                
+                // If any users have asked to be notified of upcoming sprints, notify them here
+                if (notify.length > 0){
+                    output = '\:bell: Sprint notifications: ';
+                    output += notify.join(', ');
+                    msg.say(output);
+                }
+                               
+                                                
             } else {
             
                 var left = lib.secsToMins( (delay / 1000) );

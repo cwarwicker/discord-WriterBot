@@ -1,4 +1,5 @@
 const { Command } = require('discord.js-commando');
+const lib = require('./../../lib.js');
 
 module.exports = class EightBallCommand extends Command {
     constructor(client) {
@@ -23,32 +24,34 @@ module.exports = class EightBallCommand extends Command {
 
     run(msg, {question}) {
         
+        var guildID = (msg.guild !== null) ? msg.guild.id : null;
+
         var answers = new Array(
-            '\:large_blue_circle: It is certain',
-            '\:large_blue_circle: It is decidedly so',
-            '\:large_blue_circle: Without a doubt',
-            '\:large_blue_circle: Yes - definitely',
-            '\:large_blue_circle: You may rely on it',
-            '\:large_blue_circle: As I see it, yes',
-            '\:large_blue_circle: Most likely',
-            '\:large_blue_circle: Outlook good',
-            '\:large_blue_circle: Yes',
-            '\:large_blue_circle: Signs point to yes',
-            '\:white_circle: Reply hazy, try again',
-            '\:white_circle: Ask again later',
-            '\:white_circle: Better not tell you now',
-            '\:white_circle: Cannot predict now',
-            '\:white_circle: Concentrate and ask again',
-            '\:red_circle: Don\'t count on it',
-            '\:red_circle: My reply is no',
-            '\:red_circle: My sources say no',
-            '\:red_circle: Outlook not so good',
-            '\:red_circle: Very doubtful',
-            '\:red_circle: Asbolutely not'
+            lib.get_string(guildID, '8ball:0'),
+            lib.get_string(guildID, '8ball:1'),
+            lib.get_string(guildID, '8ball:2'),
+            lib.get_string(guildID, '8ball:3'),
+            lib.get_string(guildID, '8ball:4'),
+            lib.get_string(guildID, '8ball:5'),
+            lib.get_string(guildID, '8ball:6'),
+            lib.get_string(guildID, '8ball:7'),
+            lib.get_string(guildID, '8ball:8'),
+            lib.get_string(guildID, '8ball:0'),
+            lib.get_string(guildID, '8ball:10'),
+            lib.get_string(guildID, '8ball:11'),
+            lib.get_string(guildID, '8ball:12'),
+            lib.get_string(guildID, '8ball:13'),
+            lib.get_string(guildID, '8ball:14'),
+            lib.get_string(guildID, '8ball:15'),
+            lib.get_string(guildID, '8ball:16'),
+            lib.get_string(guildID, '8ball:17'),
+            lib.get_string(guildID, '8ball:18'),
+            lib.get_string(guildID, '8ball:19'),
+            lib.get_string(guildID, '8ball:20')
         );
         
-        var rand = Math.floor(Math.random() * answers.length) + 1;
-        msg.say( `${question}\n\n${answers[rand]}` );
+        var rand = Math.floor(Math.random() * answers.length);
+        msg.say( `"${question}"\n\n${answers[rand]}` );
         
     }
 };

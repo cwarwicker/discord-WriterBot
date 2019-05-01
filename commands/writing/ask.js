@@ -27,15 +27,17 @@ module.exports = class AskCommand extends Command {
 
     run (msg, {type}){
                 
+        var guildID = (msg.guild !== null) ? msg.guild.id : null;
+
         var options = [];
         type = type.toLowerCase();
                 
         if (type === 'c'){
-            options = require('./../../assets/json/q_char.json');
+            options = lib.get_asset(guildID, 'q_char.json');
         } else if(type === 'w'){
-            options = require('./../../assets/json/q_world.json');
+            options = lib.get_asset(guildID, 'q_world.json');
         } else {
-            return msg.say('I\'d love to ask you a question about that, but I don\'t know what it is.');
+            return msg.say(lib.get_string(guildID, 'ask:error'));
         }
                 
         var rand = Math.floor( Math.random() * (options.length - 1) );

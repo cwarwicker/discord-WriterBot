@@ -93,8 +93,17 @@ class Goal
             var db = new Database();
             
             var newAmount = record.current + amount;
+            if (newAmount < 0){
+                newAmount = 0;
+            }
+            
             var alreadyCompleted = record.completed;
-            var completed = (newAmount >= record.goal) ? 1 : 0;
+            var completed = record.completed;
+            
+            // Only set completed to 1 if it is currently 0, and if the new amount meets the goal
+            if (!alreadyCompleted && newAmount >= record.goal){
+                completed = 1;
+            }
             
             db.conn.prepare('UPDATE [user_goals] SET [current] = :current, [completed] = :completed WHERE [id] = :id').run({
                 current: newAmount,

@@ -1,7 +1,9 @@
 const { Command } = require('discord.js-commando');
+const util = require('util');
+const lib = require('./../../lib.js');
+
 const Database = require('./../../structures/db.js');
 const Goal = require('./../../structures/goal.js');
-const lib = require('./../../lib.js');
 
 module.exports = class GoalCommand extends Command {
     constructor(client) {
@@ -16,9 +18,6 @@ module.exports = class GoalCommand extends Command {
             examples: [
                 '`goal` - Checks how close you are to your daily goal',
                 '`goal set 500` - Sets your daily goal to be 500 words',
-                //'`goal week set 2500` - Sets your weekly goal to be 500 words',
-                //'`goal month set 10000` - Sets your monthly goal to be 500 words',
-                //'`goal year set 100000` - Sets your yearly goal to be 500 words',
                 '`goal cancel` - Deletes your daily goal'
             ],
             args: [
@@ -72,10 +71,10 @@ module.exports = class GoalCommand extends Command {
             
             var percentStr = '[' + ('- '.repeat(progressDone)) + ('  '.repeat(progressLeft)) +  ']';
             
-            return msg.say(`${msg.author}: You are ${percentStr} **${percent}%** of the way to your ${type} goal. (${record.current}/${record.goal})`);            
+            return msg.say(`${msg.author}: ${util.format( lib.get_string(msg.guild.id, 'goal:status'), percentStr, percent, type, record.current, record.goal )}`);            
             
         } else {
-            return msg.say(`${msg.author}: You do not currently have a ${type} goal. I think you should set one, e.g. \`goal set <wordcount>\``);
+            return msg.say(`${msg.author}: ${util.format( lib.get_string(msg.guild.id, 'goal:nogoal'), type )}`);
         }
     
     }
@@ -88,7 +87,7 @@ module.exports = class GoalCommand extends Command {
         var goal = new Goal(msg, msg.guild.id, msg.author.id);
         goal.delete(type);
         
-        return msg.say(`${msg.author} has given up on their ${type} goal. Boo.`);
+        return msg.say(`${msg.author} ${lib.get_string(msg.guild.id, 'goal:givenup')}`);
         
     }
     
@@ -100,16 +99,16 @@ module.exports = class GoalCommand extends Command {
                 
                 
         if (!lib.isInt(value)){
-            return msg.say('Please enter a valid amount > 0');
+            return msg.say(lib.get_string(msg.guild.id, 'err:validamount'));
         }
         
         var goal = new Goal(msg, msg.guild.id, msg.author.id);
         var result = goal.set(type, value);
         
         if (result){
-            return msg.say(`${msg.author}: ${type} goal set to **${value}** words. Get writing!`);
+            return msg.say(`${msg.author}: ${util.format( lib.get_string(msg.guild.id, 'goal:set'), type, value )}`);
         } else {
-            return msg.say('Something went wrong.');
+            return msg.say(lib.get_string(msg.guild.id, 'err:unknown'));
         }
         
     }
