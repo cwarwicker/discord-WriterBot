@@ -28,7 +28,7 @@ class Project
     get(shortname){
         
         var db = new Database();
-        var record = db.conn.prepare('SELECT * FROM [projects] WHERE [guild] = :guild AND [user] = :user AND [shortname] = :shortname').get({
+        var record = db.conn.prepare('SELECT * FROM [projects] WHERE [guild] = :guild AND [user] = :user AND [shortname] = :shortname COLLATE NOCASE').get({
             guild: this.guildID,
             user: this.userID,
             shortname: shortname
@@ -72,7 +72,7 @@ class Project
     delete(shortname){
         
         var db = new Database();
-        db.conn.prepare('DELETE FROM [projects] WHERE [guild] = :guild AND [user] = :user AND [shortname] = :shortname').run({
+        db.conn.prepare('DELETE FROM [projects] WHERE [guild] = :guild AND [user] = :user AND [shortname] = :shortname COLLATE NOCASE').run({
             guild: this.guildID,
             user: this.userID,
             shortname: shortname
@@ -87,7 +87,7 @@ class Project
     update(shortname, words){
         
         var db = new Database();
-        db.conn.prepare('UPDATE [projects] SET [words] = :words WHERE [guild] = :guild AND [user] = :user AND [shortname] = :shortname').run({
+        db.conn.prepare('UPDATE [projects] SET [words] = :words WHERE [guild] = :guild AND [user] = :user AND [shortname] = :shortname COLLATE NOCASE').run({
             words: words,
             guild: this.guildID,
             user: this.userID,

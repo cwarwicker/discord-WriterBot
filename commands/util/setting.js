@@ -13,6 +13,7 @@ module.exports = class ProfileCommand extends Command {
                     description: 'Update a server setting',
                     guildOnly: true,
                     userPermissions: ['MANAGE_MESSAGES'],
+                    examples: ['`!set lang <language>`: Set the language to be used. Available languages currently: `en`'],
                     args: [
                         {
                             key: 'setting',
@@ -35,8 +36,7 @@ module.exports = class ProfileCommand extends Command {
             var settings = new Setting();
             
             settings.set(guildID, setting, value);
-            return msg.say(`${msg.author} ${lib.get_string(msg.guild.id, 'setting:updated')} \`${setting}\`:= \`${value}\``);            
-
+            return msg.say(`${msg.author} ${lib.get_string(guildID, 'setting:updated')} \`${setting}\`to \`${value}\``);    
             
 	}
 };

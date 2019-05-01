@@ -16,6 +16,8 @@ class NameGenerator
     generate(msg, type, limit)
     {
         
+        var guildID = (msg.guild !== null) ? msg.guild.id : null;
+
         // Make sure limit is correct
         if (limit > maxLimit){
             limit = maxLimit;
@@ -27,7 +29,7 @@ class NameGenerator
                 
         
         // Load the source
-        var filepath = lib.get_asset_path(msg.guild.id, 'gen_'+type+'.json')
+        var filepath = lib.get_asset_path(guildID, 'gen_'+type+'.json')
                         
         try {
             

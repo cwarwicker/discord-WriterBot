@@ -25,7 +25,8 @@ module.exports = class ReassureCommand extends Command {
 
     run(msg, {user}) {
         
-        const reassurances = lib.get_asset(msg.guild.id, 'reassure.json');
+        var guildID = (msg.guild !== null) ? msg.guild.id : null;
+        var reassurances = lib.get_asset(guildID, 'reassure.json');
 
         return msg.say(`${user}, ${reassurances[Math.floor(Math.random() * reassurances.length)]}`);
         

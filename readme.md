@@ -1,4 +1,4 @@
-# Writer-Bot (0.5)
+# Writer-Bot (0.6)
 
 https://github.com/cwarwicker/discord-WriterBot/wiki/Patch-Notes
 
@@ -42,3 +42,14 @@ It has many features, such as writing sprints, word count goals, xp/levels, prom
 `!roll`: Rolls a dice between 1-6, or 1 and a specified number
 
 `!xp`: Checks your server Experience Points and Level. Use the "top" flag to see the top 10 on this server.
+
+
+**Utility Commands**
+
+`!info`: Shows bot information and status
+
+`!patch`: Shows the latest patch notes for the bot
+
+`!reset`: Allows you to reset your stats
+
+`!set`: Allows users with the (MANAGE_MESSAGES) permission on the server, to change configuration values

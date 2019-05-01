@@ -4,6 +4,10 @@ const Setting = require('./structures/settings.js');
 
 module.exports.get_lang = function(guildID){
     
+    // If the command was sent in a DM to the bot
+    if (guildID === null) return 'en';
+    
+    // Otherwise, lookup server language
     var settings = new Setting();
     var lang = settings.get(guildID, 'lang');
     

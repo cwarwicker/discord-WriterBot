@@ -16,7 +16,8 @@ module.exports = class QuoteCommand extends Command {
 
     run(msg, {user}) {
         
-        const quotes = lib.get_asset(msg.guild.id, 'quotes.json');
+        var guildID = (msg.guild !== null) ? msg.guild.id : null;
+        var quotes = lib.get_asset(guildID, 'quotes.json');
 
         var quote = quotes[Math.floor(Math.random() * quotes.length)];
         return msg.say(quote.quote + ' - *'+quote.name+'*');

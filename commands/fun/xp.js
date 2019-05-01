@@ -11,6 +11,7 @@ module.exports = class XPCommand extends Command {
             group: 'fun',
             memberName: 'xp',
             description: 'Checks your server Experience Points and Level. Use the "top" flag to see the top 10 on this server.',
+            guildOnly: true,
             examples: ['`xp` Shows your level/xp', '`xp top` Shows the top 10 users on the server'],
             args: [
                 {

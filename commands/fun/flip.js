@@ -18,13 +18,15 @@ module.exports = class FlipCommand extends Command {
 
     run(msg) {
         
+        var guildID = (msg.guild !== null) ? msg.guild.id : null;
+
         // Flip the coin
         var rand = Math.floor(Math.random() * 2) + 1;
                 
         if (rand === 1){
-            return msg.say( lib.get_string(msg.guild.id, 'flip:heads') );
+            return msg.say( lib.get_string(guildID, 'flip:heads') );
         } else {
-            return msg.say( lib.get_string(msg.guild.id, 'flip:tails') );
+            return msg.say( lib.get_string(guildID, 'flip:tails') );
         }
         
     }

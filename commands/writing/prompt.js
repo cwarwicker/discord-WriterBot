@@ -20,14 +20,16 @@ module.exports = class PromptCommand extends Command {
 
     run(msg) {
         
-        const prompts = lib.get_asset(msg.guild.id, 'prompts.json');
+        var guildID = (msg.guild !== null) ? msg.guild.id : null;
+        var prompts = lib.get_asset(guildID, 'prompts.json');
 
         // Updated stat
-        var stats = new Stats();
-        stats.inc(msg.guild.id, msg.author.id, 'writing_prompts_generated', 1);
+        if (guildID !== null){
+            var stats = new Stats();
+            stats.inc(guildID, msg.author.id, 'writing_prompts_generated', 1);
+        }
         
         var rand = Math.floor(Math.random() * prompts.prompts.length);
-        
         return msg.say(`[${rand + 1}] ${prompts.prompts[rand]}`);
         
     }

@@ -23,9 +23,11 @@ module.exports = class RollCommand extends Command {
 
     run(msg, {max}) {
         
+        var guildID = (msg.guild !== null) ? msg.guild.id : null;
+        
         // Flip the coin
         var rand = Math.floor(Math.random() * max) + 1;
-        return msg.say(lib.get_string(msg.guild.id, 'roll:rolled') + ' ' + rand);
+        return msg.say(lib.get_string(guildID, 'roll:rolled') + ' ' + rand);
         
     }
 };

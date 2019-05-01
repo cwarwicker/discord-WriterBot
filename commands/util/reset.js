@@ -13,6 +13,7 @@ module.exports = class ProfileCommand extends Command {
                     memberName: 'reset',
                     description: 'Reset your server statistics',
                     guildOnly: true,
+                    examples: ['`!reset pb`: Resets your wpm personal best on the server', '`!reset wc`: Resets your total word count on the server', '`!reset all`: Resets all your stats which can be reset on the server'],
                     args: [
                         {
                             key: 'what',
