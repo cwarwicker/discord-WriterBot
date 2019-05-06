@@ -45,7 +45,7 @@ module.exports = class XPCommand extends Command {
             
             var all = xp.all();
 
-            var output = `\:trophy: **${lib.get_string(msg.guild.id, 'xp:leaderboard?')}**\n\n`;
+            var output = `\:trophy: **${lib.get_string(msg.guild.id, 'xp:leaderboard')}**\n\n`;
             
             for (var i = 0; i < all.length; i++){
                 
