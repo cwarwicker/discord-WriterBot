@@ -5,6 +5,9 @@ const Database = require('./structures/db.js');
 const cron = require('node-cron');
 const Goal = require('./structures/goal.js');
 const settings = require('./settings.json');
+const version = require('./version.json');
+
+const Update = require('./data/install/update.js');
 
 const bot = new Commando.Client({
     owner: '291154723631792129',
@@ -29,6 +32,10 @@ bot.on('ready', () => {
     // Initialise database
     const db = new Database();
     db.init();
+    
+    // Run any updates
+    var update = new Update();
+    update.run(version.dbversion);
        
     // Start crons
     //

@@ -20,11 +20,11 @@ module.exports = class ChallengeCommand extends Command {
                 '`challenge` - Generates a random writing challenge', 
                 '`challenge cancel` - Cancels your current challenge', 
                 '`challenge done` - Completes your current challenge', 
-                '`challenge easy` - Generates a random writing challenge, at 5 wpm', 
-                '`challenge normal` - Generates a random writing challenge, at 10 wpm', 
-                '`challenge hard` - Generates a random writing challenge, at 20 wpm', 
-                '`challenge hardcore` - Generates a random writing challenge, at 40 wpm', 
-                '`challenge insane` - Generates a random writing challenge, at 60 wpm', 
+                '`challenge easy` - Generates a random writing challenge, at 5 wpm (20xp)', 
+                '`challenge normal` - Generates a random writing challenge, at 10 wpm (40xp)', 
+                '`challenge hard` - Generates a random writing challenge, at 20 wpm (75xp)', 
+                '`challenge hardcore` - Generates a random writing challenge, at 40 wpm (100xp)', 
+                '`challenge insane` - Generates a random writing challenge, at 60 wpm (150xp)', 
                 '`challenge 10` - Generates a random writing challenge, at 10 wpm', 
                 '`challenge t15` - Generates a random writing challenge, with a duration of 15 minutes', 
                 '`challenge hard t30` - Generates a writing challenge at 20 wpm, with a duration of 30 minutes'
@@ -67,7 +67,41 @@ module.exports = class ChallengeCommand extends Command {
         
     }
     
-    set_challenge(msg, usr, challenge){
+    calculate_xp(wpm){
+        
+        // Default minimum value
+        var xp = 20;
+        
+        // Easy
+        if(wpm <= 5){
+            xp = 20;
+        } 
+        // Normal
+        else if(wpm <= 10){
+            xp = 40;
+        } 
+        // Hard
+        else if(wpm <= 20){
+            xp = 75;
+        } 
+        // Hardcore
+        else if(wpm <= 40){
+            xp = 100;
+        } 
+        // Insane
+        else if(wpm <= 60){
+            xp = 150;
+        } 
+        // Custom > 60
+        else if(wpm > 60) {
+            xp = 200;
+        }
+        
+        return xp;
+        
+    }
+    
+    set_challenge(msg, usr, challenge, xp){
         
        var userChallenge = this.get_challenge(msg.guild.id, usr);
        if (userChallenge){
@@ -75,10 +109,11 @@ module.exports = class ChallengeCommand extends Command {
        } else {
            
            var db = new Database();
-           db.conn.prepare('INSERT INTO [user_challenges] (guild, user, challenge) VALUES (:g, :u, :c)').run({
+           db.conn.prepare('INSERT INTO [user_challenges] (guild, user, challenge, xp) VALUES (:g, :u, :c, :xp)').run({
                g: msg.guild.id,
                u: usr,
-               c: challenge
+               c: challenge,
+               xp: xp
            });
            db.close();
            
@@ -107,12 +142,12 @@ module.exports = class ChallengeCommand extends Command {
             
             // Add xp
             var xp = new XP(guildID, userID, msg); 
-            xp.add(xp.XP_COMPLETE_CHALLENGE);
+            xp.add(userChallenge.xp);
             
             // Increment stat
             this.stats.inc(guildID, userID, 'challenges_completed', 1);
 
-            return msg.say(`${msg.author}: ${lib.get_string(msg.guild.id, 'challenge:completed')} **${userChallenge.challenge}**     +${xp.XP_COMPLETE_CHALLENGE} xp`);            
+            return msg.say(`${msg.author}: ${lib.get_string(msg.guild.id, 'challenge:completed')} **${userChallenge.challenge}**     +${userChallenge.xp} xp`);            
             
         } else {
             return msg.say(`${msg.author}: ${lib.get_string(msg.guild.id, 'challenge:noactive')}`);
@@ -180,7 +215,6 @@ module.exports = class ChallengeCommand extends Command {
                 wpm = flag;
             }
             
-            
             var time = Math.floor(Math.random()*(this.times.max - this.times.min + 1) + this.times.min);
             
             // Specify the time
@@ -190,8 +224,8 @@ module.exports = class ChallengeCommand extends Command {
                 time = flag2.replace(/[^0-9]/, '');
             }
             
-            
             var goal = wpm * time;
+            var xp = this.calculate_xp(wpm);
 
             // Round it down to a neater number
             goal = Math.round(goal / 10) * 10;
@@ -213,7 +247,7 @@ module.exports = class ChallengeCommand extends Command {
                 var answer = mg.first().content;
                 if (answer.toLowerCase() === 'yes'){
 
-                    this.set_challenge(msg, userID, challenge);
+                    this.set_challenge(msg, userID, challenge, xp);
                     msg.say(`${msg.author}: ${lib.get_string(msg.guild.id, 'challenge:accepted')}: **${challenge}**\n${lib.get_string(msg.guild.id, 'challenge:tocomplete')}`);
 
                 } else {

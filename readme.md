@@ -1,4 +1,4 @@
-# Writer-Bot (0.6)
+# Writer-Bot (0.7)
 
 https://github.com/cwarwicker/discord-WriterBot/wiki/Patch-Notes
 
