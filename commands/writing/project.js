@@ -24,7 +24,7 @@ module.exports = class ProjectCommand extends Command {
             args: [
                 {
                     key: "action",
-                    prompt: "What do you want to do? `create` a project? `delete` a project? `view` a project?",
+                    prompt: "What do you want to do? `create` a project? `delete` a project? `view` a project? `update` a project?",
                     type: "string"
                 },
                 {

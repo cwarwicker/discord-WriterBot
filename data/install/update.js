@@ -13,7 +13,7 @@ class Update
         
         db.close();
         
-        this.version = (record) ? record.value : 0;
+        this.oldVersion = (record) ? record.value : 0;
         
     }
     
@@ -30,7 +30,7 @@ class Update
         // Start transaction
         db.conn.prepare('BEGIN');
         
-        if (this.version < 201907031){
+        if (this.oldVersion < 201907031){
             
             // Add xp column to user_challenges
             db.conn.prepare('ALTER TABLE [user_challenges] ADD COLUMN [xp] int').run();
@@ -38,6 +38,20 @@ class Update
             
         }
         
+        // Add current_wc column to [sprint_users]
+        if (this.oldVersion < 201907042){
+            
+            db.conn.prepare('ALTER TABLE [sprint_users] ADD COLUMN [current_wc] INTEGER DEFAULT 0').run();
+            this.log(version, 'Added [current_wc] column to [sprint_users] table');
+
+        }
+        
+        
+        // Add [event] column to [sprint_users] so they can declare an event they wrote for
+        if (this.oldVersion < 201907043){
+            db.conn.prepare('ALTER TABLE [sprint_users] ADD COLUMN [event] INTEGER DEFAULT 0').run();
+            this.log(version, 'Added [event] column to [sprint_users] table');
+        }
         
         
         
@@ -45,9 +59,9 @@ class Update
         db.conn.prepare('COMMIT');
         
         // Finished
-        // 
+        
         // Set new version in DB
-        if (this.version == 0){
+        if (this.oldVersion == 0){
             
             db.conn.prepare('INSERT INTO [bot_settings] (setting, value) VALUES (:setting, :val)').run({
                 val: version,

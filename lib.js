@@ -95,7 +95,29 @@ module.exports.getMember = function(msg, id){
     return msg.guild.members.find('id', id);
 };
 
+module.exports.getMemberByMention = function(msg, mention){
+    
+    var id = mention.replace(/\D/g, '');
+    
+    var userArray = msg.guild.members.array();
+    for (var i = 0; i < userArray.length; i++){
+        var user = userArray[i];
+        if (user.user.id === id){
+            return user.user;
+        }
+    }
+    
+    return false;
+    
+};
+
 module.exports.getMemberByName = function(msg, name){
+    
+    // If the name is actually a mention, e.g. <@123456789>, then get it by that instead
+    var match = name.match(/^<@\d+>$/i);
+    if (match !== null){
+        return module.exports.getMemberByMention(msg, name);
+    }
     
     var userArray = msg.guild.members.array();
     for (var i = 0; i < userArray.length; i++){

@@ -5,6 +5,7 @@ const Record = require('./../../structures/record.js');
 const Stats = require('./../../structures/stats.js');
 const Goal = require('./../../structures/goal.js');
 const Project = require('./../../structures/project.js');
+const Setting = require('./../../structures/settings.js');
 const lib = require('./../../lib.js');
 
 const STAT_SPRINT_NOTIFY = 3;
@@ -166,7 +167,7 @@ module.exports = class SprintCommand extends Command {
         }  
         
         else if (opt1 === 'forget'){
-            return this.run_forget(msg);
+            return this.run_forget(msg, opt2);
         }
         
         else if(opt1 === 'project'){
@@ -331,16 +332,26 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
         
     }
     
-    run_forget(msg){
+    run_forget(msg, name){
         
+        let user = msg.author;
         let guildID = msg.guild.id;
-        let userID = msg.author.id;
+        
+        name = name.trim();
+        
+        // Are we removing someone else from the list?
+        if (name.length > 0){
+            user = lib.getMemberByName(msg, name);
+            if (!user){
+                return msg.say(`Unable to find user with that name.`);        
+            }
+        }
         
         // Set them to be notified about upcoming sprints
         var stats = new Stats();
-        stats.set(guildID, userID, 'sprint_notify', 0);
+        stats.set(guildID, user.id, 'sprint_notify', 0);
         
-        return msg.say(`${msg.author.username}: You will no longer be notified of upcoming sprints.`);        
+        return msg.say(`${user}: You will no longer be notified of upcoming sprints.`);        
         
     }
     
@@ -402,12 +413,6 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             
             if (userSprint){
 
-                // Is the actually sprint finished yet?
-//                if (!this.is_sprint_finished(sprint)){
-//                    msg.say('The sprint hasn\'t finished yet. Please wait and declare your word count at the end.');
-//                    return null;
-//                }
-
                 // Check amount is valid
                 if (!lib.isNumeric(amount)){
                     msg.say('Please enter a valid word count, greater than 0.');
@@ -422,9 +427,16 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 }
 
                 var db = new Database();
+                
+                // If the sprint is finished, set it in the [ending_wc], otherwise if it's still running use the [current_wc]
+                if (this.is_sprint_finished(sprint)){
+                    var col = 'ending_wc';
+                } else {
+                    var col = 'current_wc';
+                }
 
                 // Update record
-                db.conn.prepare('UPDATE [sprint_users] SET [ending_wc] = :wc WHERE [sprint] = :sp AND [user] = :usr').run({
+                db.conn.prepare('UPDATE [sprint_users] SET ['+col+'] = :wc WHERE [sprint] = :sp AND [user] = :usr').run({
                     wc: amount,
                     sp: sprint.id,
                     usr: userID
@@ -434,10 +446,17 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 var user = this.is_user_sprinting(sprint.id, userID);
 
                 db.close();
+                
+                // Which number are we using to display?
+                if (this.is_sprint_finished(sprint)){
+                    var wordcount = user.ending_wc;
+                } else {
+                    var wordcount = user.current_wc;
+                }
 
-                var written = user.ending_wc - user.starting_wc;
+                var written = wordcount - user.starting_wc;
 
-                msg.say(`${msg.author}: You updated your word count to: ${user.ending_wc}. Total written in this sprint: ${written}.`);
+                msg.say(`${msg.author}: You updated your word count to: ${wordcount}. Total written in this sprint: ${written}.`);
                
                 // Is the sprint over?
                 // Are all users declared now?
@@ -920,14 +939,26 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             // Clear the message timeout
             this.clear(guildID);
             
+            // Is there a guild setting for the delay?
+            var settings = new Setting();
+            
+            var setting = settings.get(guildID, 'sprint_delay_end');
+            if (setting && lib.isNumeric(setting.value) && setting <= 15){
+                var delay = setting.value * 60; // This will be in mins, so convert to seconds
+            } else {
+                var delay = this.defaults.post_delay;
+            }
+            
+            // Convert to ms
+            delay *= 1000;
+            
             // Set the new timeout for the ending message
-            var delay = this.defaults.post_delay * 1000;
             this.timeout(guildID, delay, function(){
                 obj.finish(msg);
             });
                         
             // Post the ending message
-            var output = '**Time is up**\nPens down. Use `sprint wc <amount>` to submit your final word counts, you have ' + Math.round(this.defaults.post_delay / 60) + ' minutes.\n';
+            var output = '**Time is up**\nPens down. Use `sprint wc <amount>` to submit your final word counts, you have ' + Math.round((delay/1000) / 60) + ' minute(s).\n';
             output += users.join(', ');
             msg.say(output);
                         
@@ -961,45 +992,57 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                     
                     var guildUser = lib.getMember(msg, records[i].user);
                     var user = records[i];
-                    if (guildUser && user.ending_wc > 0){
-                        
-                        var count = user.ending_wc - user.starting_wc;
-                        var wpm = Math.round( (count / (sprint.length / 60)) * 100 ) / 100;
-                        var newWpmRecord = 0;
-                        
-                        // Check record
-                        var userRecord = record.get(guildID, user.user, 'wpm');
-                        if (!userRecord || userRecord.value < wpm){
-                            record.set(guildID, user.user, 'wpm', wpm);
-                            newWpmRecord = 1;
+                    
+                    if (guildUser){
+
+                        // If the user didn't submit an ending_wc, but they do have a current_wc, use that
+                        if (user.ending_wc == 0){
+                            user.ending_wc = user.current_wc;
                         }
-                                                
-                        // Give them xp
-                        var xp = new XP(guildID, user.user, msg);
-                        xp.add(xp.XP_COMPLETE_SPRINT);
-                        
-                        // Increment their stats
-                        this.stats.inc(guildID, user.user, 'sprints_completed', 1);
-                        this.stats.inc(guildID, user.user, 'sprints_words_written', count);
-                        this.stats.inc(guildID, user.user, 'total_words_written', count);
-                        
-                        // Increment their words towards their daily goal
-                        var goal = new Goal(msg, guildID, user.user);
-                        goal.inc(count);
-                        
-                        // If they were writing to a project, update that word count
-                        if(user.project > 0){
-                            
-                            var project = new Project(msg, guildID, user.user);
-                            var userProject = project.getByID(user.project);
-                            if (userProject){
-                                project.increment(user.project, count);
+                    
+                        // Now just do the ones who have something for the ending
+                        if (user.ending_wc > 0){
+
+                            var count = user.ending_wc - user.starting_wc;
+                            var wpm = Math.round( (count / (sprint.length / 60)) * 100 ) / 100;
+                            var newWpmRecord = 0;
+
+                            // Check record
+                            var userRecord = record.get(guildID, user.user, 'wpm');
+                            if (!userRecord || userRecord.value < wpm){
+                                record.set(guildID, user.user, 'wpm', wpm);
+                                newWpmRecord = 1;
                             }
+
+                            // Give them xp
+                            var xp = new XP(guildID, user.user, msg);
+                            xp.add(xp.XP_COMPLETE_SPRINT);
+
+                            // Increment their stats
+                            this.stats.inc(guildID, user.user, 'sprints_completed', 1);
+                            this.stats.inc(guildID, user.user, 'sprints_words_written', count);
+                            this.stats.inc(guildID, user.user, 'total_words_written', count);
+
+                            // Increment their words towards their daily goal
+                            var goal = new Goal(msg, guildID, user.user);
+                            goal.inc(count);
+
+                            // If they were writing to a project, update that word count
+                            if(user.project > 0){
+
+                                var project = new Project(msg, guildID, user.user);
+                                var userProject = project.getByID(user.project);
+                                if (userProject){
+                                    project.increment(user.project, count);
+                                }
+
+                            }
+
+                            // Push to result dataset
+                            result.push({user: user.user, count: count, wpm: wpm, newWpmRecord: newWpmRecord, xp: xp.XP_COMPLETE_SPRINT});       
                             
                         }
-                                                
-                        // Push to result dataset
-                        result.push({user: user.user, count: count, wpm: wpm, newWpmRecord: newWpmRecord, xp: xp.XP_COMPLETE_SPRINT});       
+                    
                     }
                     
                 }
@@ -1041,18 +1084,22 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                 db.conn.prepare('UPDATE [sprints] SET [completed] = ? WHERE [id] = ?').run([now, sprint.id]);
                 
                 // Post the message
-                var output = '\:trophy: **Sprint Results** \:trophy:\nCongratulations to everyone.\n';
-                for (var i = 0; i < result.length; i++){
+                if (result.length > 0){               
+                    var output = '\:trophy: **Sprint Results** \:trophy:\nCongratulations to everyone.\n';
+                    for (var i = 0; i < result.length; i++){
 
-                    output += '`'+(i+1)+'`. <@' + result[i].user + '> - **' + result[i].count + ' words** ('+result[i].wpm+' wpm) ';
+                        output += '`'+(i+1)+'`. <@' + result[i].user + '> - **' + result[i].count + ' words** ('+result[i].wpm+' wpm) ';
 
-                    if (result[i].newWpmRecord === 1){
-                        output += '\:champagne: **NEW PB**';
+                        if (result[i].newWpmRecord === 1){
+                            output += '\:champagne: **NEW PB**';
+                        }
+
+                        output += '     +' + result[i].xp + 'xp';
+                        output += '\n';
+
                     }
-
-                    output += '     +' + result[i].xp + 'xp';
-                    output += '\n';
-
+                } else {
+                    var output = 'No-one submitted their wordcounts... I guess I\'ll just cancel the sprint... \:frowning:';
                 }
 
                 msg.say(output);

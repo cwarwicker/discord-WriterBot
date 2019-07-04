@@ -44,6 +44,8 @@ class Database
             this.conn.prepare( fs.readFileSync(install_path + '/user_stats.sql', 'utf-8') ).run();
             this.conn.prepare( fs.readFileSync(install_path + '/user_goals.sql', 'utf-8') ).run();
             this.conn.prepare( fs.readFileSync(install_path + '/projects.sql', 'utf-8') ).run();
+            this.conn.prepare( fs.readFileSync(install_path + '/events.sql', 'utf-8') ).run();
+            this.conn.prepare( fs.readFileSync(install_path + '/user_events.sql', 'utf-8') ).run();
 
         this.conn.prepare('COMMIT');
         

@@ -91,6 +91,22 @@
     "project:list": "Here are your current projects",
     "project:updated": "word count updated to",
     
+    "event:permissions": "You do not have the permissions to do that on this server.",
+    "event:already": "There is already an event on this server.",
+    "event:created": "Your event **%s** has been created.\nOnce you are ready to begin, run the command `event start`. When you are ready to end the event, run the command `event end`.\nWhilst the event is running, all `sprint` and `wrote` wordcounts will be automatically added to the event. Users will also be able to manually update their event wordcount by running `event update <words>`, e.g. `event update 1000`.",
+    "event:title": "Please make sure your event title is set: `event create <title>`, e.g. `event create National Novel Writing Month (2019)`",
+    "event:noexists": "There is no event currently on this server",
+    "event:deletesure": "Are you sure you want to delete the event? Once it is deleted, you can never get it or any of the user wordcounts back. `yes` or `no` (You have 30 seconds to decide)",
+    "event:deleted": "Event **%s** has been deleted.",
+    "event:plsrespond": "Please respond with either `yes` or `no` the previous question.",
+    "event:ended": ":checkered_flag: **%s** has ended :checkered_flag:\nCongratulations to everyone who took part.\nThe final leaderboard is coming up any moment now...",
+    "event:notrunning": "There is no event currently running on this server",
+    "event:cannotstart": "There is no event to start. Perhaps it is already running?",
+    "event:started": "**%s has now officially begun!**\n Good luck everyone!",
+    "event:updated": "has updated their **%s** word count to: ",
+    "event:leaderboard": "Leaderboard",
+
+    
     "wrote:addedtoproject": "added %s words to their project **%s** (%s)",
     "wrote:added": "added %s to their total words written **(%s)**",
             
