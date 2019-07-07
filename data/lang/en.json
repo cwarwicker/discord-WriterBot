@@ -4,6 +4,8 @@
     "err:validamount": "Please enter a valid amount",
     "err:unknown": "Something went wrong",
     "err:cmdoptions": "Invalid command options",
+    "err:invalidsetting": "Invalid setting",
+    "err:replytime": "You did not reply within %s seconds, so this command has been cancelled.",
             
     "flip:heads": "It landed on heads!!",
     "flip:tails": "It landed on tails!!",
@@ -60,6 +62,7 @@
     "reset:invalid": "Invalid reset option",
     
     "setting:updated": "updated server setting",
+    "mysetting:updated": "updated your setting",
     
     "ask:error": "I'd love to ask you a question about that, but I don't know what it is.",
     
@@ -93,23 +96,42 @@
     
     "event:permissions": "You do not have the permissions to do that on this server.",
     "event:already": "There is already an event on this server.",
-    "event:created": "Your event **%s** has been created.\nOnce you are ready to begin, run the command `event start`. When you are ready to end the event, run the command `event end`.\nWhilst the event is running, all `sprint` and `wrote` wordcounts will be automatically added to the event. Users will also be able to manually update their event wordcount by running `event update <words>`, e.g. `event update 1000`.",
+    "event:created": "Your event \"**%s**\" has been created!\n\nOnce you are ready to begin, run the command `event start`. When you are ready to end the event, run the command `event end`.\n\nAlternatively, you can schedule the start and end date to trigger automatically, by running the command `event schedule`.\n\nWhilst the event is running, all `sprint` and `wrote` wordcounts will be automatically added to the event. Users will also be able to manually update their event wordcount by running `event update <words>`, e.g. `event update 1000`.",
     "event:title": "Please make sure your event title is set: `event create <title>`, e.g. `event create National Novel Writing Month (2019)`",
     "event:noexists": "There is no event currently on this server",
-    "event:deletesure": "Are you sure you want to delete the event? Once it is deleted, you can never get it or any of the user wordcounts back. `yes` or `no` (You have 30 seconds to decide)",
+    "event:deletesure": "Are you sure you want to delete the event? Once it is deleted, you can never get it or any of the user wordcounts back. `yes` or `no`",
     "event:deleted": "Event **%s** has been deleted.",
     "event:plsrespond": "Please respond with either `yes` or `no` the previous question.",
     "event:ended": ":checkered_flag: **%s** has ended :checkered_flag:\nCongratulations to everyone who took part.\nThe final leaderboard is coming up any moment now...",
     "event:notrunning": "There is no event currently running on this server",
+    "event:alreadyrunning": "The event is already running",
     "event:cannotstart": "There is no event to start. Perhaps it is already running?",
     "event:started": "**%s has now officially begun!**\n Good luck everyone!",
     "event:updated": "has updated their **%s** word count to: ",
     "event:leaderboard": "Leaderboard",
+    "event:scheduled" : "Ok, **%s** has been scheduled to start at %s, %s and finish at %s, %s",
+        
+    "event:schedule:question:1": "What date would you like your event to start? (dd-mm-yyyy) (e.g. 26-07-2019)...",
+    "event:schedule:question:2": "What time would you like your event to start? (hh:mm) (24-hour clock) (e.g. 09:00)...",
+    "event:schedule:question:3": "What date would you like your event to end? (dd-mm-yyyy) (e.g. 26-07-2019)...",
+    "event:schedule:question:4": "What time would you like your event to end? (hh:mm) (24-hour clock) (e.g. 17:30)...",
+    "event:schedule:question:5": "Start Date: **%s**\nStart Time: **%s**\nEnd Date: **%s**\nEnd Time: **%s**\n\nIs that all correct? `yes` or `no`",
 
+    "event:schedule:plsrespond": "Please respond to the previous question.",
+    "event:schedule:invaliddate": "Invalid date. Please choose a valid date, in the format dd-mm-yyyy (E.g. 26-07-2019)",
+    "event:schedule:invalidtime": "Invalid time. Please choose a valid 24-hour time. E.g. 18:00, 10:15, etc...",
+    "event:timezonenotset": "In order to schedule an event, we must first calculate the difference between your timezone and the bot's timezone.\nTo do this, please set your timezone by running `myset timezone <zone>`, e.g. `myset timezone Europe/London`, or `myset timezone America/Los_Angeles`, etc... Then try scheduling your event again.\nIf you are unsure of your timezone, please refer to this wikipedia page (TZ database name column): https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
+    "event:timezoneupdated": "Using the timezone (%s), your local time right now should be: %s (UTC%s)\nIf that is not correct, please run this command again using a timezone which gives you your correct local time.",
+    "event:preschedule": "Before we get started, let's just check your local time is still correct.\nYour timezone setting is (%s), which would make your local time: %s (UTC%s).\nIf that is not correct, please cancel this command and run the `myset timezone <zone>` command to update it.\n---------------------------------------------------------------------------",
+    
+    "event:schedule:datebeforetoday": "That date has already passed. Please choose a valid date from today.",
+    "event:schedule:datetimebeforetoday": "That time has already passed. Please choose a valid time from today.",
+    "event:schedule:begin": "**%s** has now started! Good luck!",
     
     "wrote:addedtoproject": "added %s words to their project **%s** (%s)",
     "wrote:added": "added %s to their total words written **(%s)**",
             
+    "thanks": "Thanks!",        
     "level": "Level",
     "youare": "You are",
     "wordcount": "Word count"

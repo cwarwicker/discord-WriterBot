@@ -1,3 +1,6 @@
+const moment = require('moment');
+const util = require('util');
+
 const Database = require('./../structures/db.js');
 const lib = require('./../lib.js');
 
@@ -10,6 +13,10 @@ class Event
         this.guildID = guildID;
         this.event = this.get();
         
+    }
+    
+    exists(){
+        return (this.event !== false);
     }
     
     // Does any current event exist on the server?
@@ -85,13 +92,14 @@ class Event
     }
     
     
-    create(name){
+    create(name, channel){
         
         var db = new Database();
         
-        db.conn.prepare('INSERT INTO [events] (guild, title) VALUES (:guild, :name)').run({
+        db.conn.prepare('INSERT INTO [events] (guild, title, channel) VALUES (:guild, :name, :ch)').run({
             guild: this.guildID,
-            name: name
+            name: name,
+            ch: channel
         });
         db.close();
 
@@ -122,6 +130,28 @@ class Event
         
     }
     
+    schedule(startUnix, endUnix, channel){
+        
+        if (this.event){
+            
+            var db = new Database();
+            
+            // Update event
+            db.conn.prepare('UPDATE [events] SET [startdate] = :start, [enddate] = :end, [channel] = :ch WHERE [guild] = :guild AND [id] = :id').run({
+                guild: this.guildID,
+                id: this.event.id,
+                start: startUnix,
+                end: endUnix,
+                ch: channel
+            });
+
+            db.close();
+            
+            return true;
+            
+        }
+        
+    }
     
     start(){
         
@@ -208,6 +238,40 @@ class Event
         
     }
        
+       
+    static find_events_to_start(client){   
+        
+        var now = moment().unix();
+        var db = new Database();
+        
+        var records = db.conn.prepare('SELECT * FROM [events] WHERE [started] = 0 AND [startdate] <= :now AND [enddate] > :now').all({
+            now: now
+        });
+            
+            
+        // Start the event    
+        for(var i = 0; i < records.length; i++){
+            
+            var record = records[i];
+            var event = new Event(record.guild);
+            
+            // Start the event
+            event.start();
+            
+            // Send message to channel
+            try {
+                client.guilds.get(record.guild).channels.get(record.channel).send( util.format( lib.get_string(record.guild, 'event:schedule:begin'), event.getTitle() ) );
+            } catch(error){
+                console.log(error);
+            }            
+            
+        }    
+            
+        db.close();
+        
+        return true;
+        
+    }
     
     
 }

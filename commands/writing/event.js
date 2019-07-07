@@ -1,10 +1,14 @@
 const { Command } = require('discord.js-commando');
 const util = require('util');
+const moment = require('moment');
+const momentTimezone = require('moment-timezone');
 const lib = require('./../../lib.js');
 const Event = require('./../../structures/event.js');
+const UserSetting = require('./../../structures/user_settings.js');
 
 
 module.exports = class EventCommand extends Command {
+    
     constructor(client) {
         
         super(client, {
@@ -69,6 +73,10 @@ module.exports = class EventCommand extends Command {
         // End an event
         else if(action === 'end'){
             return this.run_end(msg);
+        }
+        
+        else if(action === 'schedule'){
+            return this.run_schedule(msg);
         }
                 
         
@@ -137,29 +145,66 @@ module.exports = class EventCommand extends Command {
     }
     
     run_info(msg){
-        
+                
         let guildID = msg.guild.id;
+        let userID = msg.author.id;
         
         var event = new Event(guildID);
+        if (!event.exists()){
+            return msg.say( lib.get_string(msg.guild.id, 'event:noexists') );
+        }
         
-        if (event.is_running()){
+        var leaderboard = 'test';
+        var startDate = 'N/A';
+        var endDate = 'N/A';
+        var tz = 'UTC';
         
-            var output = '';
-            output += '**'+event.getTitle()+'**\n\n';
-            output += ':trophy: -------------------- ' + lib.get_string(guildID, 'event:leaderboard') + ' -------------------- :trophy:\n\n';
-            output += this.get_leaderboard(msg);
-            
-            return msg.say(output);
+        var userSetting = new UserSetting();
+        var userTz = userSetting.get(userID, 'timezone');
+        if (userTz){
+            tz = userTz.value;
+        }
+
+        if (event.event.startdate > 0){
+            startDate = moment.unix(event.event.startdate).tz(tz).format("ddd Do MMM YYYY, HH:mm") + " ("+tz+")";
+        }
         
-//            return msg.embed({
-//			color: 3447003,
-//                        author: {
-//                            name: client.user.username
-//                        }
-//                        
-//		});
+        if (event.event.enddate > 0){
+            endDate = moment.unix(event.event.enddate).tz(tz).format("ddd Do MMM YYYY, HH:mm") + " ("+tz+")";
+        }
         
-        }        
+        var numWriters = '-';
+        var numWords = '-';
+                
+        return msg.embed({
+                    color: 0xb300b3,
+                    title: event.getTitle().toUpperCase(),
+                    author: {
+                        name: this.client.user.username,
+                        icon_url: this.client.user.avatarURL
+                    },
+                    fields: [
+                        {
+                            name: "Start Date",
+                            value: startDate
+                        },
+                        {
+                            name: "End Date",
+                            value: endDate
+                        },
+                        {
+                            name: "Writers",
+                            value: numWriters,
+                            inline: true
+                        },
+                        {
+                            name: "Words Written",
+                            value: numWords,
+                            inline: true
+                        }
+                    ]
+            });
+        
         
     }
     
@@ -167,7 +212,8 @@ module.exports = class EventCommand extends Command {
     run_create(msg, title){
         
         let guildID = msg.guild.id;
-        
+        let channelID = msg.message.channel.id;
+
         var event = new Event(guildID);
         title = title.trim();
         
@@ -187,8 +233,8 @@ module.exports = class EventCommand extends Command {
         }
         
         // Create the event
-        event.create( title );
-        return msg.say( util.format( lib.get_string(msg.guild.id, 'event:created'), title ) );
+        event.create( title, channelID );
+        return msg.say( msg.author + ', ' + util.format( lib.get_string(msg.guild.id, 'event:created'), title ) );
 
     }
     
@@ -214,7 +260,7 @@ module.exports = class EventCommand extends Command {
             return msg.say( lib.get_string(msg.guild.id, 'event:permissions') );
         }
         
-        // Is there already a current event?
+        // Is there actually an current event to delete?
         if (!event.any()){
             return msg.say( lib.get_string(msg.guild.id, 'event:noexists') );
         }
@@ -307,6 +353,148 @@ module.exports = class EventCommand extends Command {
         
     }
     
+    // Schedule it to start and end automatically
+    async run_schedule(msg){
+                
+        var guildID = msg.guild.id;
+        var userID = msg.author.id;
+        var channelID = msg.message.channel.id;
+
+        var event = new Event(guildID);
+        
+        // Are you a server mod/admin?
+        if (!msg.member.hasPermission('MANAGE_MESSAGES')){
+            return msg.say( msg.author + ', ' + lib.get_string(guildID, 'event:permissions') );
+        }
+        
+        // Is there already a current event?
+        if (event.is_running()){
+            return msg.say( msg.author + ', ' + lib.get_string(guildID, 'event:alreadyrunning') );
+        }
+        
+        // Have they set their time difference?
+        var userSetting = new UserSetting();
+        var tz = userSetting.get(userID, 'timezone');
+        if (tz === false){
+            return msg.say( msg.author + ', ' + lib.get_string(guildID, 'event:timezonenotset') );
+        }
+                
+        var userTime = momentTimezone.tz(tz.value);
+        var offset = userTime.utcOffset();
+        var offsetString = ((offset < 0) ? '' : '+') + offset;
+                                      
+        // Check their timezone is correct
+        msg.say( util.format( msg.author + ', ' + lib.get_string(guildID, 'event:preschedule'), tz.value, userTime.format('LLLL'), offsetString ) );
+        
+        const questions = [];
+        var answers = [];
+        
+        // Create the question and answer arrays
+        for (var i = 1; i <= 5; i++){
+            questions.push( lib.get_string(guildID, 'event:schedule:question:'+i) );
+        }
+        
+        var waitTime = 60;
+                
+        
+        // Now ask the questions
+        for (var i = 0; i < questions.length; i++){
+            
+            try {
+                
+                var err = false;
+                
+                // Ask the question
+                var question = questions[i];
+                if (i === 4){
+                    question = util.format(question, answers[0], answers[1], answers[2], answers[3]);
+                }
+                
+                await msg.say(question);
+                
+                // Await the response
+                const response = await msg.channel.awaitMessages( m => ( (m.author.id == userID) ), {
+                    max: 1,
+                    time: (waitTime * 1000),
+                    errors: ['time']
+                } );
+                
+                let answer = response.first().content.toLowerCase();
+                
+                // Cancel or exist
+                if (answer === 'exit' || answer === 'quit' || answer === 'cancel'){
+                    return msg.say('OK');
+                }
+                
+                // Check validity
+                // Date
+                if (i === 0 || i === 2){
+                    
+                    // Check date format is valid
+                    if (!lib.is_valid_date(answer, 'DD-MM-YYYY')){
+                        err = true;
+                        i--; // Redo question
+                        msg.say( lib.get_string(guildID, 'event:schedule:invaliddate') );
+                    }
+                    
+                } 
+                
+                // Time
+                else if(i === 1 || i === 3){
+                    
+                    // Check time format is valid
+                    if (!lib.is_valid_time(answer)){
+                        err = true;
+                        i--; // Redo question
+                        msg.say( lib.get_string(guildID, 'event:schedule:invalidtime') );
+                    }
+                                        
+                }
+                
+                // Confirm
+                else if(i === 4){
+
+                    // Not correct, so start again
+                    if (answer === 'no'){
+                        err = true;
+                        answers = [];
+                        i = -1;
+                    }
+                    
+                }
+                
+                // If evrything is okay
+                if (!err){
+                    answers.push(response.first().content);
+                }
+                
+            } catch(error){
+                return msg.say( util.format( lib.get_string(guildID, 'err:replytime'), waitTime ) );
+            }
+            
+        }
+        
+        // Everything is okay, so continue
+        // Not going to bother checking that dates and times work, if they get it wrong, they get it wrong
+        if (answers.length === questions.length){
+            
+            var startUnix = lib.convert_date_time_to_unix(answers[0], answers[1], offset);
+            var endUnix = lib.convert_date_time_to_unix(answers[2], answers[3], offset);
+            
+            event.schedule(startUnix, endUnix, channelID);
+            return msg.say( msg.author + ', ' + util.format( lib.get_string(guildID, 'event:scheduled'), event.getTitle(), answers[0], answers[1], answers[2], answers[3] ) );
+            
+        } else {
+            return msg.say( msg.author + ', ' + lib.get_string(guildID, 'err:unknown') );
+        }
+        
+        
+        
+        
+        return null;
+        
+    }
+        
     run_update(msg, wordcount){
         
         let guildID = msg.guild.id;

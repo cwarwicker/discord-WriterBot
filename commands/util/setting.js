@@ -3,7 +3,7 @@ const lib = require('./../../lib.js');
 
 const Setting = require('./../../structures/settings.js');
 
-module.exports = class ProfileCommand extends Command {
+module.exports = class SettingCommand extends Command {
 	constructor(client) {
             
             super(client, {
@@ -45,7 +45,7 @@ module.exports = class ProfileCommand extends Command {
             var settings = new Setting();
             
             if (this.acceptedSettings.indexOf(setting) < 0){
-                return msg.say('Invalid setting.');
+                return msg.say( lib.get_string(guildID, 'err:invalidsetting') );
             }
             
             settings.set(guildID, setting, value);

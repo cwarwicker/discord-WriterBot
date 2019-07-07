@@ -1,4 +1,5 @@
 const fs = require('fs');
+const moment = require('moment-timezone');
 const Setting = require('./structures/settings.js');
 
 
@@ -53,7 +54,7 @@ module.exports.get_string = function(guildID, str){
     } else {
         var strings = require('./data/lang/en.json');
     }
-    
+        
     return (strings[str]) ? strings[str] : '[[str]]';
     
 }
@@ -157,6 +158,48 @@ module.exports.findObjectArrayKeyByKey = function(array, key, value) {
     return null;
 };
 
+module.exports.is_valid_time = function(time){
+        
+    var pat = /^([0-1]?[0-9]|2[0-3]):?([0-5][0-9])$/;
+    return (time.match(pat) !== null);
+        
+};
+
+module.exports.is_valid_date = function(date, format){
+    return moment(date, format, true).isValid();
+};
+
+module.exports.convert_date_time_to_unix = function(date, time, offset){
+        
+    // Get the timestamp of that date on the server
+    var timestamp = moment(date + ' ' + time, 'DD-MM-YYYY HH:mm');
+    
+    // Convert that to UTC if the server is not UTC
+    var utc = moment.tz(     timestamp.format('YYYY-MM-DD HH:mm'), 'UTC'    );
+    
+    // Adjust by offset
+    return utc.unix() - (offset * 60);
+    
+};
+
+module.exports.convert_ddmmyyyy_to_yyyymmdd = function(date, time){
+    
+    // Split the date and reverse it into a number
+    let split = date.split("-");
+    let reverse = split.reverse();
+    var newDate = reverse.join("");
+    
+    // Split the time and reverse it into a number and append it to the date
+    if (time !== undefined){
+        
+        newDate += time.replace(/\D/g, "");
+        
+    }
+    
+    return newDate;
+    
+};
+
 module.exports.log = function(data){
     
     fs.appendFile('data/logs', data + '\n', (err) => {  
@@ -164,4 +207,4 @@ module.exports.log = function(data){
         if (err) throw err;
     });
     
-}
+};

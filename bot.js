@@ -6,8 +6,16 @@ const cron = require('node-cron');
 const Goal = require('./structures/goal.js');
 const settings = require('./settings.json');
 const version = require('./version.json');
-
 const Update = require('./data/install/update.js');
+
+const event = require('./structures/event.js');
+
+//const moment = require('moment');
+
+
+//var unix = 1562521500;
+//console.log( moment.unix(unix).tz('UTC').format("DD-MM-YYYY, HH:mm") );
+
 
 const bot = new Commando.Client({
     owner: '291154723631792129',
@@ -15,6 +23,12 @@ const bot = new Commando.Client({
     disableEveryone: true,
     unknownCommandResponse: false
 });
+
+
+
+
+
+
 
 bot.registry
     .registerDefaultTypes()
@@ -45,8 +59,16 @@ bot.on('ready', () => {
         var goal = new Goal();
         goal.reset();
     });
+    
+    // Testing
+    event.find_events_to_start(bot);
+
+
+    
+
         
-    console.log(`[READY] Logged in as ${bot.user.tag} (${bot.user.id})`);        
+    console.log(`[READY] Logged in as ${bot.user.tag} (${bot.user.id})`);       
+    
     
 });
 
@@ -62,3 +84,5 @@ bot.setProvider(
 ).catch(console.error);
 
 bot.login(settings.token);
+
+
