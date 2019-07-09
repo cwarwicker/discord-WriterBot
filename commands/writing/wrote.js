@@ -5,6 +5,7 @@ const lib = require('./../../lib.js');
 const Stats = require('./../../structures/stats.js');
 const Goal = require('./../../structures/goal.js');
 const Project = require('./../../structures/project.js');
+const Event = require('./../../structures/event.js');
 
 module.exports = class WroteCommand extends Command {
     constructor(client) {
@@ -62,6 +63,13 @@ module.exports = class WroteCommand extends Command {
                 return msg.reply(util.format(lib.get_string(msg.guild.id, 'project:noexists'), shortname));
             }
             
+        }
+        
+        // Is there an event running?
+        var event = new Event(msg.guild.id);
+        if (event.is_running()){
+            var eventWordCount = event.getUserWordCount(msg.author.id);
+            event.update(msg.author, (eventWordCount + amount));
         }
                 
         // Increment their words written stat

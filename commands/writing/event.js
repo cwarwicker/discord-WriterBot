@@ -51,13 +51,23 @@ module.exports = class EventCommand extends Command {
         }
                 
         // Just display the name and info
-        if (action.length === 0){
+        if (action.length === 0 || action === 'info'){
             return this.run_info(msg);
         }
         
         // Create an event
         else if (action === 'create'){
             return this.run_create(msg, arg1);
+        }
+        
+        // Set description
+        else if(action === 'description' || action === 'desc'){
+            return this.run_set(msg, 'description', arg1);
+        }
+        
+        // Set img
+        else if(action === 'image' || action === 'img'){
+            return this.run_set(msg, 'img', arg1);
         }
         
         // Delete an event
@@ -71,14 +81,19 @@ module.exports = class EventCommand extends Command {
         }
         
         // End an event
-        else if(action === 'end'){
+        else if(action === 'end' || action === 'stop'){
             return this.run_end(msg);
         }
         
+        // Check how much time left
+        else if(action === 'left' || action === 'time'){
+            return this.run_left(msg);
+        }
+        
+        // Schedule the event
         else if(action === 'schedule'){
             return this.run_schedule(msg);
         }
-                
         
         // Update your event progress made outside of the bot
         else if(action === 'update'){
@@ -87,39 +102,83 @@ module.exports = class EventCommand extends Command {
         
         // View your own progress in an event
         else if(action === 'me'){
-            
+            return this.run_me(msg);
         }
         
         // View the leaderboard for the event
-        else if(action === 'leaderboard'){
-            
+        else if(action === 'leaderboard' || action === 'leaders' || action === 'top'){
+            return this.run_leaderboard(msg);
         }
         
         // View the top leaderboard of historical events
         else if(action === 'history'){
-            
+            // TODO
         }
         
-        // Also todo: 
-        // sprint - if an event is active, automatically add wordcount to it
-        // wrote - if an event is active, automatically add wordcount to it
-        
-        
-        
+        else
+        {
+            return msg.say( lib.get_string(msg.guild.id, 'err:what?') );
+        }
+                        
     }
     
-    get_leaderboard(msg, mention){
+    get_leaderboard(msg, mention, limit){
         
-        var event = new Event(msg.guild.id);
-        var users = event.getUsers();
-        var output = '';
+        let guildID = msg.guild.id;
         
+        var event = new Event(guildID, true);
+        
+        // If the event has ended, show entire leaderboard with no limit
+        if (!event.is_running()){
+            limit = undefined;
+        }
+        
+        var users = event.getUsers(limit);
+               
+        // No users, don't bother
+        if (users.length === 0){
+            return false;
+        }
+        
+        var fieldArray = [];
+        var desc = lib.get_string(guildID, 'event:leaderboard:desc');
+        var footer = util.format( lib.get_string(guildID, 'event:leaderboard:footer'), limit );
+        
+        // If no limit, don't show the limit in the string or the footer
+        if (limit === undefined){
+            limit = '';
+            footer = '';
+        }
+        
+        // If the event has ended, don't show the footer, and take out the "so far" of the description.
+        if (!event.is_running()){
+            desc = lib.get_string(guildID, 'event:leaderboard:desc:ended');
+            footer = '';
+        }
+        
+        // Headers
+        fieldArray.push({
+            name: '\u200b',
+            value: '**'+lib.get_string(guildID, 'user')+'**',
+            inline: true
+        });
+
+        // Word count
+        fieldArray.push({
+            name: '\u200b',
+            value: '**'+lib.get_string(guildID, 'wordcount')+'**',
+            inline: true
+        });
+                
+        var userField = '';
+        var wordsField = '';
+        
+        // Now loop through the users
         for (var i = 0; i < users.length; i++){
             
             var user = users[i];
             var pos = i+1;
-            output += pos + '. ';
-            
+                                    
             // Last known username
             var username = user.username;
             
@@ -132,17 +191,113 @@ module.exports = class EventCommand extends Command {
                     username = member.user.username;
                 }
             }
+                        
+            // If username is too long, don't show it all
+            if (username.length > 20){
+                username = username.slice(0, 20) + '..';
+            }
             
-            output += username;
+            userField += pos + '. ' + username;
+            userField += '\n';
             
-            // Word count
-            output += '          **'+user.words+' Words**';
-            
+            wordsField += user.words;
+            wordsField += '\n';
+                        
         }
         
-        return output;
+        fieldArray.push({
+            name: '\u200b',
+            value: userField,
+            inline: true
+        });
+
+        // Word count
+        fieldArray.push({
+            name: '\u200b',
+            value: wordsField,
+            inline: true
+        });
+        
+                
+        // Data for the embedded message        
+        var embed = {
+            color: 0xb300b3,
+            title: event.getTitle().toUpperCase() + ' - ' + lib.get_string(guildID, 'event:leaderboard'),
+            description: util.format( desc, limit + ' ', event.getTitle() ),
+            thumbnail: {
+                url: 'https://i.imgur.com/tJtAdNs.png'
+            },
+            fields: fieldArray,
+            footer: {
+                text: footer,
+                icon_url: 'https://i.imgur.com/tJtAdNs.png'
+            }
+        };
+        
+        return embed;
         
     }
+    
+    run_left(msg){
+        
+        let guildID = msg.guild.id;
+        let userID = msg.author.id;
+        
+        var event = new Event(guildID);
+        
+        // Is there already a current event?
+        if (!event.is_running()){
+            return msg.say( lib.get_string(msg.guild.id, 'event:notrunning') );
+        }
+        
+        var now = Math.floor(new Date() / 1000);
+        var end = event.getEndTime();
+
+        if (end <= 0){
+            return msg.say(msg.author + ', ' + lib.get_string(guildID, 'event:noendtime'));
+        } else {
+            return msg.say(msg.author + ', ' + util.format( lib.get_string(guildID, 'event:timeleft'), lib.convert_time_left_hr(now, end) ) );
+        }
+        
+    }
+    
+    run_leaderboard(msg){
+        var content = this.get_leaderboard(msg, false, 20);
+        if (content !== false){
+            return msg.embed( content );
+        } else {
+            return msg.say( lib.get_string(msg.guild.id, 'event:noleaderboard') );
+        }
+    }
+        
+        
+    run_set(msg, type, value){
+        
+        let guildID = msg.guild.id;
+        let userID = msg.author.id;
+        
+        var event = new Event(guildID);
+        var types = ['description', 'img'];
+        
+        if (!event.exists()){
+            return msg.say( lib.get_string(msg.guild.id, 'event:noexists') );
+        }
+        
+        // Are you a server mod/admin?
+        if (!msg.member.hasPermission('MANAGE_MESSAGES')){
+            return msg.say( lib.get_string(msg.guild.id, 'event:permissions') );
+        }
+        
+        // Must be valid type
+        if (types.indexOf(type) < 0){
+            return msg.say( lib.get_string(guildID, 'err:what?') );
+        }
+        
+        event.set(type, value);
+        return msg.say( msg.author + ', ' + util.format( lib.get_string(guildID, 'event:set'), type, value ) );
+        
+        
+    }    
     
     run_info(msg){
                 
@@ -154,7 +309,6 @@ module.exports = class EventCommand extends Command {
             return msg.say( lib.get_string(msg.guild.id, 'event:noexists') );
         }
         
-        var leaderboard = 'test';
         var startDate = 'N/A';
         var endDate = 'N/A';
         var tz = 'UTC';
@@ -166,45 +320,88 @@ module.exports = class EventCommand extends Command {
         }
 
         if (event.event.startdate > 0){
-            startDate = moment.unix(event.event.startdate).tz(tz).format("ddd Do MMM YYYY, HH:mm") + " ("+tz+")";
+            startDate = moment.unix(event.event.startdate).tz(tz).format("ddd Do MMM YYYY, HH:mm") + "\n("+tz+")";
         }
         
         if (event.event.enddate > 0){
-            endDate = moment.unix(event.event.enddate).tz(tz).format("ddd Do MMM YYYY, HH:mm") + " ("+tz+")";
+            endDate = moment.unix(event.event.enddate).tz(tz).format("ddd Do MMM YYYY, HH:mm") + "\n("+tz+")";
         }
         
-        var numWriters = '-';
-        var numWords = '-';
-                
-        return msg.embed({
-                    color: 0xb300b3,
-                    title: event.getTitle().toUpperCase(),
-                    author: {
-                        name: this.client.user.username,
-                        icon_url: this.client.user.avatarURL
-                    },
-                    fields: [
-                        {
-                            name: "Start Date",
-                            value: startDate
-                        },
-                        {
-                            name: "End Date",
-                            value: endDate
-                        },
-                        {
-                            name: "Writers",
-                            value: numWriters,
-                            inline: true
-                        },
-                        {
-                            name: "Words Written",
-                            value: numWords,
-                            inline: true
-                        }
-                    ]
-            });
+        // Has it already started?
+        var desc = '';
+        if (event.is_running()){
+            desc = lib.get_string(guildID, 'event:started');
+        } else {
+            desc = lib.get_string(guildID, 'event:notyetstarted');
+        }
         
+        var numWriters = event.getUsers().length;
+        var numWords = event.getTotalWordCount();
+        
+        // Descrioption provided?
+        var event_desc = event.getDesc();
+        if (event_desc !== false && event_desc !== null && event_desc.trim().length > 0){
+            desc = event_desc + '\n\n' + '*'+desc+'*';
+        }
+        
+        // Use the default thumbnail or one provided?
+        var thumbnail = 'https://i.imgur.com/tJtAdNs.png';
+        var event_img = event.getImg();
+        if (event_img !== false && event_img !== null && event_img.trim().length > 0){
+            thumbnail = event_img;
+        }
+        
+        // Display info in an embedded message, to make it look nicer
+        return msg.embed({
+            color: 0xb300b3,
+            title: event.getTitle().toUpperCase(),
+            description: desc,
+            thumbnail: {
+                url: thumbnail
+            },
+            fields: [
+                {
+                    name: "Start Date",
+                    value: startDate
+                },
+                {
+                    name: "End Date",
+                    value: endDate
+                },
+                {
+                    name: '\u200b',
+                    value: '\u200b'
+                },
+                {
+                    name: "Writers",
+                    value: numWriters,
+                    inline: true
+                },
+                {
+                    name: "Words Written",
+                    value: numWords,
+                    inline: true
+                }
+            ]
+        });
+        
+        
+    }
+    
+    run_me(msg){
+        
+        let guildID = msg.guild.id;
+        let userID = msg.author.id;
+        
+        var event = new Event(guildID);
+        
+        // Is there actually an current event to delete?
+        if (!event.any()){
+            return msg.say( lib.get_string(msg.guild.id, 'event:noexists') );
+        }
+        
+        var yourWords = event.getUserWordCount(userID);
+        return msg.say( msg.author + ', ' + util.format( lib.get_string(guildID, 'event:wordcount'), event.getTitle(), yourWords ) );
         
     }
     
@@ -320,7 +517,7 @@ module.exports = class EventCommand extends Command {
         // Create the event
         event.start();
         
-        var output = util.format( lib.get_string(msg.guild.id, 'event:started'), event.getTitle() );
+        var output = util.format( lib.get_string(msg.guild.id, 'event:begin'), event.getTitle() );
         return msg.say( output );
         
     }
@@ -365,6 +562,11 @@ module.exports = class EventCommand extends Command {
         // Are you a server mod/admin?
         if (!msg.member.hasPermission('MANAGE_MESSAGES')){
             return msg.say( msg.author + ', ' + lib.get_string(guildID, 'event:permissions') );
+        }
+        
+        // Is there actually an event created?
+        if (!event.any()){
+            return msg.say( lib.get_string(msg.guild.id, 'event:noexists') );
         }
         
         // Is there already a current event?
@@ -498,7 +700,6 @@ module.exports = class EventCommand extends Command {
     run_update(msg, wordcount){
         
         let guildID = msg.guild.id;
-        let userID = msg.author.id;
         
         var event = new Event(guildID);
         

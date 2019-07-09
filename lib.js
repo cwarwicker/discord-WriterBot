@@ -200,6 +200,21 @@ module.exports.convert_ddmmyyyy_to_yyyymmdd = function(date, time){
     
 };
 
+module.exports.convert_time_left_hr = function(now, end){
+    
+    var left = end - now;
+    
+    var h = Math.floor(left/ 3600);
+    var m = Math.floor(left % 3600 / 60);
+    var s = Math.floor(left % 3600 % 60);
+
+    var hDisplay = h > 0 ? h + (h === 1 ? " hour, " : " hours, ") : "";
+    var mDisplay = m > 0 ? m + (m === 1 ? " minute, " : " minutes, ") : "";
+    var sDisplay = s > 0 ? s + (s === 1 ? " second" : " seconds") : "";
+    return hDisplay + mDisplay + sDisplay; 
+    
+};
+
 module.exports.log = function(data){
     
     fs.appendFile('data/logs', data + '\n', (err) => {  

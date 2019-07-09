@@ -3,6 +3,8 @@ CREATE TABLE IF NOT EXISTS 'main'.'events' (
     guild TEXT NOT NULL,
     channel TEXT NOT NULL,
     title VARCHAR(255) NOT NULL,
+    description TEXT NULL,
+    img VARCHAR(255) NULL,
     startdate BIGINT NULL,
     enddate BIGINT NULL,
     started INTEGER NOT NULL DEFAULT 0,

@@ -7,11 +7,11 @@ const lib = require('./../lib.js');
 class Event
 {
     
-    constructor(guildID)
+    constructor(guildID, mostRecentIfNoneRunning)
     {
         
         this.guildID = guildID;
-        this.event = this.get();
+        this.event = this.get(mostRecentIfNoneRunning);
         
     }
     
@@ -38,15 +38,39 @@ class Event
         
     }
     
-    get(){
+    get(mostRecentIfNoneRunning){
         
         var db = new Database();
+                
+        // Try and get a running one
         var record = db.conn.prepare('SELECT * FROM [events] WHERE [guild] = :guild AND [ended] = 0').get({
             guild: this.guildID
         });
+        
+        // If there wasn't one, but we asked for the most recent, get that
+        if (record === undefined && mostRecentIfNoneRunning === true){
+            record = db.conn.prepare('SELECT * FROM [events] WHERE [guild] = :guild ORDER BY [id] DESC LIMIT 1').get({
+                guild: this.guildID
+            });
+        }
+                
         db.close();
         
         return (record) ? record : false;
+        
+    }
+    
+    set(type, value){
+        
+        var db = new Database();
+        
+        db.conn.prepare('UPDATE [events] SET ['+type+'] = :value WHERE [guild] = :guild AND [id] = :id').run({
+            value: value,
+            guild: this.guildID,
+            id: this.event.id
+        });
+        
+        db.close();
         
     }
     
@@ -57,6 +81,24 @@ class Event
             return false;
         }
     }
+    
+    getDesc(){
+        if (this.event){
+            return this.event.description;
+        } else {
+            return false;
+        }
+    }
+    
+    getImg(){
+        if (this.event){
+            return this.event.img;
+        } else {
+            return false;
+        }
+    }
+    
+    
     
     // Get the leaderboard
     getUsers(limit){
@@ -84,13 +126,43 @@ class Event
         users.sort(function(a, b){ 
             return b.words - a.words;
         });
-        
-    
-        
+                
         return users;
         
     }
     
+    getTotalWordCount(){
+        
+        var db = new Database();
+        var record = db.conn.prepare('SELECT TOTAL(words) as [ttl] FROM [user_events] WHERE [event] = :event').get({event: this.event.id });
+        db.close();
+        return record.ttl;
+        
+    }
+    
+    getUserWordCount(userID){
+        
+        var db = new Database();
+        var record = db.conn.prepare('SELECT words FROM [user_events] WHERE [event] = :event AND [user] = :user').get({
+            event: this.event.id,
+            user: userID
+        });
+        db.close();
+        return (record) ? record.words : 0;
+        
+    }
+    
+    getEndTime(){
+        
+        var db = new Database();
+        var record = db.conn.prepare('SELECT [enddate] FROM [events] WHERE [guild] = :guild AND [id] = :id').get({
+            guild: this.guildID,
+            id: this.event.id
+        });
+        db.close();
+        return record.enddate;
+        
+    }
     
     create(name, channel){
         
@@ -238,7 +310,7 @@ class Event
         
     }
        
-       
+    // Look for events which are scheduled to start and start them
     static find_events_to_start(client){   
         
         var now = moment().unix();
@@ -247,7 +319,6 @@ class Event
         var records = db.conn.prepare('SELECT * FROM [events] WHERE [started] = 0 AND [startdate] <= :now AND [enddate] > :now').all({
             now: now
         });
-            
             
         // Start the event    
         for(var i = 0; i < records.length; i++){
@@ -260,7 +331,44 @@ class Event
             
             // Send message to channel
             try {
-                client.guilds.get(record.guild).channels.get(record.channel).send( util.format( lib.get_string(record.guild, 'event:schedule:begin'), event.getTitle() ) );
+                client.guilds.get(record.guild).channels.get(record.channel).send( util.format( lib.get_string(record.guild, 'event:begin'), event.getTitle() ) );
+            } catch(error){
+                console.log(error);
+            }            
+            
+        }    
+            
+        db.close();
+        
+        return true;
+        
+    }
+    
+    // Look for events which are scheduled to end and end them
+    static find_events_to_end(client){   
+        
+        var now = moment().unix();
+        var db = new Database();
+        
+        var records = db.conn.prepare('SELECT * FROM [events] WHERE [started] > 0 AND [ended] = 0 AND [enddate] <= :now').all({
+            now: now
+        });
+            
+        // Start the event    
+        for(var i = 0; i < records.length; i++){
+            
+            var record = records[i];
+            var event = new Event(record.guild);
+            
+            // Start the event
+            event.end();
+            
+            // Send message to channel
+            try {
+                
+                // End message
+                client.guilds.get(record.guild).channels.get(record.channel).send( util.format( lib.get_string(record.guild, 'event:ended'), event.getTitle() ) );
+                
             } catch(error){
                 console.log(error);
             }            

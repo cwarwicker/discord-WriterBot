@@ -4,17 +4,12 @@ const sql = require('sqlite');
 const Database = require('./structures/db.js');
 const cron = require('node-cron');
 const Goal = require('./structures/goal.js');
+const moment = require('moment');
+
 const settings = require('./settings.json');
 const version = require('./version.json');
 const Update = require('./data/install/update.js');
-
 const event = require('./structures/event.js');
-
-//const moment = require('moment');
-
-
-//var unix = 1562521500;
-//console.log( moment.unix(unix).tz('UTC').format("DD-MM-YYYY, HH:mm") );
 
 
 const bot = new Commando.Client({
@@ -50,25 +45,34 @@ bot.on('ready', () => {
     // Run any updates
     var update = new Update();
     update.run(version.dbversion);
+    
+    let checkEvents = function(){
+        console.log('[CRON]['+moment().format("DD-MM-YYYY, HH:mm")+'] Checking events');
+        event.find_events_to_start(bot);
+        event.find_events_to_end(bot);
+    };
+    
+    // Check events on boot, incase we went down
+    checkEvents();
+    
+    // TODO: Restart any sprint timers, if we can
+    
+    
        
     // Start crons
     //
     // Midnight every night
     cron.schedule('0 0 * * *', function(){
-        console.log('[CRON] Resetting user goals');
+        console.log('[CRON]['+moment().format("DD-MM-YYYY, HH:mm")+'] Resetting user goals');
         var goal = new Goal();
         goal.reset();
     });
     
-    // Testing
-    event.find_events_to_start(bot);
-
-
-    
+    // Every 10 minutes, check for events to start and end
+    cron.schedule('*/10 * * * *', checkEvents);
 
         
     console.log(`[READY] Logged in as ${bot.user.tag} (${bot.user.id})`);       
-    
     
 });
 

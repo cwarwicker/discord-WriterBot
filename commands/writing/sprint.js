@@ -6,6 +6,7 @@ const Stats = require('./../../structures/stats.js');
 const Goal = require('./../../structures/goal.js');
 const Project = require('./../../structures/project.js');
 const Setting = require('./../../structures/settings.js');
+const Event = require('./../../structures/event.js');
 const lib = require('./../../lib.js');
 
 const STAT_SPRINT_NOTIFY = 3;
@@ -1036,6 +1037,13 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                                     project.increment(user.project, count);
                                 }
 
+                            }
+                            
+                            // Is there an event running?
+                            var event = new Event(msg.guild.id);
+                            if (event.is_running()){
+                                var eventWordCount = event.getUserWordCount(msg.author.id);
+                                event.update(msg.author, (eventWordCount + count));
                             }
 
                             // Push to result dataset
