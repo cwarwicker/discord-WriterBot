@@ -67,6 +67,10 @@ module.exports = class EventCommand extends Command {
             return this.run_create(msg, arg1);
         }
         
+        else if(action === 'rename'){
+            return this.run_rename(msg, arg1);
+        }
+        
         // Set description
         else if(action === 'description' || action === 'desc'){
             return this.run_set(msg, 'description', arg1);
@@ -250,14 +254,24 @@ module.exports = class EventCommand extends Command {
         let guildID = msg.guild.id;
         let userID = msg.author.id;
         
+        var now = Math.floor(new Date() / 1000);
         var event = new Event(guildID);
+        
+        // Is it scheduled to start but not yet started? ANd it actually has a scheduled start date... If so - get how long until it starts
+        if (event.any() && !event.is_running()){
+            var start = event.getStartTime();
+            if (start > 0){
+                return msg.say(msg.author + ', ' + util.format( lib.get_string(guildID, 'event:timetostart'), lib.convert_time_left_hr(now, start) ) );
+            }
+        }
+        
+        // Otherwise:
         
         // Is there already a current event?
         if (!event.is_running()){
             return msg.say( lib.get_string(msg.guild.id, 'event:notrunning') );
         }
         
-        var now = Math.floor(new Date() / 1000);
         var end = event.getEndTime();
 
         if (end <= 0){
@@ -420,12 +434,7 @@ module.exports = class EventCommand extends Command {
 
         var event = new Event(guildID);
         title = title.trim();
-        
-        // Make sure shortnbame and title are set
-        if (title.length < 1){
-            return msg.reply(lib.get_string(msg.guild.id, 'event:title'));
-        }
-        
+                
         // Are you a server mod/admin?
         if (!msg.member.hasPermission('MANAGE_MESSAGES')){
             return msg.say( lib.get_string(msg.guild.id, 'event:permissions') );
@@ -436,10 +445,45 @@ module.exports = class EventCommand extends Command {
             return msg.say( lib.get_string(msg.guild.id, 'event:already') );
         }
         
+        // Make sure shortnbame and title are set
+        if (title.length < 1){
+            return msg.reply(lib.get_string(msg.guild.id, 'event:title'));
+        }
+        
         // Create the event
         event.create( title, channelID );
         return msg.say( msg.author + ', ' + util.format( lib.get_string(msg.guild.id, 'event:created'), title ) );
 
+    }
+    
+    run_rename(msg, title){
+        
+        let guildID = msg.guild.id;
+        let channelID = msg.message.channel.id;
+
+        var event = new Event(guildID);
+        title = title.trim();
+                
+        // Are you a server mod/admin?
+        if (!msg.member.hasPermission('MANAGE_MESSAGES')){
+            return msg.say( lib.get_string(msg.guild.id, 'event:permissions') );
+        }
+        
+        // Make sure the event exists
+        if (!event.any()){
+            return msg.say( lib.get_string(msg.guild.id, 'event:noexists') );
+        }
+        
+        // Make sure shortnbame and title are set
+        if (title.length < 1){
+            return msg.reply(lib.get_string(msg.guild.id, 'event:rename:title'));
+        }
+        
+        // Create the event
+        event.rename( title, channelID );
+        return msg.say( msg.author + ', ' + util.format( lib.get_string(msg.guild.id, 'event:renamed'), title ) );
+        
+        
     }
     
     run_delete(msg){

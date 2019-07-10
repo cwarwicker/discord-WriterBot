@@ -152,6 +152,18 @@ class Event
         
     }
     
+    getStartTime(){
+        
+        var db = new Database();
+        var record = db.conn.prepare('SELECT [startdate] FROM [events] WHERE [guild] = :guild AND [id] = :id').get({
+            guild: this.guildID,
+            id: this.event.id
+        });
+        db.close();
+        return record.startdate;
+        
+    }
+    
     getEndTime(){
         
         var db = new Database();
@@ -172,6 +184,22 @@ class Event
             guild: this.guildID,
             name: name,
             ch: channel
+        });
+        db.close();
+
+        return true;
+        
+    }
+    
+    rename(name, channel){
+        
+        var db = new Database();
+        
+        db.conn.prepare('UPDATE [events] SET [title] = :name, [channel] = :ch WHERE [guild] = :guild AND [id] = :id').run({
+            guild: this.guildID,
+            name: name,
+            ch: channel,
+            id: this.event.id
         });
         db.close();
 

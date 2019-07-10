@@ -98,7 +98,9 @@
     "event:permissions": "You do not have the permissions to do that on this server.",
     "event:already": "There is already an event on this server.",
     "event:created": "Your event \"**%s**\" has been created!\n\nOnce you are ready to begin, run the command `event start`. When you are ready to end the event, run the command `event end`.\n\nAlternatively, you can schedule the start and end date to trigger automatically, by running the command `event schedule`.\n\nWhilst the event is running, all `sprint` and `wrote` wordcounts will be automatically added to the event. Users will also be able to manually update their event wordcount by running `event update <words>`, e.g. `event update 1000`.",
+    "event:renamed": "Event renamed to: **%s**",
     "event:title": "Please make sure your event title is set: `event create <title>`, e.g. `event create National Novel Writing Month (2019)`",
+    "event:rename:title": "Please make sure your event title is set: `event rename <title>`, e.g. `event rename National Novel Writing Month (2019)`",
     "event:noexists": "There is no event currently on this server",
     "event:deletesure": "Are you sure you want to delete the event? Once it is deleted, you can never get it or any of the user wordcounts back. `yes` or `no`",
     "event:deleted": "Event **%s** has been deleted.",
@@ -136,6 +138,7 @@
     "event:schedule:datetimebeforetoday": "That time has already passed. Please choose a valid time from today.",
     "event:begin": "**%s has now officially begun!**\nGood luck everyone! :writing_hand: :grin:",
     "event:timeleft" : "You have %s until this event ends.",
+    "event:timetostart": "You have %s until this event begins.",
     "event:noendtime": "This event does not have a scheduled end date/time. It will end when someone manually ends it.",
     
     "wrote:addedtoproject": "added %s words to their project **%s** (%s)",
