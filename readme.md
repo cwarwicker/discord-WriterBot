@@ -1,4 +1,4 @@
-# Writer-Bot (0.7)
+# Writer-Bot (0.8-alpha)
 
 https://github.com/cwarwicker/discord-WriterBot/wiki/Patch-Notes
 
@@ -11,6 +11,8 @@ It has many features, such as writing sprints, word count goals, xp/levels, prom
 `!ask`: Asks you a random question about your character or your world, to get the creative juices flowing.
 
 `!challenge`: Generates a random writing challenge for you. e.g. "Write 400 words in 15 minutes". You can add the flags "easy", "normal", "hard", "hardcore", or "insane" to choose a pre-set wpm, or add your chosen wpm as the flag, or you can specify a time instead by adding a the time in minutes, prefixed with a "t", e.g. "t15"
+
+`!event`: Create server-wide writing events and compete against your fellow writers to see who can write the most **[IN TESTING]**
 
 `!generate`: Random generator for various things (character names, place names, land names, book titles, story ideas). Define the type of item you wanted generated and then optionally, the amount of items to generate.
 
@@ -51,5 +53,7 @@ It has many features, such as writing sprints, word count goals, xp/levels, prom
 `!patch`: Shows the latest patch notes for the bot
 
 `!reset`: Allows you to reset your stats
+
+`!myset`: Allows you to set user configuration values, such as your timezone
 
 `!set`: Allows users with the (MANAGE_MESSAGES) permission on the server, to change configuration values

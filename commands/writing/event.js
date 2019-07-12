@@ -17,9 +17,20 @@ module.exports = class EventCommand extends Command {
             group: 'writing',
             memberName: 'event',
             guildOnly: true,
-            description: 'Using these commands, you can create your own server writing events (like NaNoWriMo) and compete against each other to see who can write the most',
+            description: 'Using these commands, you can create your own server writing events (like NaNoWriMo) and compete against each other to see who can write the most.\nOnly one event can run on a server at a time.',
             examples: [
-                
+                '`event create My Event Title` Create an event called "My Event Title" | Permissions required: [MANAGE_MESSAGES]',
+                '`event rename My New Event Title` Rename event to "My New Event Title" | Permissions required: [MANAGE_MESSAGES]',
+                '`event description This is the description` Set the description of the event to "This is the description" | Permissions required: [MANAGE_MESSAGES]',
+                '`event image https://i.imgur.com/tJtAdNs.png` Set the thumbnail image for the event to the image URL specified | Permissions required: [MANAGE_MESSAGES]',
+                '`event delete` Deletes the current event | Permissions required: [MANAGE_MESSAGES]',
+                '`event schedule` Starts the event scheduling wizard. Please pay attention to the date/time formats, they must be entered exactly as the bot expects | Permissions required: [MANAGE_MESSAGES]',
+                '`event start` Manually starts the current event | Permissions required: [MANAGE_MESSAGES]',
+                '`event end` Manually ends the current event | Permissions required: [MANAGE_MESSAGES]',
+                '`event time` Checks how long until the event ends or starts',
+                '`event update 500` Updates your event word count to 500 total words',
+                '`event me` Checks your current event word count',
+                '`event top` Checks the word count leaderboard for the current event'
             ],
             args: [
                 {

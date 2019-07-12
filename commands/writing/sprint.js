@@ -993,7 +993,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                     
                     var guildUser = lib.getMember(msg, records[i].user);
                     var user = records[i];
-                    
+                                        
                     if (guildUser){
 
                         // If the user didn't submit an ending_wc, but they do have a current_wc, use that
@@ -1042,8 +1042,8 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                             // Is there an event running?
                             var event = new Event(msg.guild.id);
                             if (event.is_running()){
-                                var eventWordCount = event.getUserWordCount(msg.author.id);
-                                event.update(msg.author, (eventWordCount + count));
+                                var eventWordCount = event.getUserWordCount(guildUser.user.id);
+                                event.update(guildUser.user, (eventWordCount + count));
                             }
 
                             // Push to result dataset
