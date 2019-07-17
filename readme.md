@@ -18,7 +18,7 @@ It has many features, such as writing sprints, word count goals, xp/levels, prom
 
 `!goal`: Sets a daily goal which resets every 24 hours
 
-`!lookup`: Looks up the definitions of a given word, using the Oxford English Dictionary API. Add the flag s to search for synonymns, or a for antonyms.
+~~`!lookup`:~~ [This command has been removed, as the dictionary API it was using to lookup words is no longer free to use.]
 
 `!project`: Using these commands, you can create different projects and store word counts against them seperately. They also integrate with the wrote and sprint commands. See the help information for those commands for more info.
 
