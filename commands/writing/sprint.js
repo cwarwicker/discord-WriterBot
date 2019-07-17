@@ -341,7 +341,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
         name = name.trim();
         
         // Are we removing someone else from the list?
-        if (name.length > 0){
+        if (name.length > 0 && msg.member.hasPermission('MANAGE_MESSAGES')){
             user = lib.getMemberByName(msg, name);
             if (!user){
                 return msg.say(`Unable to find user with that name.`);        
