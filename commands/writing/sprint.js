@@ -36,7 +36,7 @@ module.exports = class SprintCommand extends Command {
             examples: [
                 '`sprint start` Quickstart a sprint with the default settings',
                 '`sprint for 20 in 3` Schedules a sprint for 20 minutes, to start in 3 minutes',
-                '`sprint for 20 at :30` Schedules a sprint for 20 minutes, starting the next time it is half past the current hour',
+                '`sprint for 20 at :30` Schedules a sprint for 20 minutes, starting the next time it is half past the current hour (UTC)',
                 '`sprint cancel` Cancels the current sprint. This can only be done by the person who created the sprint, or any users with the MANAGE_MESSAGES permission',
                 '`sprint join` Joins the current sprint',
                 '`sprint join 100` Joins the current sprint, with a starting word count of 100',
