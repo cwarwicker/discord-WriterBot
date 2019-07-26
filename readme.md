@@ -1,4 +1,4 @@
-# Writer-Bot (0.8)
+# Writer-Bot (0.8.1)
 
 https://github.com/cwarwicker/discord-WriterBot/wiki/Patch-Notes
 
@@ -18,7 +18,7 @@ It has many features, such as writing sprints, word count goals, xp/levels, prom
 
 `!goal`: Sets a daily goal which resets every 24 hours
 
-~~`!lookup`:~~ [This command has been removed, as the dictionary API it was using to lookup words is no longer free to use.]
+~~`!lookup`:~~ [This command was removed in v0.8, as the dictionary API it was using to lookup words is no longer free to use.]
 
 `!project`: Using these commands, you can create different projects and store word counts against them seperately. They also integrate with the wrote and sprint commands. See the help information for those commands for more info.
 
