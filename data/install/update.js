@@ -27,36 +27,40 @@ class Update
         
         var db = new Database();
         
-        // Start transaction
-        db.conn.prepare('BEGIN');
-        
-        if (this.oldVersion < 201907031){
-            
-            // Add xp column to user_challenges
-            db.conn.prepare('ALTER TABLE [user_challenges] ADD COLUMN [xp] int').run();
-            this.log(version, 'Added [xp] column to [user_challenges] table');
-            
-        }
-        
-        // Add current_wc column to [sprint_users]
-        if (this.oldVersion < 201907042){
-            
-            db.conn.prepare('ALTER TABLE [sprint_users] ADD COLUMN [current_wc] INTEGER DEFAULT 0').run();
-            this.log(version, 'Added [current_wc] column to [sprint_users] table');
+        if (this.oldVersion > 0){
 
+            // Start transaction
+            db.conn.prepare('BEGIN');
+
+            if (this.oldVersion < 201907031){
+
+                // Add xp column to user_challenges
+                db.conn.prepare('ALTER TABLE [user_challenges] ADD COLUMN [xp] int').run();
+                this.log(version, 'Added [xp] column to [user_challenges] table');
+
+            }
+
+            // Add current_wc column to [sprint_users]
+            if (this.oldVersion < 201907042){
+
+                db.conn.prepare('ALTER TABLE [sprint_users] ADD COLUMN [current_wc] INTEGER DEFAULT 0').run();
+                this.log(version, 'Added [current_wc] column to [sprint_users] table');
+
+            }
+
+
+            // Add [event] column to [sprint_users] so they can declare an event they wrote for
+            if (this.oldVersion < 201907043){
+                db.conn.prepare('ALTER TABLE [sprint_users] ADD COLUMN [event] INTEGER DEFAULT 0').run();
+                this.log(version, 'Added [event] column to [sprint_users] table');
+            }
+
+
+
+            // End transaction
+            db.conn.prepare('COMMIT');
+        
         }
-        
-        
-        // Add [event] column to [sprint_users] so they can declare an event they wrote for
-        if (this.oldVersion < 201907043){
-            db.conn.prepare('ALTER TABLE [sprint_users] ADD COLUMN [event] INTEGER DEFAULT 0').run();
-            this.log(version, 'Added [event] column to [sprint_users] table');
-        }
-        
-        
-        
-        // End transaction
-        db.conn.prepare('COMMIT');
         
         // Finished
         

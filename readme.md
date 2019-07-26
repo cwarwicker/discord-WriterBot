@@ -59,4 +59,6 @@ It has many features, such as writing sprints, word count goals, xp/levels, prom
 `!set`: Allows users with the (MANAGE_MESSAGES) permission on the server, to change configuration values
 
 
+***
+
 For further information about any of the commands, run `!help <command>`, e.g. `!help event` or `!help sprint`
