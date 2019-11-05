@@ -43,7 +43,10 @@
     "profile:goalscompleted": "Daily Goals Completed" ,
     "profile:goalprogress": "Daily Goal Progress" ,
     
-    "roll:rolled": "You rolled a",
+    "roll:rolling": "You want me to roll %s of my %s dice? Okay, here we go...\n",
+    "roll:total": "Total: ",
+    "roll:max:sides": "The maximum number of sides is 255",
+    "roll:max:count": "The maximum number of dice you can roll at once is 50",
     
     "xp:leaderboard": "Leaderboard",
     "xp:noxp": "You haven't earned any xp on this server yet. You can earn xp by doing writing challenges, sprints and meeting your daily goal",
@@ -144,6 +147,7 @@
     "wrote:addedtoproject": "added %s words to their project **%s** (%s)",
     "wrote:added": "added %s to their total words written **(%s)**",
             
+    "a": "a",        
     "user": "User",            
     "thanks": "Thanks!",        
     "level": "Level",
