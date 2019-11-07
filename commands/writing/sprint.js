@@ -668,12 +668,21 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
 
             if (!this.is_user_sprinting(sprint.id, userID)){
                 
+                var now = Math.floor(new Date() / 1000);
+                var timejoined = now;
+                
+                // If the sprint hasn't actually started yet, set timejoined to the start time.
+                if (sprint.start > now){
+                    timejoined = sprint.start;
+                }
+
                 // Join sprint
-                db.conn.prepare('INSERT INTO [sprint_users] (sprint, user, starting_wc, ending_wc) VALUES (:sp, :usr, :st, :end)').run({
+                db.conn.prepare('INSERT INTO [sprint_users] (sprint, user, starting_wc, ending_wc, timejoined) VALUES (:sp, :usr, :st, :end, :time)').run({
                     sp: sprint.id,
                     usr: userID,
                     st: start,
-                    end: 0
+                    end: 0,
+                    time: timejoined
                 });
                 
                 msg.reply(`You have joined the sprint with ${start} words.`);
@@ -850,11 +859,12 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             var db = new Database();
             
             // Create sprint
-            db.conn.prepare('INSERT INTO [sprints] (guild, start, end, length, createdby, created) VALUES (:g, :s, :e, :l, :cb, :c)').run({
+            db.conn.prepare('INSERT INTO [sprints] (guild, start, end, end_reference, length, createdby, created) VALUES (:g, :s, :e, :eref, :l, :cb, :c)').run({
                 g: guildID,
                 s: start,
                 l: length,
                 e: end,
+                eref: end,
                 cb: userID,
                 c: now
             });
@@ -862,11 +872,12 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             sprint = this.get(guildID);
             
             // Join sprint
-            db.conn.prepare('INSERT INTO [sprint_users] (sprint, user, starting_wc, ending_wc) VALUES (:sp, :usr, :st, :end)').run({
+            db.conn.prepare('INSERT INTO [sprint_users] (sprint, user, starting_wc, ending_wc, timejoined) VALUES (:sp, :usr, :st, :end, :time)').run({
                 sp: sprint.id,
                 usr: userID,
                 st: 0,
-                end: 0
+                end: 0,
+                time: start
             });
             
             // Increment sprint_started stat
@@ -1090,7 +1101,15 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
                         if (user.ending_wc > 0){
 
                             var count = user.ending_wc - user.starting_wc;
-                            var wpm = Math.round( (count / (sprint.length / 60)) * 100 ) / 100;
+                            var timesprinted = sprint.end_reference - user.timejoined;
+                            
+                            // If for whatever reason, the timejoined or sprint.end_reference is 0 then use sprint start time.
+                            if (user.timejoined <= 0 || sprint.end_reference == 0){
+                                timesprinted = sprint.length;
+                            } 
+                            
+                            // Calculate WPM based on the time they sprinted, not just from the sprint length.
+                            var wpm = Math.round( (count / (timesprinted / 60)) * 100 ) / 100;
                             var newWpmRecord = 0;
 
                             // Check record

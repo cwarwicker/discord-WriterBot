@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS 'main'.'sprints' (
     guild TEXT NOT NULL,
     start BIGINT NOT NULL,
     end BIGINT NOT NULL,
+    end_reference BIGINT NOT NULL,
     length BIGINT NOT NULL,
     createdby TEXT NOT NULL,
     created BIGINT NOT NULL,

@@ -26,7 +26,7 @@ class Update
     {
         
         var db = new Database();
-        
+              
         if (this.oldVersion > 0){
 
             // Start transaction
@@ -54,16 +54,24 @@ class Update
                 db.conn.prepare('ALTER TABLE [sprint_users] ADD COLUMN [event] INTEGER DEFAULT 0').run();
                 this.log(version, 'Added [event] column to [sprint_users] table');
             }
-
-
+           
+            // Add timejoined column to sprint_users table
+            if (this.oldVersion < 201911051){
+                db.conn.prepare('ALTER TABLE [sprint_users] ADD COLUMN [timejoined] BIGINT DEFAULT 0').run();
+                this.log(version, 'Added [timejoined] column to [sprint_users] table');
+            }
+            
+            // Also need an extra end column on sprint table, so we can compare timejoined to the sprint end, after the [end] gets set to 0
+            if (this.oldVersion < 201911052){
+                db.conn.prepare('ALTER TABLE [sprints] ADD COLUMN [end_reference] BIGINT DEFAULT 0').run();
+                this.log(version, 'Added [end_reference] column to [sprints] table');
+            }
 
             // End transaction
             db.conn.prepare('COMMIT');
         
         }
-        
-        // Finished
-        
+                
         // Set new version in DB
         if (this.oldVersion == 0){
             
@@ -80,6 +88,8 @@ class Update
             });
             
         }
+        
+        
         
         db.close();
         
