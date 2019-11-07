@@ -67,6 +67,7 @@
     "reset:invalid": "Invalid reset option",
     "reset:server": "Whole server stats reset to 0",
     "reset:server:sure": "Are you sure you want to do this? It will reset the stats, xp and levels for every user on the server. (If you are sure please run `reset server yes`)",
+    "reset:xp": "xp/level reset",
     
     "setting:updated": "updated server setting",
     "mysetting:updated": "updated your setting",

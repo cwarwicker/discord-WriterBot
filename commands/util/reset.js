@@ -2,6 +2,7 @@ const { Command } = require('discord.js-commando');
 const Record = require('./../../structures/record.js');
 const Stats = require('./../../structures/stats.js');
 const Goal = require('./../../structures/goal.js');
+const XP = require('./../../structures/xp.js');
 const lib = require('./../../lib.js');
 
 module.exports = class ProfileCommand extends Command {
@@ -16,8 +17,9 @@ module.exports = class ProfileCommand extends Command {
                     examples: [
                         '`!reset pb`: Resets your wpm personal best on the server', 
                         '`!reset wc`: Resets your total word count on the server', 
+                        '`!reset xp`: Resets your xp/level to 0',
                         '`!reset all`: Resets all your stats which can be reset on the server',
-                        '`!reset server`: Resets the entire server stats and xp/levels`'
+                        '`!reset server`: Resets the entire server stats, records and xp/levels`'
                     ],
                     args: [
                         {
@@ -56,6 +58,12 @@ module.exports = class ProfileCommand extends Command {
                 stats.set(guildID, userID, 'total_words_written', 0);
                 return msg.say(`${msg.author}, ${lib.get_string(msg.guild.id, 'reset:wc')}`);
                 
+            } else if(what === 'xp') {
+             
+                var xp = new XP(guildID, userID, msg);
+                xp.reset();
+                return msg.say(`${msg.author}, ${lib.get_string(msg.guild.id, 'reset:xp')}`);
+            
             } else if(what === 'all'){
                 
                 // wpm pb
@@ -72,6 +80,9 @@ module.exports = class ProfileCommand extends Command {
                 
                 var goal = new Goal(msg, msg.guild.id, msg.author.id);
                 goal.delete('daily');
+                
+                var xp = new XP(guildID, userID, msg);
+                xp.reset();
                 
                 return msg.say(`${msg.author}, ${lib.get_string(msg.guild.id, 'reset:done')}`);
                                 

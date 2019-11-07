@@ -115,6 +115,18 @@ class XP
         
     }
     
+    reset() {
+        
+        var db = new Database();
+        db.conn.prepare('UPDATE [user_xp] SET [xp] = 0 WHERE [guild] = :guild AND [user] = :user').run({
+            guild: this.guild,
+            user: this.user
+        });
+        db.close();
+        
+        return true;
+        
+    }
     
     
 }
