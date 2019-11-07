@@ -72,7 +72,10 @@ class Stats
             guild: guild
         });
         
-        // Will leave user_records for now, since people might want to keep a record of their best WPM.
+        // Delete user records
+        db.conn.prepare('DELETE FROM [user_records] WHERE [guild] = :guild COLLATE NOCASE').run({
+            guild: guild
+        });
         
         db.close();
         
