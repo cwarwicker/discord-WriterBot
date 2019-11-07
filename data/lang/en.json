@@ -93,10 +93,15 @@
     "project:setnames": "Please make sure your project shortname and title are set: `project create shortname title` (e.g. `project create test My Test Book`)",
     "project:exists": "You already have a project with that shortname",
     "project:noexists": "You do not have a project with that shortname (%s)",
+    "project:alreadycompleted": "%s is already completed. If you need to re-open it, you can run `project restart shortname`",
     "project:created": "Project created",        
     "project:deleted": "Project deleted",   
     "project:list": "Here are your current projects",
     "project:updated": "word count updated to",
+    "project:iscompleted": ":sparkler: **Completed** :sparkler:",
+    "project:uncompleted": "Project restarted",
+    "project:recompleted": "Project re-completed",
+    "project:completed": "completed their project %s!     +%sxp",
     
     "event:permissions": "You do not have the permissions to do that on this server.",
     "event:already": "There is already an event on this server.",
@@ -152,7 +157,8 @@
     "thanks": "Thanks!",        
     "level": "Level",
     "youare": "You are",
-    "wordcount": "Word count"
+    "wordcount": "Word ount",
+    "finalwordcount": "Finished Word Count"
     
     
 }

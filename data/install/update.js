@@ -66,6 +66,12 @@ class Update
                 db.conn.prepare('ALTER TABLE [sprints] ADD COLUMN [end_reference] BIGINT DEFAULT 0').run();
                 this.log(version, 'Added [end_reference] column to [sprints] table');
             }
+            
+            // Completed field on projects table
+            if (this.oldVersion < 201911071){
+                db.conn.prepare('ALTER TABLE [projects] ADD COLUMN [completed] BIGINT DEFAULT 0').run();
+                this.log(version, 'Added [completed] column to [projects] table');
+            }
 
             // End transaction
             db.conn.prepare('COMMIT');

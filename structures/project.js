@@ -42,7 +42,7 @@ class Project
     all(){
         
         var db = new Database();
-        var records = db.conn.prepare('SELECT * FROM [projects] WHERE [guild] = :guild AND [user] = :user ORDER BY name, shortname, words').all({
+        var records = db.conn.prepare('SELECT * FROM [projects] WHERE [guild] = :guild AND [user] = :user ORDER BY completed, name, shortname, words').all({
             guild: this.guildID,
             user: this.userID
         });
@@ -83,6 +83,25 @@ class Project
         
     }
     
+    complete(shortname, completed){
+        
+        // If completed, store a timestamp.
+        if (completed == 1){
+            completed = Math.floor(new Date() / 1000);
+        }
+        
+        var db = new Database();
+        db.conn.prepare('UPDATE [projects] SET [completed] = :completed WHERE [guild] = :guild AND [user] = :user AND [shortname] = :shortname COLLATE NOCASE').run({
+            completed: completed,
+            guild: this.guildID,
+            user: this.userID,
+            shortname: shortname
+        });
+        db.close();
+        
+        return true; 
+        
+    }
     
     update(shortname, words){
         

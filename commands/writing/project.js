@@ -3,6 +3,7 @@ const util = require('util');
 const lib = require('./../../lib.js');
 
 const Project = require('./../../structures/project.js');
+const XP = require('./../../structures/xp.js');
 
 
 module.exports = class ProjectCommand extends Command {
@@ -63,6 +64,14 @@ module.exports = class ProjectCommand extends Command {
             return this.run_update(msg, arg1, arg2);
         }
         
+        else if(action === 'complete' || action === 'finish'){
+            return this.run_complete(msg, arg1, 1);
+        }
+        
+        else if(action === 'uncomplete' || action === 'restart'){
+            return this.run_complete(msg, arg1, -1);
+        }
+        
         else
         {
             return msg.say( lib.get_string(msg.guild.id, 'err:cmdoptions') );
@@ -110,6 +119,46 @@ module.exports = class ProjectCommand extends Command {
         
     }
     
+    run_complete(msg, shortname, completed){
+        
+        let guildID = msg.guild.id;
+        let userID = msg.author.id;
+        
+        // Check they don't already have a project with this shortname
+        var project = new Project(msg, guildID, userID);
+        var record = project.get(shortname);
+        if (!record){
+            return msg.reply(util.format(lib.get_string(msg.guild.id, 'project:noexists'), shortname));
+        }
+        
+        // Mark it as completed/uncompleted
+        project.complete(shortname, completed);
+        
+        // Did we just complete it? And it wasn't already completed previously and restarted.
+        if (completed === 1 && record.completed == 0){
+            
+            var xp = new XP(guildID, userID, msg);
+            
+            // Calculate how much xp they should get for this project. (1 xp per 100 words). Minimum of 10. Maximum of 5000.
+            var experience = Math.ceil(record.words / 100);
+            if (experience < 10){
+                experience = 10;
+            } else if(experience > 5000){
+                experience = 5000;
+            }
+            
+            xp.add(experience);  
+            
+            return msg.reply( util.format(lib.get_string(msg.guild.id, 'project:completed'), record.name, experience) );
+            
+        } else if (completed === 1){
+            return msg.reply(lib.get_string(msg.guild.id, 'project:recompleted') + ': ' + record.name + ' ('+record.shortname+')');
+        } else {        
+            return msg.reply(lib.get_string(msg.guild.id, 'project:uncompleted') + ': ' + record.name + ' ('+record.shortname+')');
+        }
+        
+    }
+    
     run_view(msg){
         
         let guildID = msg.guild.id;
@@ -119,11 +168,27 @@ module.exports = class ProjectCommand extends Command {
         var projects = project.all();
         
         var content = '';
+        
         if (projects){
+            
             projects.forEach( function(el){
+                                
+                // Is it completed?
+                if (el.completed > 0){
+                    content += ':sparkler: '
+                }
+                
                 content += '**'+el.name+'** *('+el.shortname+')*\n';
-                content += lib.get_string(msg.guild.id, 'wordcount') + ': ' + el.words + '\n\n';
+                
+                var str = 'wordcount';
+                if (el.completed > 0){
+                    str = 'finalwordcount';
+                }
+                
+                content += lib.get_string(msg.guild.id, str) + ': ' + el.words + '\n\n';
+                
             } );
+            
         }
         
         return msg.reply(lib.get_string(msg.guild.id, 'project:list') + ':\n\n' + content);
@@ -139,6 +204,11 @@ module.exports = class ProjectCommand extends Command {
         var record = project.get(shortname);
         if (!record){
             return msg.reply(util.format(lib.get_string(msg.guild.id, 'project:noexists'), shortname));
+        }
+        
+        // Is it already completed?
+        if (record.completed == 1){
+            return msg.reply(util.format(lib.get_string(msg.guild.id, 'project:alreadycompleted'), record.name));
         }
         
         // Update it
