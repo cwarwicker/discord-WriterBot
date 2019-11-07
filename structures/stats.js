@@ -58,6 +58,28 @@ class Stats
         
     }
     
+    reset_server(guild){
+        
+        var db = new Database();
+        
+        // Delete stats
+        db.conn.prepare('DELETE FROM [user_stats] WHERE [guild] = :guild COLLATE NOCASE').run({
+            guild: guild
+        });
+        
+        // Delete xp/levels
+        db.conn.prepare('DELETE FROM [user_xp] WHERE [guild] = :guild COLLATE NOCASE').run({
+            guild: guild
+        });
+        
+        // Will leave user_records for now, since people might want to keep a record of their best WPM.
+        
+        db.close();
+        
+        return true; 
+        
+    }
+    
     getTotalActiveSprints(){
         
         var now = Math.floor(new Date() / 1000);

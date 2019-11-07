@@ -7,6 +7,7 @@
     "err:invalidsetting": "Invalid setting",
     "err:replytime": "You did not reply within %s seconds, so this command has been cancelled.",
     "err:what?": "I'm not sure what you mean...",
+    "err:permissions": "You do not have the permissions to do that on this server.",
             
     "flip:heads": "It landed on heads!!",
     "flip:tails": "It landed on tails!!",
@@ -64,6 +65,8 @@
     "reset:wc": "total word count reset to 0",
     "reset:done": "profile reset",
     "reset:invalid": "Invalid reset option",
+    "reset:server": "Whole server stats reset to 0",
+    "reset:server:sure": "Are you sure you want to do this? It will reset the stats, xp and levels for every user on the server. (If you are sure please run `reset server yes`)",
     
     "setting:updated": "updated server setting",
     "mysetting:updated": "updated your setting",

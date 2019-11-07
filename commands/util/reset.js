@@ -13,25 +13,38 @@ module.exports = class ProfileCommand extends Command {
                     memberName: 'reset',
                     description: 'Reset your server statistics',
                     guildOnly: true,
-                    examples: ['`!reset pb`: Resets your wpm personal best on the server', '`!reset wc`: Resets your total word count on the server', '`!reset all`: Resets all your stats which can be reset on the server'],
+                    examples: [
+                        '`!reset pb`: Resets your wpm personal best on the server', 
+                        '`!reset wc`: Resets your total word count on the server', 
+                        '`!reset all`: Resets all your stats which can be reset on the server',
+                        '`!reset server`: Resets the entire server stats and xp/levels`'
+                    ],
                     args: [
                         {
                             key: 'what',
                             prompt: 'What do you want to reset? Words-per-minute PB: `pb`, Total Word Count: `wc`, or your entire profile: `all`',
                             type: 'string'
+                        },
+                        {
+                            key: 'confirm',
+                            prompt: 'Are you sure you want to do that? (yes/no)',
+                            type: 'string',
+                            default: ''
                         }
                     ]
 		});
                                 
 	}
 
-	run(msg, {what}) {
+	run(msg, {what, confirm}) {
             
             var guildID = msg.guild.id;
             var userID = msg.author.id;
             
             var stats = new Stats();
             var record = new Record();
+            
+            confirm = confirm.toLowerCase();
             
             if (what === 'pb'){
                 
@@ -62,6 +75,20 @@ module.exports = class ProfileCommand extends Command {
                 
                 return msg.say(`${msg.author}, ${lib.get_string(msg.guild.id, 'reset:done')}`);
                                 
+            } else if (what === 'server'){
+                
+                // Are you a server mod/admin?
+                if (!msg.member.hasPermission('MANAGE_MESSAGES')){
+                    return msg.say( lib.get_string(msg.guild.id, 'err:permissions') );
+                }
+                
+                if (confirm === 'yes'){
+                    stats.reset_server(guildID);
+                    return msg.say( lib.get_string(msg.guild.id, 'reset:server') );
+                } else {
+                    return msg.say( lib.get_string(msg.guild.id, 'reset:server:sure') );
+                }                
+                
             } else {
                 return msg.say(lib.get_string(msg.guild.id, 'reset:invalid') + ': `pb`, `wc`, `all`');
             }
