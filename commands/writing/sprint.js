@@ -49,6 +49,7 @@ module.exports = class SprintCommand extends Command {
                 '`sprint pb` Displays your personal best wpm from sprints on this server. Run `sprint pb reset` to reset your personal best to 0 on the current server',
                 '`sprint notify` You will be notified when someone starts a new sprint',
                 '`sprint forget` You will no longer be notified when someone starts a new sprint',
+                '`sprint status` Shows you your current word count on the sprint',
                 '`sprint help` Displays a similar help screen to this one, with a few added bits of info'
             ],
             args: [
@@ -184,13 +185,17 @@ module.exports = class SprintCommand extends Command {
             return this.run_set_project(msg, opt2);
         }
         
+        else if(opt1 === 'status'){
+            return this.run_status(msg);
+        }
+        
         else if (opt1 === ''){
             return msg.say('Did you mean `sprint start`?');
         }
         
         else {
             
-            var replyArray = ['Er...what?', 'I\'m too tired.', 'I can\'t do that Dave.', 'That sounds like a cool feature, maybe I should add it?', 'What are you trying to do?'];
+            var replyArray = ['Er...what?', 'I\'m too tired.', 'I can\'t do that Dave.', 'That sounds like a cool feature, maybe I should add it.', 'What are you trying to do?'];
             var rand = Math.round(Math.random() * (replyArray.length - 1));
             return msg.say( replyArray[rand] );
             
@@ -222,6 +227,19 @@ module.exports = class SprintCommand extends Command {
         db.close();
         
         return (result);
+        
+    }
+    
+    get_user_current_wordcount(sprint, usr){
+        
+        var db = new Database();
+        var result = db.conn.prepare('SELECT * FROM [sprint_users] WHERE [sprint] = :s AND [user] = :u').get({ 
+            s: sprint,
+            u: usr
+        });
+        db.close();
+        
+        return (result.current_wc > 0) ? result.current_wc : result.starting_wc;
         
     }
     
@@ -407,6 +425,35 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
         }
                 
     }
+    
+    run_status(msg){
+        
+        var obj = this;
+        
+        let userID = msg.author.id;
+        let guildID = msg.guild.id;
+        
+        var sprint = this.get(guildID);
+        
+        if (sprint){
+            
+            var userSprint = this.is_user_sprinting(sprint.id, userID);
+            
+            if (userSprint){
+                
+                var current = this.get_user_current_wordcount(sprint.id, userID);
+                var diff = current - userSprint.starting_wc;
+                return msg.say(`${msg.author}: Your current word count for this sprint is: ${current}. Total written in this sprint: ${diff}`);
+                
+            } else {
+                return msg.reply('You must have joined the sprint before you can set which project you are writing in');
+            }
+            
+        } else {
+            return msg.say('There is no active sprint at the moment. Maybe you should start one? `sprint start`.');            
+        }
+                    
+    }
         
     run_declare(msg, amount){
         
@@ -423,17 +470,46 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             
             if (userSprint){
 
+                var current = this.get_user_current_wordcount(sprint.id, userID);
+                var calculation = false;
+                
+                // If they put a plus or minus in front of the number, do a calculation for them based on their starting_wc
+                if (amount.charAt(0) === '+' || amount.charAt(0) === '-'){
+                    
+                    calculation = true;
+                                                            
+                    // Subtract
+                    if (amount < 0){
+                        
+                        // Set the amount to the rest of the string
+                        amount = amount.substr(1).trim();
+                                                
+                        // Subtract the amount from the starting wc
+                        amount = current - parseInt(amount);
+                                                
+                    } else {
+                        
+                        // Set the amount to the rest of the string
+                        amount = amount.substr(1).trim();
+                        
+                        // Add the amount to the starting wc
+                        amount = current + parseInt(amount);
+                        
+                    }
+                                                            
+                }
+                
                 // Check amount is valid
                 if (!lib.isNumeric(amount)){
-                    msg.say('Please enter a valid word count, greater than 0.');
+                    msg.say('Please enter a valid word count.');
                     return null;
                 }
 
                 amount = Math.floor(amount);
                 
-                // If the submitted wordcount is less than they started with, show error
-                if (amount < userSprint.starting_wc){
-                    return msg.say(`Word count ${amount} is less than the wordcount you started with (${userSprint.starting_wc})! If you joined with a starting wordcount, make sure to declare your new total wordcount, not just the amount you wrote in this sprint.`);
+                // If the submitted wordcount is less than they started with (and they did not specifcy a negative number), show error
+                if (amount < userSprint.starting_wc && calculation === false){
+                    return msg.say(`Word count ${amount} is less than the wordcount you started with (${userSprint.starting_wc})!\nIf you joined with a starting wordcount, make sure to declare your new total wordcount, not just the amount you wrote in this sprint.\nIf you really ARE trying to lower your word count for this sprint, try doing \`sprint wc -${current - amount}\``);
                 }
 
                 var db = new Database();
@@ -953,7 +1029,7 @@ e.g. if you joined with 1000 words, and during the sprint you wrote another 500 
             var settings = new Setting();
             
             var setting = settings.get(guildID, 'sprint_delay_end');
-            if (setting && lib.isNumeric(setting.value) && setting <= 15){
+            if (setting && lib.isNumeric(setting.value) && setting.value <= 15){
                 var delay = setting.value * 60; // This will be in mins, so convert to seconds
             } else {
                 var delay = this.defaults.post_delay;
