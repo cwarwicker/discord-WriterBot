@@ -52,12 +52,7 @@ module.exports = class EventCommand extends Command {
                 
     }
 
-    async run(msg, {action, arg1}) {
-        
-//        if (testing.event !== undefined && testing.event.indexOf(msg.guild.id) < 0){
-//            return msg.say('Sorry, this feature is still in testing and only available to a few servers at the moment.');
-//        }
-        
+    async run(msg, {action, arg1}) {       
         
         // Add guild to waiting array if not already set
         var key = lib.findObjectArrayKeyByKey(this.waiting, 'guild', msg.guild.id);
