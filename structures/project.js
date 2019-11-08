@@ -132,7 +132,20 @@ class Project
         
     }
     
-    
+    get_server_total(guildID, completed){
+        
+        var db = new Database();
+        var operator = (completed) ? '>' : '<=';
+
+        var record = db.conn.prepare('SELECT COUNT(*) as ttl FROM [projects] WHERE [guild] = :guild AND [completed] '+operator+' 0').get({
+            guild: guildID
+        });
+                
+        db.close();
+        
+        return (record) ? record.ttl : '-';
+        
+    }
     
     
 }

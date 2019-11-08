@@ -157,13 +157,23 @@
     "wrote:addedtoproject": "added %s words to their project **%s** (%s)",
     "wrote:added": "added %s to their total words written **(%s)**",
             
+    "stats:words": "Words Written: ",    
+    "stats:sprints": "Sprints Run: ",
+    "stats:sprintwords": "Words Written in Sprints: ",
+    "stats:dailygoals": "Daily Goals Completed: ",
+    "stats:challenges": "Challenges Completed: ",
+    "stats:projects": "Projects On-the-Go: ",
+    "stats:projectscompleted": "Projects Completed: ",
+    
     "a": "a",        
     "user": "User",            
     "thanks": "Thanks!",        
     "level": "Level",
     "youare": "You are",
     "wordcount": "Word ount",
-    "finalwordcount": "Finished Word Count"
+    "finalwordcount": "Finished Word Count",
+    "serverstats": "Overall Server Statistics",
+    "serverstats:info": "Currently this includes users who have left the guild. In the future this will exclude their results."
     
     
 }

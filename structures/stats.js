@@ -58,6 +58,20 @@ class Stats
         
     }
     
+    get_server_total(guild, type){
+        
+        var db = new Database();
+        var record = db.conn.prepare('SELECT SUM(value) as ttl FROM [user_stats] WHERE [guild] = :guild AND [name] = :name').get({
+            guild: guild,
+            name: type
+        });
+        db.close();
+        
+        return (record) ? record.ttl : '-';
+        
+        
+    }
+    
     reset_server(guild){
         
         var db = new Database();
