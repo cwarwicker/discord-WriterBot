@@ -16,7 +16,7 @@ module.exports = class MySettingCommand extends Command {
                 description: 'Update a user setting',
                 guildOnly: true,
                 examples: [
-                            '`!myset time <hh:mm>`: Set your current time, so we can calculate the difference between your timezone and the bot\'s timezone.',
+                            '`!myset timezone timezone`: Set your current timezone. E.g. `!myset timezone Europe/London`. **Make sure you use a valid TZ Database Name, from this list: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones**',
                           ],
                 args: [
                     {
@@ -27,7 +27,8 @@ module.exports = class MySettingCommand extends Command {
                     {
                         key: 'value',
                         prompt: 'What value are you setting?',
-                        type: 'string'
+                        type: 'string',
+                        default: ''
                     }
                 ]
             });
@@ -52,6 +53,11 @@ module.exports = class MySettingCommand extends Command {
             
             // Time - Calculate and set the actual setting value
             if (setting === 'timezone'){
+                
+                // If they didn't enter a value yet, reply with the wikipedia link for info
+                if (value === ''){
+                    return msg.say( lib.get_string(guildID, 'mysetting:timezone:help') );
+                }
                 
                 var timezone = value;
                 var userTime = moment.tz(timezone);

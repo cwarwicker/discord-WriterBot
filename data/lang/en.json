@@ -71,6 +71,7 @@
     
     "setting:updated": "updated server setting",
     "mysetting:updated": "updated your setting",
+    "mysetting:timezone:help": "Your timezone setting must be a valid TZ Database Name. Please see the following wikipedia page and choose your timezone from the TZ Database Name column: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones (It should look something like `Europe/London`)",
     
     "ask:error": "I'd love to ask you a question about that, but I don't know what it is.",
     
