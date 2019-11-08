@@ -1,0 +1,14 @@
+{
+    "names": {
+    
+        "a": ["Case", "Mystery", "Death", "Crime", "Disappearance", "Sign", "Secret", "Dreams", "Nightmares", "Puzzle", "Day", "Night", "Enemy"],
+        "adj": ["White", "Black", "Blue", "Red", "Crimson", "Translucent", "Forgotten", "Echoing", "Vanishing", "Missing", "Absent", "Quiet", "Silent"],
+        "adjmore": ["Forsaken by", "Corrupted by", "Crushed by", "Blinded by", "Deafened by", "Lost in", "Murdered by", "Abandoned by", "Aching for", "Essence of", "Flaws of", "Shrouded by", "Along came"],
+        "object": ["Token", "Door", "Man", "Woman", "Boy", "Girl", "Lodger", "Cottage", "House", "Attic", "Basement", "Staircase", "Bookcase", "Stranger", "Monkey", "Viper", "Wolf", "Spider", "Map", "Eye", "Plan", "Bone", "Blood", "Coffin", "Grave", "Watch", "Clock", "Lights", "Statue", "Monument", "Temple"],
+        "place": ["House", "Cottage", "Stairs", "Attic", "Basement", "Cellar", "Town", "City", "Woods", "Forest", "Mountains", "River", "Lake", "Creek", "Brook", "Neighbourhood", "Sea", "Home", "Darkness", "Country", "State", "Garden", "Farm", "Swamp", "End"],
+        "conceptual": ["Darkness", "Silence", "Evil", "Love", "Death", "The Void", "Hopelessness", "The End", "The Storm", "Hope", "History", "Light", "Destiny", "Dreams", "My Past", "My Future", "My Sins", "The Fog", "The Night", "Time", "The Stars", "Failure"]
+    },
+    
+    "formats": ["$object of $conceptual", "$a of the $place", "$a of the $adj $object", "The $adj $object", "The $adj $place", "$adjmore $conceptual", "$adjmore a $object"]
+        
+}

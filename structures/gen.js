@@ -122,6 +122,10 @@ class NameGenerator
                     resp += 'Here are your ' + limit + ' sci-fi book titles:\n\n';
                 } else if(type === 'book_hp'){
                     resp += 'Here are your ' + limit + ' Harry Potter book titles:\n\n';
+                } else if(type === 'book_erotica'){
+                    resp += 'Here are your ' + limit + ' erotic book titles:\n\n';
+                } else if(type === 'book_mystery'){
+                    resp += 'Here are your ' + limit + ' mystery book titles:\n\n';
                 } 
                 
                 resp += results.join('\n');
@@ -134,7 +138,7 @@ class NameGenerator
             
         } catch(e){
             
-            var replyArray = ['Er...what?', 'Generate what, now?', 'I can\'t do that', 'That sounds like a cool feature, maybe I should add it?'];
+            var replyArray = ['Er...what?', 'Generate what, now?', 'I can\'t do that', 'That sounds like a cool feature, maybe I should add it.'];
             var rand = Math.round(Math.random() * (replyArray.length - 1));
             msg.say( replyArray[rand] );
             return null;
