@@ -19,13 +19,14 @@ module.exports = class GenerateCommand extends Command {
                 '`generate book_sf` Generates 10 sci-fi book titles', 
                 '`generate book_horror` Generates 10 horror book titles', 
                 '`generate book_rom` Generates 10 romance/erotic book titles', 
+                '`generate book_mystery` Generates 10 mystery book titles', 
                 '`generate book_hp` Generates 10 Harry Potter book titles',
                 '`generate idea` Generates a random story idea'
             ],
             args: [
                 {
                     key: 'type',
-                    prompt: 'What type of name do you want to generate? (`char`, `place`, `land`, `book`, `book_fantasy`, `book_sf`, `book_horror`, `book_rom`, `book_hp`, `idea`)',
+                    prompt: 'What type of name do you want to generate? (`char`, `place`, `land`, `book`, `book_fantasy`, `book_sf`, `book_horror`, `book_rom`, `book_mystery`, `book_hp`, `idea`)',
                     type: 'string'
                 },
                 {
