@@ -5,7 +5,6 @@ const momentTimezone = require('moment-timezone');
 const lib = require('./../../lib.js');
 const Event = require('./../../structures/event.js');
 const UserSetting = require('./../../structures/user_settings.js');
-const testing = require('../../testing.json');
 
 module.exports = class EventCommand extends Command {
     
