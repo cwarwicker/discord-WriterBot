@@ -1,7 +1,7 @@
 {
   "name": "Writer-Bot",
-  "version": "0.8.1",
-  "description": "A discord bot for writing-related servers, with tools such as: sprints, challenges, daily goals, word look-ups, random name generators, writing prompts/ideas, etc...",
+  "version": "0.9",
+  "description": "A discord bot for writing-related servers, with tools such as: sprints, challenges, daily goals, projects, random name generators, writing prompts/ideas, etc...",
   "main": "bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
