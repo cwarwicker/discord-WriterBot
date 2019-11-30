@@ -59,6 +59,7 @@
     "info:uptime": "Uptime",
     "info:generalstats": "General Stats",
     "info:servers": "Servers",
+    "info:members": "Members",
     "info:sprints": "Active Sprints",
     
     "reset:pb": "words-per-minute PB reset to 0",
@@ -170,7 +171,7 @@
     "thanks": "Thanks!",        
     "level": "Level",
     "youare": "You are",
-    "wordcount": "Word ount",
+    "wordcount": "Word Count",
     "finalwordcount": "Finished Word Count",
     "serverstats": "Overall Server Statistics",
     "serverstats:info": "Currently this includes users who have left the guild. In the future this will exclude their results."
