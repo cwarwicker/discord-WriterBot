@@ -30,3 +30,4 @@ data/db/bot.db
 data/db/settings.db
 todo
 settings.json
+data/logs
